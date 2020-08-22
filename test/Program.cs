@@ -6,13 +6,10 @@ namespace JsonSGTest
 {
     class Program
     {
+        static JsonSGConvert _convert = new JsonSGConvert();
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            var convert = new JsonSGConvert();
-
-            convert.PrintClassInfo();
-
             var testClass = new JsongTests3()
             {
                 FirstName = "Daniel",
@@ -20,19 +17,28 @@ namespace JsonSGTest
                 Age = 38
             };
 
-            string expectedJson = "{\"FirstName\":\"Daniel\",\"LastName\":\"Hughes\",\"Age\":38}";
+            Console.WriteLine(_convert.ToJson(testClass));
 
-            Console.WriteLine(convert.ToJson(testClass));
-
-            Test("ToJsonFormat", ToJsonFormat, testClass, expectedJson);
-            Test("ToJsonStringConcat", ToJsonStringConcat, testClass, expectedJson);
-            Test("ToJsonStringFormat", ToJsonStringFormat, testClass, expectedJson);
-            Test("ToJsonAppend", ToJsonAppend, testClass, expectedJson);
-            Test("Jsong", test => convert.ToJson(test), testClass, expectedJson);
+            Test("ToJsonFormat", ToJsonFormat, testClass, ExpectedJson);
+            Test("ToJsonStringConcat", ToJsonStringConcat, testClass, ExpectedJson);
+            Test("ToJsonStringFormat", ToJsonStringFormat, testClass, ExpectedJson);
+            Test("ToJsonAppend", ToJsonAppend, testClass, ExpectedJson);
+            Test("Jsong", ToJsonSG, testClass, ExpectedJson);
+            //Test("Utf8Json", ToUtf8Json, testClass, ExpectedJson);
         }
 
-        [ThreadStatic]
-        static StringBuilder Builder;
+        const string ExpectedJson = "{\"FirstName\":\"Daniel\",\"LastName\":\"Hughes\",\"Age\":38}";
+
+        // static string ToUtf8Json(JsongTests3 testClass)
+        // {
+        //     var bytes = Utf8Json.JsonSerializer.Serialize(testClass);
+        //     return ExpectedJson;//Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+        // }
+
+        static string ToJsonSG(JsongTests3 testClass)
+        {
+            return _convert.ToJson(testClass);//Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+        }
 
         static string ToJsonFormat(JsongTests3 testClass)
         {
@@ -48,6 +54,9 @@ namespace JsonSGTest
         {
             return String.Concat("{\"FirstName\":\"", testClass.FirstName, "\",\"LastName\":\"", testClass.LastName, "\",\"Age\":", testClass.Age, "}");
         }
+
+        [ThreadStatic]
+        static StringBuilder Builder;
 
         static string ToJsonAppend(JsongTests3 testClass)
         {

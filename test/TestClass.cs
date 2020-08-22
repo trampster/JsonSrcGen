@@ -11,7 +11,7 @@ namespace JsonSGTest
             set;
         }
 
-        public string LastName 
+        public string LastName
         { 
             get;
             set;

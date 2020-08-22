@@ -8,24 +8,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace JsonSG
+namespace JsonSG.Generator
 {
 
 
     [Generator]
     public class JsonGenerator : ISourceGenerator
     {
-        const string JsonAttributeText = @"using System;
-
-namespace JsonSG
-{
-    public class JsonAttribute : Attribute
-    {
-        
-    }
-}
-";
-
         const string BuilderText = @"
             var builder = Builder;
             if(builder == null)
@@ -37,20 +26,12 @@ namespace JsonSG
 
         public void Execute(SourceGeneratorContext context)
         {
-            context.AddSource("JsonAttribute", SourceText.From(JsonAttributeText, Encoding.UTF8));
+            File.AppendAllText("execute.log", "Execute Started");
 
             // retreive the populated receiver 
             if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
                 return;
         
-            // we're going to create a new compilation that contains the attribute.
-            // TODO: we should allow source generators to provide source during initialize, so that this step isn't required.
-            CSharpParseOptions options = (context.Compilation as CSharpCompilation).SyntaxTrees[0].Options as CSharpParseOptions;
-            Compilation compilation = context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(SourceText.From(JsonAttributeText, Encoding.UTF8), options));
-
-            // get the newly bound attribute, and INotifyPropertyChanged
-            INamedTypeSymbol attributeSymbol = compilation.GetTypeByMetadataName("JsonSG.JsonAttribute");
-
             StringBuilder classBuilder = new StringBuilder();
 
             classBuilder.Append(@"
@@ -65,22 +46,23 @@ namespace JsonSG
         StringBuilder Builder;
 ");
 
-            var printMethodBuilder = new StringBuilder();
-            printMethodBuilder.Append(@"
-                public void PrintClassInfo()
-                {");
+
+            Compilation compilation = context.Compilation;
 
             foreach (var candidateClass in receiver.CandidateClases)
             {
                 SemanticModel model = compilation.GetSemanticModel(candidateClass.SyntaxTree);
                 var classSymbol = model.GetDeclaredSymbol(candidateClass);
 
-                if (classSymbol.GetAttributes().Any(ad => ad.AttributeClass.Equals(attributeSymbol, SymbolEqualityComparer.Default)))
+                foreach(var attribute in classSymbol.GetAttributes())
                 {
-                    printMethodBuilder.Append($"System.Console.WriteLine(\" Found Class {classSymbol.Name}\");");
+                    File.AppendAllText("execute.log", $"Attribute Name:{attribute.AttributeClass.Name} namespace:{attribute.AttributeClass.ContainingNamespace.Name}");
+                }
 
-                    classBuilder.AppendLine($"public string ToJson({classSymbol.ContainingNamespace}.{classSymbol.Name} value)");
-                    classBuilder.AppendLine( "{");
+                if (classSymbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "JsonAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSG"))
+                {
+                    AppendLine(classBuilder, 2, $"public string ToJson({classSymbol.ContainingNamespace}.{classSymbol.Name} value)");
+                    AppendLine(classBuilder, 2, "{");
                     classBuilder.AppendLine(BuilderText);
 
                     var appendBuilder = new StringBuilder();
@@ -90,47 +72,52 @@ namespace JsonSG
                     foreach(var member in classSymbol.GetMembers().Where(member => member.Kind == SymbolKind.Property))
                     {
                         var property = member as IPropertySymbol;
-                        printMethodBuilder.Append($"System.Console.WriteLine(\" Member {member.Name} Type {property.Type.Name}\");");
                         if(!isFirst)
                         {
                             appendBuilder.Append(",");
                         }
                         appendBuilder.Append($"\\\"{member.Name}\\\":");
 
-                        if(GetType(member, printMethodBuilder) == "String")
+                        if(GetType(member) == "String")
                         {
                             appendBuilder.Append($"\\\"");
                         }
                         MakeAppend(classBuilder, appendBuilder);
 
-
-                        classBuilder.AppendLine($"    builder.Append(value.{member.Name});");
-                        if(GetType(member, printMethodBuilder) == "String")
+                        AppendLine(classBuilder, 3, $"builder.Append(value.{member.Name});");
+                        if(GetType(member) == "String")
                         {
                             appendBuilder.Append($"\\\"");
                         }
 
                         if(isFirst) isFirst = false;
                     }
-                    appendBuilder.Append("}");
+                    appendBuilder.Append("}"); 
                     MakeAppend(classBuilder, appendBuilder);
-                    classBuilder.AppendLine( "    return builder.ToString();");
-                    classBuilder.AppendLine( "}");
+                    AppendLine(classBuilder, 3, "return builder.ToString();");
+                    AppendLine(classBuilder, 2, "}");
                 }
             }
 
-            printMethodBuilder.Append(@"}");
 
-            classBuilder.Append(printMethodBuilder.ToString());
-
-            classBuilder.Append(@"}}");
+            AppendLine(classBuilder, 1, "}");
+            AppendLine(classBuilder, 0, "}");
 
             File.WriteAllText("Generated.cs", classBuilder.ToString());
 
             context.AddSource("JsonSGConvert", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
         }
 
-        string GetType(ISymbol symbol, StringBuilder logger)
+        void AppendLine(StringBuilder builder, int indentLevel, string text)
+        {
+            for(int index = 0; index < indentLevel; index++)
+            {
+                builder.Append("    ");
+            }
+            builder.AppendLine(text);
+        }
+
+        string GetType(ISymbol symbol)
         {
             var property = symbol as IPropertySymbol;
             if(property != null)
@@ -141,9 +128,9 @@ namespace JsonSG
             throw new Exception($"unsupported member type {symbol}");
         }
 
-        void MakeAppend(StringBuilder classBuidler, StringBuilder appendContent)
+        void MakeAppend(StringBuilder classBuilder, StringBuilder appendContent)
         {
-            classBuidler.Append($"    builder.Append(\"{appendContent.ToString()}\");");
+            AppendLine(classBuilder, 3, $"builder.Append(\"{appendContent.ToString()}\");");
             appendContent.Clear();
         }
 

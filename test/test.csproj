@@ -10,9 +10,13 @@
     <ItemGroup>
         <!-- Note that this is not a "normal" ProjectReference.
             It needs the additional 'OutputItemType' and 'ReferenceOutputAssmbly' attributes. -->
-        <ProjectReference Include="../src/JsonSG.csproj" 
+        <ProjectReference Include="../JsonSG.Generator/JsonSG.Generator.csproj" 
                         OutputItemType="Analyzer"
                         ReferenceOutputAssembly="false" />
+
+        <ProjectReference Include="../JsonSG/JsonSG.csproj" />
+
+        <!-- <PackageReference Include="Utf8Json" Version="1.3.7" />  -->
     </ItemGroup>
 
 </Project>
