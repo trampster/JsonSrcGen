@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
+    </PropertyGroup>
+
+    <!-- Add this as a new ItemGroup, replacing paths and names appropriately -->
+    <ItemGroup>
+        <!-- Note that this is not a "normal" ProjectReference.
+            It needs the additional 'OutputItemType' and 'ReferenceOutputAssmbly' attributes. -->
+        <ProjectReference Include="../src/JsonSG.csproj" 
+                        OutputItemType="Analyzer"
+                        ReferenceOutputAssembly="false" />
+    </ItemGroup>
+
+</Project>
