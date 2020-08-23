@@ -10,8 +10,6 @@ using System.Text;
 
 namespace JsonSG.Generator
 {
-
-
     [Generator]
     public class JsonGenerator : ISourceGenerator
     {
@@ -49,62 +47,83 @@ namespace JsonSG
 
             Compilation compilation = context.Compilation;
 
-            foreach (var candidateClass in receiver.CandidateClases)
+            var classes = GetJsonClassInfo(receiver.CandidateClases, compilation);
+
+            foreach (var jsonClass in classes)
             {
-                SemanticModel model = compilation.GetSemanticModel(candidateClass.SyntaxTree);
-                var classSymbol = model.GetDeclaredSymbol(candidateClass);
+                AppendLine(classBuilder, 2, $"public string ToJson({jsonClass.Namespace}.{jsonClass.Name} value)");
+                AppendLine(classBuilder, 2, "{");
+                classBuilder.AppendLine(BuilderText);
 
-                foreach(var attribute in classSymbol.GetAttributes())
+                var appendBuilder = new StringBuilder();
+                appendBuilder.Append("{");
+
+                bool isFirst = true;
+                foreach(var property in jsonClass.Properties)
                 {
-                    File.AppendAllText("execute.log", $"Attribute Name:{attribute.AttributeClass.Name} namespace:{attribute.AttributeClass.ContainingNamespace.Name}");
-                }
-
-                if (classSymbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "JsonAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSG"))
-                {
-                    AppendLine(classBuilder, 2, $"public string ToJson({classSymbol.ContainingNamespace}.{classSymbol.Name} value)");
-                    AppendLine(classBuilder, 2, "{");
-                    classBuilder.AppendLine(BuilderText);
-
-                    var appendBuilder = new StringBuilder();
-                    appendBuilder.Append("{");
-
-                    bool isFirst = true;
-                    foreach(var member in classSymbol.GetMembers().Where(member => member.Kind == SymbolKind.Property))
+                    if(!isFirst)
                     {
-                        var property = member as IPropertySymbol;
-                        if(!isFirst)
-                        {
-                            appendBuilder.Append(",");
-                        }
-                        appendBuilder.Append($"\\\"{member.Name}\\\":");
-
-                        if(GetType(member) == "String")
-                        {
-                            appendBuilder.Append($"\\\"");
-                        }
-                        MakeAppend(classBuilder, appendBuilder);
-
-                        AppendLine(classBuilder, 3, $"builder.Append(value.{member.Name});");
-                        if(GetType(member) == "String")
-                        {
-                            appendBuilder.Append($"\\\"");
-                        }
-
-                        if(isFirst) isFirst = false;
+                        appendBuilder.Append(",");
                     }
-                    appendBuilder.Append("}"); 
+                    appendBuilder.Append($"\\\"{property.Name}\\\":"); 
+
+                    if(property.Type == "String")
+                    {
+                        appendBuilder.Append($"\\\"");
+                    }
                     MakeAppend(classBuilder, appendBuilder);
-                    AppendLine(classBuilder, 3, "return builder.ToString();");
-                    AppendLine(classBuilder, 2, "}");
+
+                    AppendLine(classBuilder, 3, $"builder.Append(value.{property.Name});");
+                    if(property.Type == "String")
+                    {
+                        appendBuilder.Append($"\\\"");
+                    }
+
+                    if(isFirst) isFirst = false;
                 }
+                appendBuilder.Append("}"); 
+                MakeAppend(classBuilder, appendBuilder);
+                AppendLine(classBuilder, 3, "return builder.ToString();"); 
+                AppendLine(classBuilder, 2, "}");
             }
 
             AppendLine(classBuilder, 1, "}");
             AppendLine(classBuilder, 0, "}");
 
-            //File.WriteAllText("Generated.cs", classBuilder.ToString()); 
+            File.WriteAllText("Generated.cs", classBuilder.ToString()); 
 
             context.AddSource("JsonSGConvert", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
+        }
+
+        IReadOnlyCollection<JsonClass> GetJsonClassInfo(List<ClassDeclarationSyntax> classDeclarations, Compilation compilation)
+        {
+            var jsonClasses = new List<JsonClass>();
+
+            foreach (var candidateClass in classDeclarations)
+            {
+
+                SemanticModel model = compilation.GetSemanticModel(candidateClass.SyntaxTree);
+                var classSymbol = model.GetDeclaredSymbol(candidateClass);
+
+                if (classSymbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "JsonAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSG"))
+                {
+                    string jsonClassName = classSymbol.Name;
+                    string jsonClassNamespace = classSymbol.ContainingNamespace.ToString();
+
+                    var jsonProperties = new List<JsonProperty>();
+
+                    foreach(var member in classSymbol.GetMembers().Where(member => member.Kind == SymbolKind.Property))
+                    {
+                        var property = member as IPropertySymbol;
+                        string jsonPropertyName = member.Name;
+                        string jsonPropertyType = GetType(member);
+                        jsonProperties.Add(new JsonProperty(jsonPropertyType, jsonPropertyName));
+                    }
+
+                    jsonClasses.Add(new JsonClass(jsonClassName, jsonClassNamespace, jsonProperties));
+                }
+            }
+            return jsonClasses; 
         }
 
         void AppendLine(StringBuilder builder, int indentLevel, string text)
@@ -152,11 +171,14 @@ namespace JsonSG
         /// </summary>
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
+            var classes = new List<JsonClass>();
             // any method with at least one attribute is a candidate for property generation
-            if (syntaxNode is ClassDeclarationSyntax methodDeclarationSyntax
-                && methodDeclarationSyntax.AttributeLists.Count > 0)
+            if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
+                && classDeclarationSyntax.AttributeLists.Count > 0)
             {
-                CandidateClases.Add(methodDeclarationSyntax);
+                var properties = new List<JsonProperty>();
+
+                CandidateClases.Add(classDeclarationSyntax);
             }
         }
     }
