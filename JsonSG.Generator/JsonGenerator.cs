@@ -13,15 +13,6 @@ namespace JsonSG.Generator
     [Generator]
     public class JsonGenerator : ISourceGenerator
     {
-        const string BuilderText = @"
-            var builder = Builder;
-            if(builder == null)
-            {
-                builder = new StringBuilder();
-                Builder = builder;
-            }
-            builder.Clear();";
-
         public void Execute(SourceGeneratorContext context)
         {
             File.AppendAllText("execute.log", "Execute Started");
@@ -30,7 +21,7 @@ namespace JsonSG.Generator
             if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
                 return;
         
-            StringBuilder classBuilder = new StringBuilder();
+            var classBuilder = new CodeBuilder();
 
             classBuilder.Append(@"
 using System;
@@ -49,46 +40,15 @@ namespace JsonSG
 
             var classes = GetJsonClassInfo(receiver.CandidateClases, compilation);
 
+            var toJsonGenerator = new ToJsonGenerator();
+
             foreach (var jsonClass in classes)
             {
-                AppendLine(classBuilder, 2, $"public string ToJson({jsonClass.Namespace}.{jsonClass.Name} value)");
-                AppendLine(classBuilder, 2, "{");
-                classBuilder.AppendLine(BuilderText);
-
-                var appendBuilder = new StringBuilder();
-                appendBuilder.Append("{");
-
-                bool isFirst = true;
-                foreach(var property in jsonClass.Properties)
-                {
-                    if(!isFirst)
-                    {
-                        appendBuilder.Append(",");
-                    }
-                    appendBuilder.Append($"\\\"{property.Name}\\\":"); 
-
-                    if(property.Type == "String")
-                    {
-                        appendBuilder.Append($"\\\"");
-                    }
-                    MakeAppend(classBuilder, appendBuilder);
-
-                    AppendLine(classBuilder, 3, $"builder.Append(value.{property.Name});");
-                    if(property.Type == "String")
-                    {
-                        appendBuilder.Append($"\\\"");
-                    }
-
-                    if(isFirst) isFirst = false;
-                }
-                appendBuilder.Append("}"); 
-                MakeAppend(classBuilder, appendBuilder);
-                AppendLine(classBuilder, 3, "return builder.ToString();"); 
-                AppendLine(classBuilder, 2, "}");
+                toJsonGenerator.Generate(jsonClass, classBuilder);
             }
 
-            AppendLine(classBuilder, 1, "}");
-            AppendLine(classBuilder, 0, "}");
+            classBuilder.AppendLine(1, "}");
+            classBuilder.AppendLine(0, "}");
 
             File.WriteAllText("Generated.cs", classBuilder.ToString()); 
 
@@ -126,15 +86,6 @@ namespace JsonSG
             return jsonClasses; 
         }
 
-        void AppendLine(StringBuilder builder, int indentLevel, string text)
-        {
-            for(int index = 0; index < indentLevel; index++)
-            {
-                builder.Append("    ");
-            }
-            builder.AppendLine(text);
-        }
-
         string GetType(ISymbol symbol)
         {
             var property = symbol as IPropertySymbol;
@@ -144,12 +95,6 @@ namespace JsonSG
             }
 
             throw new Exception($"unsupported member type {symbol}");
-        }
-
-        void MakeAppend(StringBuilder classBuilder, StringBuilder appendContent)
-        {
-            AppendLine(classBuilder, 3, $"builder.Append(\"{appendContent.ToString()}\");");
-            appendContent.Clear();
         }
 
         public void Initialize(InitializationContext context)
