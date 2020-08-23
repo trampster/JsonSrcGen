@@ -99,11 +99,10 @@ namespace JsonSG
                 }
             }
 
-
             AppendLine(classBuilder, 1, "}");
             AppendLine(classBuilder, 0, "}");
 
-            File.WriteAllText("Generated.cs", classBuilder.ToString());
+            //File.WriteAllText("Generated.cs", classBuilder.ToString()); 
 
             context.AddSource("JsonSGConvert", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
         }
