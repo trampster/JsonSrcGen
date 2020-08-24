@@ -11,13 +11,7 @@ namespace JsonSGTest
             set;
         }
 
-        public string LastName
-        { 
-            get;
-            set;
-        }
-
-        public int Age
+        public string LastName 
         {
             get;
             set;

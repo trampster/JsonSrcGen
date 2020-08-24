@@ -41,14 +41,16 @@ namespace JsonSG
             var classes = GetJsonClassInfo(receiver.CandidateClases, compilation);
 
             var toJsonGenerator = new ToJsonGenerator();
+            var fromJsonGenerator = new FromJsonGenerator();
 
             foreach (var jsonClass in classes)
             {
                 toJsonGenerator.Generate(jsonClass, classBuilder);
+                fromJsonGenerator.Generate(jsonClass, classBuilder);
             }
 
             classBuilder.AppendLine(1, "}");
-            classBuilder.AppendLine(0, "}");
+            classBuilder.AppendLine(0, "}"); 
 
             File.WriteAllText("Generated.cs", classBuilder.ToString()); 
 
