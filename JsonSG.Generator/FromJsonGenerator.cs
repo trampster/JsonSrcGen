@@ -22,10 +22,7 @@ namespace JsonSG.Generator
             classBuilder.AppendLine(4, "var propertyName = json.ReadTo('\\\"');");
             classBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
             classBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(':');");
-            classBuilder.AppendLine(4, "json = json.SkipWhitespaceTo('\\\"');");
-            classBuilder.AppendLine(4, "var propertyValue = json.ReadTo('\\\"');");
-            classBuilder.AppendLine(4, "json = json.Slice(propertyValue.Length + 1);");
-            classBuilder.AppendLine(0, "");
+            
             
             classBuilder.AppendLine(4, "switch(propertyName[0])");
             classBuilder.AppendLine(4, "{");
@@ -35,9 +32,18 @@ namespace JsonSG.Generator
                 classBuilder.AppendLine(5, $"case '{property.Name[0]}':");
                 classBuilder.AppendLine(6, $"if(!propertyName.EqualsString(\"{property.Name}\"))");
                 classBuilder.AppendLine(6, "{");
-                classBuilder.AppendLine(7, "break;");
+                classBuilder.AppendLine(7, "break;"); //todo: need to read to the next property (could be an object list so need to count '{' and '}')
                 classBuilder.AppendLine(6, "}");
-                classBuilder.AppendLine(6, $"value.{property.Name} = new String(propertyValue);");
+                if(property.Type == "Int32")
+                {
+                    classBuilder.AppendLine(6, $"json = json.ReadInt(out int property{property.Name}Value);");
+
+                }
+                else if(property.Type == "String")
+                {
+                    classBuilder.AppendLine(6, $"json = json.ReadString(out string property{property.Name}Value);");
+                }
+                classBuilder.AppendLine(6, $"value.{property.Name} = property{property.Name}Value;");
                 classBuilder.AppendLine(6, "break;");
             }
 

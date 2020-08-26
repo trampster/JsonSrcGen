@@ -4,6 +4,63 @@ namespace JsonSG
 {
     public static class JsonSpanExtensions
     {
+        public static ReadOnlySpan<char> ReadInt(this ReadOnlySpan<char> json, out int value)
+        {
+            json = json.SkipWhitespace();
+            int afterIntIndex = 0;
+            for(int index =0; index < json.Length; index++)
+            {
+                var character = json[index];
+                switch(character)
+                {
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                    case '-':
+                        continue;
+                    default:
+                        afterIntIndex = index;
+                        break;
+                }
+                break;
+            }
+            
+            var intSpan = json.Slice(0, afterIntIndex);
+            Console.WriteLine($"IntSpan {new string(intSpan)}");
+            value = int.Parse(json.Slice(0, afterIntIndex));
+
+            return json.Slice(afterIntIndex);
+        }
+
+        public static ReadOnlySpan<char> ReadString(this ReadOnlySpan<char> json, out string value)
+        {
+            json = json.SkipWhitespaceTo('\"');
+            var propertyValue = json.ReadTo('\"');
+            value = new string(propertyValue);
+            return json.Slice(value.Length + 1);
+        }
+
+        public static ReadOnlySpan<char> SkipWhitespace(this ReadOnlySpan<char> json)
+        {
+            for(int index = 0; index < json.Length; index++)
+            {
+                var value = json[index];
+                if(value == ' ' && value == '\t')
+                {
+                    continue;
+                }
+                return json.Slice(index);
+            }
+            throw new InvalidJsonException($"Unexpected end of json while skipping whitespace");
+        }
+
         public static ReadOnlySpan<char> SkipWhitespaceTo(this ReadOnlySpan<char> json, char to)
         {
             for(int index = 0; index < json.Length; index++)

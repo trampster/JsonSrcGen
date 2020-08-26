@@ -15,7 +15,28 @@ namespace JsonSG.Generator
     {
         public void Execute(SourceGeneratorContext context)
         {
-            File.AppendAllText("execute.log", "Execute Started");
+            try
+            {
+                Generate(context);
+            }
+            catch (Exception e)
+            {
+                //This is temporary till https://github.com/dotnet/roslyn/issues/46084 is fixed
+                context.ReportDiagnostic(Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "SI0000",
+                        "An exception was thrown by the JsonSG generator",
+                        "An exception was thrown by the JsonSG generator: '{0}'",
+                        "JsonSG",
+                        DiagnosticSeverity.Error,
+                        isEnabledByDefault: true), 
+                    Location.None,
+                    e.ToString() + e.StackTrace));
+            }
+        }
+
+        public void Generate(SourceGeneratorContext context)
+        {
 
             // retreive the populated receiver 
             if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
