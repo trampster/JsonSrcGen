@@ -8,6 +8,59 @@ namespace JsonSG
     {
         [ThreadStatic]
         StringBuilder Builder;
+        public string ToJson(UnitTests.JsonBooleanClass value)
+        {
+
+            var builder = Builder;
+            if(builder == null)
+            {
+                builder = new StringBuilder();
+                Builder = builder;
+            }
+            builder.Clear();
+            builder.Append("{\"IsFalse\":");
+            builder.Append(value.IsFalse ? "true" : "false");
+            builder.Append(",\"IsTrue\":");
+            builder.Append(value.IsTrue ? "true" : "false");
+            builder.Append("}");
+            return builder.ToString();
+        }
+        public void FromJson(UnitTests.JsonBooleanClass value, string jsonString)
+        {
+            var json = jsonString.AsSpan();
+            json = json.SkipWhitespaceTo('{');
+            while(true)
+            {
+                json = json.SkipWhitespaceTo('\"');
+                var propertyName = json.ReadTo('\"');
+                json = json.Slice(propertyName.Length + 1);
+                json = json.SkipWhitespaceTo(':');
+                switch(propertyName.Length % 2)
+                {
+                    case 0:
+                        if(!propertyName.EqualsString("IsTrue"))
+                        {
+                            break;
+                        }
+                        json = json.ReadBool(out bool propertyIsTrueValue);
+                        value.IsTrue = propertyIsTrueValue;
+                        break;
+                    case 1:
+                        if(!propertyName.EqualsString("IsFalse"))
+                        {
+                            break;
+                        }
+                        json = json.ReadBool(out bool propertyIsFalseValue);
+                        value.IsFalse = propertyIsFalseValue;
+                        break;
+                }
+                json = json.SkipWhitespaceTo(',', '}', out char found);
+                if(found == '}')
+                {
+                    return;
+                }
+            }
+        }
         public string ToJson(UnitTests.CollisionJsonClass value)
         {
 

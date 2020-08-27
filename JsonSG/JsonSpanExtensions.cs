@@ -4,6 +4,18 @@ namespace JsonSG
 {
     public static class JsonSpanExtensions
     {
+        public static ReadOnlySpan<char> ReadBool(this ReadOnlySpan<char> json, out bool value)
+        {
+            json = json.SkipWhitespace();
+            if(json[0] == 't')
+            {
+                value = true;
+                return json.Slice(4);
+            }
+            value = false;
+            return json.Slice(5);
+        }
+
         public static ReadOnlySpan<char> ReadInt(this ReadOnlySpan<char> json, out int value)
         {
             json = json.SkipWhitespace();

@@ -1,5 +1,6 @@
 using System.Text;
 using System.Linq;
+using System;
 
 namespace JsonSG.Generator
 {
@@ -30,18 +31,28 @@ namespace JsonSG.Generator
                 {
                     appendBuilder.Append(",");
                 }
+
                 appendBuilder.Append($"\\\"{property.Name}\\\":"); 
 
-                if(property.Type == "String")
+                switch(property.Type)
                 {
-                    appendBuilder.Append($"\\\"");
-                }
-                MakeAppend(classBuilder, appendBuilder);
+                    case "String":
+                        appendBuilder.Append($"\\\"");
+                        MakeAppend(classBuilder, appendBuilder);
+                        classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
+                        appendBuilder.Append($"\\\"");
+                        break;
+                    case "Int32":
+                        MakeAppend(classBuilder, appendBuilder);
+                        classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
+                        break;
+                    case "Boolean":
+                        MakeAppend(classBuilder, appendBuilder);
+                        classBuilder.AppendLine(3, $"builder.Append(value.{property.Name} ? \"true\" : \"false\");");
+                        break;
+                    default:
+                        throw new Exception($"Unsupported type {property.Type}");
 
-                classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
-                if(property.Type == "String")
-                {
-                    appendBuilder.Append($"\\\"");
                 }
 
                 if(isFirst) isFirst = false;

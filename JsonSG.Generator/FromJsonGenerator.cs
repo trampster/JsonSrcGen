@@ -84,14 +84,19 @@ namespace JsonSG.Generator
                 classBuilder.AppendLine(indentLevel+2, "{");
                 classBuilder.AppendLine(indentLevel+3, "break;"); //todo: need to read to the next property (could be an object list so need to count '{' and '}')
                 classBuilder.AppendLine(indentLevel+2, "}");
-                if(property.Type == "Int32")
+                switch(property.Type)
                 {
-                    classBuilder.AppendLine(indentLevel+2, $"json = json.ReadInt(out int property{property.Name}Value);");
-
-                }
-                else if(property.Type == "String") 
-                {
-                    classBuilder.AppendLine(indentLevel+2, $"json = json.ReadString(out string property{property.Name}Value);");
+                    case "Int32":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadInt(out int property{property.Name}Value);");
+                        break;
+                    case "String":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadString(out string property{property.Name}Value);");
+                        break;
+                    case "Boolean":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool property{property.Name}Value);");
+                        break;
+                    default:
+                        throw new Exception($"Unsupported type {property.Type}");
                 }
                 classBuilder.AppendLine(indentLevel+2, $"value.{property.Name} = property{property.Name}Value;");
                 classBuilder.AppendLine(indentLevel+2, "break;");
