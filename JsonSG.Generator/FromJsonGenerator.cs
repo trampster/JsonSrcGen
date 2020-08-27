@@ -1,5 +1,8 @@
 using System.Text;
 using System;
+using System.Linq;
+using JsonSG.Generator.PropertyHashing;
+using System.Collections.Generic;
 
 namespace JsonSG.Generator
 {
@@ -23,43 +26,101 @@ namespace JsonSG.Generator
             classBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
             classBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(':');");
             
-            
-            classBuilder.AppendLine(4, "switch(propertyName[0])");
-            classBuilder.AppendLine(4, "{");
-
-            foreach(var property in jsonClass.Properties)
-            {
-                classBuilder.AppendLine(5, $"case '{property.Name[0]}':");
-                classBuilder.AppendLine(6, $"if(!propertyName.EqualsString(\"{property.Name}\"))");
-                classBuilder.AppendLine(6, "{");
-                classBuilder.AppendLine(7, "break;"); //todo: need to read to the next property (could be an object list so need to count '{' and '}')
-                classBuilder.AppendLine(6, "}");
-                if(property.Type == "Int32")
-                {
-                    classBuilder.AppendLine(6, $"json = json.ReadInt(out int property{property.Name}Value);");
-
-                }
-                else if(property.Type == "String")
-                {
-                    classBuilder.AppendLine(6, $"json = json.ReadString(out string property{property.Name}Value);");
-                }
-                classBuilder.AppendLine(6, $"value.{property.Name} = property{property.Name}Value;");
-                classBuilder.AppendLine(6, "break;");
-            }
-
-            classBuilder.AppendLine(4, "}"); // end of switch
+            GenerateProperties(jsonClass.Properties, 4, classBuilder);
 
             classBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(',', '}', out char found);");
             classBuilder.AppendLine(4, "if(found == '}')");
             classBuilder.AppendLine(4, "{");
             classBuilder.AppendLine(5, "return;");
             classBuilder.AppendLine(4, "}");
-            
-
-
 
             classBuilder.AppendLine(3, "}");
             classBuilder.AppendLine(2, "}");
+        }
+
+        public void GenerateProperties(IReadOnlyCollection<JsonProperty> properties, int indentLevel, CodeBuilder classBuilder)
+        {
+            var propertyHashFactory = new PropertyHashFactory();
+            var propertyHash = propertyHashFactory.FindBestHash(properties.Select(p => p.Name).ToArray());
+
+            var hashesQuery =
+                from property in properties
+                let hash = propertyHash.Hash(property.Name)
+                group property by hash into hashGroup
+                orderby hashGroup.Key
+                select hashGroup;
+
+            var hashes = hashesQuery.ToArray();
+            var switchGroups = FindSwitchGroups(hashes);
+
+            foreach(var switchGroup in switchGroups)
+            {
+                // if(switchGroup.Count <= 2)
+                // {
+                //     GenerateIfGroup(switchGroup, propertyHandlers, unknownPropertyLabel, loopCheckLabel, hashLocal);
+                //     continue;
+                // }
+                GenerateSwitchGroup(switchGroup, classBuilder, indentLevel, propertyHash);
+            }
+        }
+
+        void GenerateSwitchGroup(SwitchGroup switchGroup, CodeBuilder classBuilder, int indentLevel, PropertyHash propertyHash)
+        {
+            classBuilder.AppendLine(indentLevel, $"switch({propertyHash.GenerateHashCode()})");
+            classBuilder.AppendLine(indentLevel, "{");
+            
+            foreach(var hashGroup in switchGroup)
+            {
+                classBuilder.AppendLine(indentLevel+1, $"case {hashGroup.Key}:");
+                var subProperties = hashGroup.ToArray();
+                if(subProperties.Length != 1)
+                {
+                    GenerateProperties(subProperties, indentLevel+2, classBuilder);
+                    classBuilder.AppendLine(indentLevel+2, "break;");
+                    continue;
+                }
+                var property = subProperties[0];
+                classBuilder.AppendLine(indentLevel+2, $"if(!propertyName.EqualsString(\"{property.Name}\"))");
+                classBuilder.AppendLine(indentLevel+2, "{");
+                classBuilder.AppendLine(indentLevel+3, "break;"); //todo: need to read to the next property (could be an object list so need to count '{' and '}')
+                classBuilder.AppendLine(indentLevel+2, "}");
+                if(property.Type == "Int32")
+                {
+                    classBuilder.AppendLine(indentLevel+2, $"json = json.ReadInt(out int property{property.Name}Value);");
+
+                }
+                else if(property.Type == "String") 
+                {
+                    classBuilder.AppendLine(indentLevel+2, $"json = json.ReadString(out string property{property.Name}Value);");
+                }
+                classBuilder.AppendLine(indentLevel+2, $"value.{property.Name} = property{property.Name}Value;");
+                classBuilder.AppendLine(indentLevel+2, "break;");
+            }
+
+            classBuilder.AppendLine(indentLevel, "}"); // end of switch
+        }
+
+        class SwitchGroup : List<IGrouping<int, JsonProperty>>{}
+
+        IEnumerable<SwitchGroup> FindSwitchGroups(IGrouping<int, JsonProperty>[] hashes)
+        {
+            int last = 0;
+            int gaps = 0;
+            var switchGroup = new SwitchGroup();
+            foreach(var grouping in hashes)
+            {
+                int hash = grouping.Key;
+                gaps += hash - last -1;
+                if(gaps > 8)
+                {
+                    //to many gaps this switch group is finished
+                    yield return switchGroup;
+                    switchGroup = new SwitchGroup();
+                    gaps = 0;
+                }
+                switchGroup.Add(grouping);
+            }
+            yield return switchGroup;
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Text;
+using System.Linq;
 
 namespace JsonSG.Generator
 {
@@ -23,7 +24,7 @@ namespace JsonSG.Generator
             appendBuilder.Append("{");
 
             bool isFirst = true;
-            foreach(var property in jsonClass.Properties)
+            foreach(var property in jsonClass.Properties.OrderBy(p => p.Name))
             {
                 if(!isFirst)
                 {
