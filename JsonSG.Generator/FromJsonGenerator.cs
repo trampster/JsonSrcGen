@@ -96,7 +96,7 @@ namespace JsonSG.Generator
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool property{property.Name}Value);");
                         break;
                     default:
-                        throw new Exception($"Unsupported type {property.Type}");
+                        throw new Exception($"Unsupported type {property.Type}"); 
                 }
                 classBuilder.AppendLine(indentLevel+2, $"value.{property.Name} = property{property.Name}Value;");
                 classBuilder.AppendLine(indentLevel+2, "break;");

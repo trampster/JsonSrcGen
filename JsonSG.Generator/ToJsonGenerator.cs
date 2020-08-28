@@ -32,22 +32,33 @@ namespace JsonSG.Generator
                     appendBuilder.Append(",");
                 }
 
-                appendBuilder.Append($"\\\"{property.Name}\\\":"); 
+                appendBuilder.Append($"\\\"{property.Name}\\\":");
 
                 switch(property.Type)
                 {
                     case "String":
+                        classBuilder.AppendLine(3, $"if(value.{property.Name} == null)");
+                        classBuilder.AppendLine(3, "{");
+                        var nullAppendBuilder = new StringBuilder(appendBuilder.ToString());
+                        nullAppendBuilder.Append("null");
+                        MakeAppend(4, classBuilder, nullAppendBuilder);
+                        classBuilder.AppendLine(3, "}");
+
+                        classBuilder.AppendLine(3, "else");
+                        classBuilder.AppendLine(3, "{");
                         appendBuilder.Append($"\\\"");
-                        MakeAppend(classBuilder, appendBuilder);
-                        classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
+                        MakeAppend(4, classBuilder, appendBuilder);
+                        classBuilder.AppendLine(4, $"builder.Append(value.{property.Name});");
                         appendBuilder.Append($"\\\"");
+                        MakeAppend(4, classBuilder, appendBuilder);
+                        classBuilder.AppendLine(3, "}");
                         break;
                     case "Int32":
-                        MakeAppend(classBuilder, appendBuilder);
+                        MakeAppend(3, classBuilder, appendBuilder);
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
                         break;
                     case "Boolean":
-                        MakeAppend(classBuilder, appendBuilder);
+                        MakeAppend(3, classBuilder, appendBuilder);
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name} ? \"true\" : \"false\");");
                         break;
                     default:
@@ -58,14 +69,14 @@ namespace JsonSG.Generator
                 if(isFirst) isFirst = false;
             }
             appendBuilder.Append("}"); 
-            MakeAppend(classBuilder, appendBuilder);
+            MakeAppend(3, classBuilder, appendBuilder);
             classBuilder.AppendLine(3, "return builder.ToString();"); 
             classBuilder.AppendLine(2, "}");
         }
 
-        void MakeAppend(CodeBuilder classBuilder, StringBuilder appendContent)
+        void MakeAppend(int indentLevel, CodeBuilder classBuilder, StringBuilder appendContent)
         {
-            classBuilder.AppendLine(3, $"builder.Append(\"{appendContent.ToString()}\");");
+            classBuilder.AppendLine(indentLevel, $"builder.Append(\"{appendContent.ToString()}\");");
             appendContent.Clear();
         }
     }

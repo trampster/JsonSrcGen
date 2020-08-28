@@ -1,3 +1,4 @@
 obj
 bin
 .vscode
+Generated/Generated.cs

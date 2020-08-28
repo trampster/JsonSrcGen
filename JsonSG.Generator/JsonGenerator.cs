@@ -71,9 +71,9 @@ namespace JsonSG
             }
 
             classBuilder.AppendLine(1, "}");
-            classBuilder.AppendLine(0, "}"); 
+            classBuilder.AppendLine(0, "}");
 
-            File.WriteAllText("Generated.cs", classBuilder.ToString()); 
+            File.WriteAllText(Path.Combine($"..", "Generated", "Generated.cs"), classBuilder.ToString());
 
             context.AddSource("JsonSGConvert", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
         }
@@ -123,7 +123,7 @@ namespace JsonSG
         public void Initialize(InitializationContext context)
         {
             // Register a factory that can create our custom syntax receiver
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver()); 
         }
     }
 

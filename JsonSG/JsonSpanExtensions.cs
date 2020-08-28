@@ -53,7 +53,12 @@ namespace JsonSG
 
         public static ReadOnlySpan<char> ReadString(this ReadOnlySpan<char> json, out string value)
         {
-            json = json.SkipWhitespaceTo('\"');
+            json = json.SkipWhitespaceTo('\"', 'n', out char found);
+            if(found == 'n')
+            {
+                value = null;
+                return json.Slice(3);
+            }
             var propertyValue = json.ReadTo('\"');
             value = new string(propertyValue);
             return json.Slice(value.Length + 1);

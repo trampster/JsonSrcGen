@@ -9,6 +9,7 @@ namespace UnitTests
     {
         public string FirstName {get;set;}
         public string LastName {get;set;}
+        public string NullProperty {get;set;}
     }
 
     public class StringPropertyTests
@@ -28,14 +29,15 @@ namespace UnitTests
             var jsonClass = new JsonClass()
             {
                 FirstName = "Bob",
-                LastName = "Marley"
+                LastName = "Marley",
+                NullProperty = null
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = _convert.ToJson(jsonClass); 
 
             //assert
-            Assert.That(json, Is.EqualTo("{\"FirstName\":\"Bob\",\"LastName\":\"Marley\"}"));
+            Assert.That(json, Is.EqualTo("{\"FirstName\":\"Bob\",\"LastName\":\"Marley\",\"NullProperty\":null}"));
         }
 
 
@@ -43,7 +45,7 @@ namespace UnitTests
         public void FromJson_CorrectJsonClass()
         {
             //arrange
-            var json = "{\"FirstName\":\"Bob\",\"LastName\":\"Marley\"}";
+            var json = "{\"FirstName\":\"Bob\",\"LastName\":\"Marley\",\"NullProperty\":null}";
             var jsonClass = new JsonClass();
 
             //act
@@ -52,6 +54,7 @@ namespace UnitTests
             //assert
             Assert.That(jsonClass.FirstName, Is.EqualTo("Bob"));
             Assert.That(jsonClass.LastName, Is.EqualTo("Marley"));
+            Assert.That(jsonClass.NullProperty, Is.EqualTo(null));
         }
     }
 }
