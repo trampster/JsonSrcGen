@@ -54,6 +54,7 @@ namespace JsonSG.Generator
                         classBuilder.AppendLine(3, "}");
                         break;
                     case "Int32":
+                    case "UInt32":
                         MakeAppend(3, classBuilder, appendBuilder);
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
                         break;

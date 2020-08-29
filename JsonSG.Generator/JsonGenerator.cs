@@ -73,7 +73,15 @@ namespace JsonSG
             classBuilder.AppendLine(1, "}");
             classBuilder.AppendLine(0, "}");
 
-            File.WriteAllText(Path.Combine($"..", "Generated", "Generated.cs"), classBuilder.ToString());
+            try
+            {
+                
+               File.WriteAllText(Path.Combine($"..", "Generated", "Generated.cs"), classBuilder.ToString());
+            }
+            catch(DirectoryNotFoundException)
+            {
+                //ignore because if it hasn't changed the current path is in the snap directory
+            }
 
             context.AddSource("JsonSGConvert", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
         }

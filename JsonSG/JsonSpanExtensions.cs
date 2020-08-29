@@ -45,8 +45,45 @@ namespace JsonSG
             }
             
             var intSpan = json.Slice(0, afterIntIndex);
-            Console.WriteLine($"IntSpan {new string(intSpan)}");
             value = int.Parse(json.Slice(0, afterIntIndex));
+
+            return json.Slice(afterIntIndex);
+        }
+
+        public static ReadOnlySpan<char> ReadUInt(this ReadOnlySpan<char> json, out uint value)
+        {
+            json = json.SkipWhitespace();
+            int afterIntIndex = 0;
+            int soFar = 0;
+            for(int index =0; index < json.Length; index++)
+            {
+                var character = json[index];
+                switch(character)
+                {
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        int digit = ((int)character) - 48;
+                        soFar *= 10;
+                        soFar += digit; 
+                        continue;
+
+                    default:
+                        afterIntIndex = index;
+                        break;
+                }
+                break;
+            }
+            
+            var intSpan = json.Slice(0, afterIntIndex);
+            value = (uint)soFar;
 
             return json.Slice(afterIntIndex);
         }
