@@ -11,13 +11,13 @@ namespace JsonSGTest
         static void Main(string[] args)
         {
             var testClass = new JsongTests3();
-            testClass.First = int.MaxValue;
-            testClass.Second = int.MaxValue;
-            testClass.Third = int.MaxValue;
+            testClass.First = ushort.MaxValue;
+            testClass.Second = ushort.MaxValue;
+            testClass.Third = ushort.MaxValue;
 
             Console.WriteLine(_convert.ToJson(testClass));
 
-            Func<JsongTests3, bool> check = toCheck => toCheck.First == int.MaxValue && toCheck.Second == int.MaxValue && toCheck.Third == int.MaxValue;
+            Func<JsongTests3, bool> check = toCheck => toCheck.First == ushort.MaxValue && toCheck.Second == ushort.MaxValue && toCheck.Third == ushort.MaxValue;
 
             TestFromJson("System.Text.Json", json => System.Text.Json.JsonSerializer.Deserialize<JsongTests3>(json), check, ExpectedJson);
             TestFromJson("FromJsonSG", json => FromJsonSG(testClass, json), check, ExpectedJson);
@@ -28,7 +28,7 @@ namespace JsonSGTest
             TestToJson("ToJsonUtf8", jsonClass => ToJsonUtf8(jsonClass), testClass, ExpectedJson);
         }
 
-        static string ExpectedJson = $"{{\"First\":2147483647,\"Second\":2147483647,\"Third\":2147483647}}";
+        static string ExpectedJson = $"{{\"First\":65535,\"Second\":65535,\"Third\":65535}}";
         static byte[] ExpectedJsonByte = Encoding.UTF8.GetBytes(ExpectedJson);
 
 
