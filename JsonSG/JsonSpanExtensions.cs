@@ -19,8 +19,17 @@ namespace JsonSG
         public static ReadOnlySpan<char> ReadInt(this ReadOnlySpan<char> json, out int value)
         {
             json = json.SkipWhitespace();
+            int sign = 1;
+            int startIndex = 0;
+            if(json[0] == '-')
+            {
+                sign = -1;
+                startIndex = 1;
+            }
             int afterIntIndex = 0;
-            for(int index =0; index < json.Length; index++)
+            int soFar = 0;
+
+            for(int index = startIndex; index < json.Length; index++)
             {
                 var character = json[index];
                 switch(character)
@@ -35,7 +44,9 @@ namespace JsonSG
                     case '7':
                     case '8':
                     case '9':
-                    case '-':
+                        int digit = ((int)character) - 48;
+                        soFar *= 10;
+                        soFar += digit; 
                         continue;
                     default:
                         afterIntIndex = index;
@@ -44,8 +55,7 @@ namespace JsonSG
                 break;
             }
             
-            var intSpan = json.Slice(0, afterIntIndex);
-            value = int.Parse(json.Slice(0, afterIntIndex));
+            value = sign * soFar;
 
             return json.Slice(afterIntIndex);
         }
@@ -82,7 +92,6 @@ namespace JsonSG
                 break;
             }
             
-            var intSpan = json.Slice(0, afterIntIndex);
             value = (uint)soFar;
 
             return json.Slice(afterIntIndex);
