@@ -8,6 +8,7 @@ Json object with the following properties:
 * int
 * uint
 * ushort
+* short
 * byte
 * boolean
 * string
