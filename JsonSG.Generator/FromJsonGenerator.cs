@@ -95,6 +95,9 @@ namespace JsonSG.Generator
                     case "UInt16":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadUShort(out ushort property{property.Name}Value);");
                         break;
+                    case "Byte":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadByte(out byte property{property.Name}Value);");
+                        break;
                     case "String":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadString(out string property{property.Name}Value);");
                         break;

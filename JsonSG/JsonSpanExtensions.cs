@@ -60,6 +60,41 @@ namespace JsonSG
             return json.Slice(afterIntIndex);
         }
 
+        public static ReadOnlySpan<char> ReadByte(this ReadOnlySpan<char> json, out byte value)
+        {
+            json = json.SkipWhitespace();
+            int afterIntIndex = 0;
+            value = 0;
+            for(int index = 0; index < json.Length; index++)
+            {
+                var character = json[index];
+                switch(character)
+                {
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        byte digit = (byte)(((byte)character) - 48);
+                        value *= 10;
+                        value += digit; 
+                        continue;
+
+                    default:
+                        afterIntIndex = index;
+                        break;
+                }
+                break;
+            }
+            
+            return json.Slice(afterIntIndex);
+        }
+
         public static ReadOnlySpan<char> ReadUShort(this ReadOnlySpan<char> json, out ushort value)
         {
             json = json.SkipWhitespace();

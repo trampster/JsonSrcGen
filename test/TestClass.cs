@@ -5,19 +5,19 @@ namespace JsonSGTest
     [Json]
     public class JsongTests3 
     {
-        public ushort First
+        public byte First
         {
             get;
             set;
         }
 
-        public ushort Second
+        public byte Second
         {
             get;
             set;
         }
 
-        public ushort Third
+        public byte Third
         {
             get;
             set;
