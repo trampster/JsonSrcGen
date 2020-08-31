@@ -7,5 +7,7 @@ Note: Requires the .Net 5 Preview to run. Mono platforms do not have support for
 Json object with the following properties:
 * int
 * uint
+* ushort
+* byte
 * boolean
 * string
