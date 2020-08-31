@@ -55,6 +55,7 @@ namespace JsonSG.Generator
                         break;
                     case "Int32":
                     case "UInt32":
+                    case "Int16":
                     case "UInt16":
                     case "Byte":
                         MakeAppend(3, classBuilder, appendBuilder);
