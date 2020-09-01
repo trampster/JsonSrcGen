@@ -55,6 +55,7 @@ namespace JsonSG.Generator
                         break;
                     case "Int32":
                     case "UInt32":
+                    case "Int64":
                     case "UInt64":
                     case "Int16":
                     case "UInt16":

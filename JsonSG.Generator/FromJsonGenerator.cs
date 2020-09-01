@@ -95,6 +95,9 @@ namespace JsonSG.Generator
                     case "UInt64":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadULong(out ulong property{property.Name}Value);");
                         break;
+                    case "Int64":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadLong(out long property{property.Name}Value);");
+                        break;
                     case "Int16":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadShort(out short property{property.Name}Value);");
                         break;
@@ -111,7 +114,7 @@ namespace JsonSG.Generator
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool property{property.Name}Value);");
                         break;
                     default:
-                        throw new Exception($"Unsupported type {property.Type} in From Json"); 
+                        throw new Exception($"Unsupported type {property.Type} in from json generator"); 
                 }
                 classBuilder.AppendLine(indentLevel+2, $"value.{property.Name} = property{property.Name}Value;");
                 classBuilder.AppendLine(indentLevel+2, "break;");
