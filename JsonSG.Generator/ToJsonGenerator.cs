@@ -55,6 +55,7 @@ namespace JsonSG.Generator
                         break;
                     case "Int32":
                     case "UInt32":
+                    case "UInt64":
                     case "Int16":
                     case "UInt16":
                     case "Byte":
@@ -66,7 +67,7 @@ namespace JsonSG.Generator
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name} ? \"true\" : \"false\");");
                         break;
                     default:
-                        throw new Exception($"Unsupported type {property.Type}");
+                        throw new Exception($"Unsupported type {property.Type} in to json generator");
 
                 }
 
