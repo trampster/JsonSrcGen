@@ -75,7 +75,6 @@ namespace JsonSG
 
             try
             {
-                
                File.WriteAllText(Path.Combine($"..", "Generated", "Generated.cs"), classBuilder.ToString());
             }
             catch(DirectoryNotFoundException)
@@ -117,11 +116,20 @@ namespace JsonSG
             return jsonClasses; 
         }
 
+
         string GetType(ISymbol symbol)
         {
             var property = symbol as IPropertySymbol;
             if(property != null)
             {
+                if(property.Type.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
+                {
+                    var namedType = property.Type as INamedTypeSymbol;
+                    if(namedType != null)
+                    {
+                        return $"{namedType.TypeArguments.First().Name}?";
+                    }
+                }
                 return property.Type.Name;
             }
 
@@ -152,8 +160,6 @@ namespace JsonSG
             if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
                 && classDeclarationSyntax.AttributeLists.Count > 0)
             {
-                var properties = new List<JsonProperty>();
-
                 CandidateClases.Add(classDeclarationSyntax);
             }
         }

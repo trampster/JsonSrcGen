@@ -16,6 +16,22 @@ namespace JsonSG
             return json.Slice(5);
         }
 
+        public static ReadOnlySpan<char> ReadBool(this ReadOnlySpan<char> json, out bool? value)
+        {
+            json = json.SkipWhitespace();
+            switch(json[0])
+            {
+                case 't':
+                    value = true;
+                    return json.Slice(4);
+                case 'n':
+                    value = null;
+                    return json.Slice(4);
+            }
+            value = false;
+            return json.Slice(5);
+        }
+
         public static ReadOnlySpan<char> ReadShort(this ReadOnlySpan<char> json, out short value)
         {
             json = json.SkipWhitespace();

@@ -113,6 +113,9 @@ namespace JsonSG.Generator
                     case "Boolean":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool property{property.Name}Value);");
                         break;
+                    case "Boolean?":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool? property{property.Name}Value);");
+                        break;
                     default:
                         throw new Exception($"Unsupported type {property.Type} in from json generator"); 
                 }

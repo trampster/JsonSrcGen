@@ -67,6 +67,10 @@ namespace JsonSG.Generator
                         MakeAppend(3, classBuilder, appendBuilder);
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name} ? \"true\" : \"false\");");
                         break;
+                    case "Boolean?":
+                        MakeAppend(3, classBuilder, appendBuilder);
+                        classBuilder.AppendLine(3, $"builder.Append(value.{property.Name} == null ? \"null\" : value.{property.Name}.Value ? \"true\" : \"false\");");
+                        break;
                     default:
                         throw new Exception($"Unsupported type {property.Type} in to json generator");
 
