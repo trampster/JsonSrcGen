@@ -10,5 +10,8 @@ Json object with the following properties:
 * ushort
 * short
 * byte
+* long
+* ulong
 * boolean
+* boolean?
 * string
