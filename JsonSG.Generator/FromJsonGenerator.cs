@@ -95,11 +95,32 @@ namespace JsonSG.Generator
                     case "UInt64":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadULong(out ulong property{property.Name}Value);");
                         break;
+                    case "UInt64?":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableULong(out ulong? property{property.Name}Value);");
+                        break;
                     case "Int64":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadLong(out long property{property.Name}Value);");
                         break;
+                    case "Int64?":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableLong(out long? property{property.Name}Value);");
+                        break;
                     case "Int16":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadShort(out short property{property.Name}Value);");
+                        break;
+                    case "Int32?":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableInt(out int? property{property.Name}Value);");
+                        break;
+                    case "Int16?":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableInt(out int? property{property.Name}Int);");
+                        classBuilder.AppendLine(indentLevel+2, $"var property{property.Name}Value = ({property.Type})property{property.Name}Int;");
+                        break;
+                    case "UInt32?":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableUInt(out uint? property{property.Name}Value);");
+                        break;
+                    case "UInt16?":
+                    case "Byte?": 
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableUInt(out uint? property{property.Name}Uint);");
+                        classBuilder.AppendLine(indentLevel+2, $"var property{property.Name}Value = ({property.Type})property{property.Name}Uint;");
                         break;
                     case "UInt16":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadUShort(out ushort property{property.Name}Value);");

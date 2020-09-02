@@ -11,5 +11,6 @@ namespace JsonSG.Generator
         public string Type {get;}
 
         public string Name {get;}
+
     }
 }

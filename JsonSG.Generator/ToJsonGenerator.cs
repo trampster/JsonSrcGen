@@ -63,6 +63,20 @@ namespace JsonSG.Generator
                         MakeAppend(3, classBuilder, appendBuilder);
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
                         break;
+                    case "UInt32?":
+                    case "UInt16?":
+                    case "Byte?":
+                    case "Int32?":
+                    case "Int16?":
+                    case "UInt64?":
+                    case "Int64?":
+                        MakeAppend(3, classBuilder, appendBuilder);
+                        classBuilder.AppendLine(3, $"if(value.{property.Name} == null)");
+                        classBuilder.AppendLine(3, "{");
+                        classBuilder.AppendLine(4, $"builder.Append(\"null\");");
+                        classBuilder.AppendLine(3, "}");
+                        classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
+                        break;
                     case "Boolean":
                         MakeAppend(3, classBuilder, appendBuilder);
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name} ? \"true\" : \"false\");");

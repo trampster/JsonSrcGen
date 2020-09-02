@@ -76,6 +76,54 @@ namespace JsonSG
             return json.Slice(afterIntIndex);
         }
 
+        public static ReadOnlySpan<char> ReadNullableLong(this ReadOnlySpan<char> json, out long? value)
+        {
+            json = json.SkipWhitespace();
+            int sign = 1;
+            int startIndex = 0;
+            switch(json[0])
+            {
+                case '-':
+                    sign = -1;
+                    startIndex = 1;
+                    break;
+                case 'n':
+                    value = null;
+                    return json.Slice(4);
+            }
+            int afterIntIndex = 0;
+            value = 0;
+            for(int index = startIndex; index < json.Length; index++)
+            {
+                var character = json[index];
+                switch(character)
+                {
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        long digit = ((long)character) - 48;
+                        value *= 10;
+                        value += digit; 
+                        continue;
+                    default:
+                        afterIntIndex = index;
+                        break;
+                }
+                break;
+            }
+            
+            value = sign * value;
+
+            return json.Slice(afterIntIndex);
+        }
+
         public static ReadOnlySpan<char> ReadLong(this ReadOnlySpan<char> json, out long value)
         {
             json = json.SkipWhitespace();
@@ -115,6 +163,58 @@ namespace JsonSG
             }
             
             value = sign * value;
+
+            return json.Slice(afterIntIndex);
+        }
+
+
+        public static ReadOnlySpan<char> ReadNullableInt(this ReadOnlySpan<char> json, out int? value)
+        {
+            json = json.SkipWhitespace();
+            int sign = 1;
+            int startIndex = 0;
+
+            switch(json[0])
+            {
+                case '-':
+                    sign = -1;
+                    startIndex = 1;
+                    break;
+                case 'n':
+                    value = null;
+                    return json.Slice(4);
+            }
+
+            int afterIntIndex = 0;
+            int soFar = 0;
+
+            for(int index = startIndex; index < json.Length; index++)
+            {
+                var character = json[index];
+                switch(character)
+                {
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        int digit = ((int)character) - 48;
+                        soFar *= 10;
+                        soFar += digit; 
+                        continue;
+                    default:
+                        afterIntIndex = index;
+                        break;
+                }
+                break;
+            }
+            
+            value = sign * soFar;
 
             return json.Slice(afterIntIndex);
         }
@@ -235,6 +335,46 @@ namespace JsonSG
             return json.Slice(afterIntIndex);
         }
 
+        public static ReadOnlySpan<char> ReadNullableULong(this ReadOnlySpan<char> json, out ulong? value)
+        {
+            json = json.SkipWhitespace();
+            if(json[0] == 'n')
+            {
+                value = null;
+                return json.Slice(4);
+            }
+            int afterIntIndex = 0;
+            value = 0;
+            for(int index =0; index < json.Length; index++)
+            {
+                var character = json[index];
+                switch(character)
+                {
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        ulong digit = ((ulong)character) - 48;
+                        value *= 10;
+                        value += digit; 
+                        continue;
+
+                    default:
+                        afterIntIndex = index;
+                        break;
+                }
+                break;
+            }
+            
+            return json.Slice(afterIntIndex);
+        }
+
         public static ReadOnlySpan<char> ReadULong(this ReadOnlySpan<char> json, out ulong value)
         {
             json = json.SkipWhitespace();
@@ -267,6 +407,48 @@ namespace JsonSG
                 break;
             }
             
+            return json.Slice(afterIntIndex);
+        }
+
+        public static ReadOnlySpan<char> ReadNullableUInt(this ReadOnlySpan<char> json, out uint? value)
+        {
+            json = json.SkipWhitespace();
+            if(json[0] == 'n')
+            {
+                value = null;
+                return json.Slice(4);
+            }
+            int afterIntIndex = 0;
+            int soFar = 0;
+            for(int index =0; index < json.Length; index++)
+            {
+                var character = json[index];
+                switch(character)
+                {
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        int digit = ((int)character) - 48;
+                        soFar *= 10;
+                        soFar += digit; 
+                        continue;
+
+                    default:
+                        afterIntIndex = index;
+                        break;
+                }
+                break;
+            }
+            
+            value = (uint)soFar;
+
             return json.Slice(afterIntIndex);
         }
 
