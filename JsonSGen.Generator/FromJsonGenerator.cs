@@ -135,6 +135,13 @@ namespace JsonSGen.Generator
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadDouble(out double property{property.Name}Double);");
                         classBuilder.AppendLine(indentLevel+2, $"var property{property.Name}Value = (float)property{property.Name}Double;");
                         break;
+                    case "Double?":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableDouble(out double? property{property.Name}Value);");
+                        break;
+                    case "Single?":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableDouble(out double? property{property.Name}Double);");
+                        classBuilder.AppendLine(indentLevel+2, $"var property{property.Name}Value = (float?)property{property.Name}Double;");
+                        break;
                     case "String":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadString(out string property{property.Name}Value);");
                         break;

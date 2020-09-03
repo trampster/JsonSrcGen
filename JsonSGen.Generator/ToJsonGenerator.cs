@@ -65,6 +65,18 @@ namespace JsonSGen.Generator
                         MakeAppend(3, classBuilder, appendBuilder);
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
                         break;
+                    case "Single?":
+                    case "Double?":
+                        MakeAppend(3, classBuilder, appendBuilder);
+                        classBuilder.AppendLine(3, $"if(value.{property.Name} == null)");
+                        classBuilder.AppendLine(3, "{");
+                        classBuilder.AppendLine(4, $"builder.Append(\"null\");");
+                        classBuilder.AppendLine(3, "}");
+                        classBuilder.AppendLine(3, "else");
+                        classBuilder.AppendLine(3, "{");
+                        classBuilder.AppendLine(4, $"builder.Append(value.{property.Name});");
+                        classBuilder.AppendLine(3, "}");
+                        break;
                     case "UInt32?":
                     case "UInt16?":
                     case "Byte?":
@@ -77,7 +89,10 @@ namespace JsonSGen.Generator
                         classBuilder.AppendLine(3, "{");
                         classBuilder.AppendLine(4, $"builder.Append(\"null\");");
                         classBuilder.AppendLine(3, "}");
-                        classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
+                        classBuilder.AppendLine(3, "else");
+                        classBuilder.AppendLine(3, "{");
+                        classBuilder.AppendLine(4, $"builder.Append(value.{property.Name});");
+                        classBuilder.AppendLine(3, "}");
                         break;
                     case "Boolean":
                         MakeAppend(3, classBuilder, appendBuilder);
