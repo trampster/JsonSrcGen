@@ -128,6 +128,13 @@ namespace JsonSG.Generator
                     case "Byte":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadByte(out byte property{property.Name}Value);");
                         break;
+                    case "Double":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadDouble(out double property{property.Name}Value);");
+                        break;
+                    case "Single":
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadDouble(out double property{property.Name}Double);");
+                        classBuilder.AppendLine(indentLevel+2, $"var property{property.Name}Value = (float)property{property.Name}Double;");
+                        break;
                     case "String":
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadString(out string property{property.Name}Value);");
                         break;

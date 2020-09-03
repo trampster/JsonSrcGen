@@ -263,6 +263,83 @@ namespace JsonSG
             return json.Slice(afterIntIndex);
         }
 
+        static bool IsNumber(char character)
+        {
+            return character >= '0' && character <= '9';
+        }
+
+        public static ReadOnlySpan<char> ReadDouble(this ReadOnlySpan<char> json, out double value)
+        {
+            json = json.SkipWhitespace();
+
+            int index = 0;
+            int sign = 1;
+            char character = ' ';
+
+            if(json[index] == '-')
+            {
+                sign = -1;
+                index++;
+            }
+
+            double wholePart = 0;
+            for(; index < json.Length; index++)
+            {
+                character = json[index];
+                if(!IsNumber(character)) break;
+                wholePart = (wholePart*10) + character - '0';
+            }
+
+            double fractionalPart = 0;
+            if(character == '.')
+            {
+                long fractionalValue = 0;
+                int factionalLength = 0;
+                for(index = index+1; index < json.Length; index++)
+                {
+                    character = json[index];
+                    if(!IsNumber(character)) break;
+                    fractionalValue = (fractionalValue*10) + character - '0';
+                    factionalLength++;
+                }
+                double divisor = Math.Pow(10, factionalLength);
+                fractionalPart = fractionalValue/divisor;
+            }
+
+            int exponentPart = 0;
+            if(character == 'E' || character == 'e')
+            {
+                index++;
+                character = json[index];
+                int exponentSign = 1;
+                if(character == '-')
+                {
+                    index++;
+                    exponentSign = -1;
+                }
+                else if(character == '+')
+                {
+                    index++;
+                }
+
+                for(; index < json.Length; index++)
+                {
+                    character = json[index];
+                    if(!IsNumber(character)) break;
+                    exponentPart = (exponentPart*10) + character - '0';
+                }
+
+                exponentPart *= exponentSign;
+            }
+            else
+            {
+                value =  sign*(wholePart + fractionalPart);
+                return json.Slice(index);
+            }
+            value = sign*(wholePart + fractionalPart) * Math.Pow(10, exponentPart);
+            return json.Slice(index);
+        }
+
         public static ReadOnlySpan<char> ReadByte(this ReadOnlySpan<char> json, out byte value)
         {
             json = json.SkipWhitespace();

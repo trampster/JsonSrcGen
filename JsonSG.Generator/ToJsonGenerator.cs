@@ -60,6 +60,8 @@ namespace JsonSG.Generator
                     case "Int16":
                     case "UInt16":
                     case "Byte":
+                    case "Single":
+                    case "Double":
                         MakeAppend(3, classBuilder, appendBuilder);
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
                         break;
