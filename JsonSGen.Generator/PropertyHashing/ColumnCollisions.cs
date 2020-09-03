@@ -1,4 +1,4 @@
-namespace JsonSG.Generator.PropertyHashing
+namespace JsonSGen.Generator.PropertyHashing
 {
     public class ColumnCollisions
     {

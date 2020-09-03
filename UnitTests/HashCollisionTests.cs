@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using JsonSG;
+using JsonSGen;
 
 
 namespace UnitTests
@@ -16,12 +16,12 @@ namespace UnitTests
 
     public class HashCollisionTest
     {
-        JsonSG.JsonSGConvert _convert;
+        JsonSGen.JsonSGenConvert _convert;
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSGConvert();
+            _convert = new JsonSGenConvert();
         }
 
         /// <summary>

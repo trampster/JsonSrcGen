@@ -1,6 +1,6 @@
-using JsonSG;
+using JsonSGen;
 
-namespace JsonSGTest
+namespace JsonSGenTest
 {
     [Json]
     public class JsongTests3 

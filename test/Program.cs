@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text;
-using JsonSG;
+using JsonSGen;
 
-namespace JsonSGTest
+namespace JsonSGenTest
 {
     class Program
     {
-        static JsonSGConvert _convert = new JsonSGConvert();
+        static JsonSGenConvert _convert = new JsonSGenConvert();
 
         static void Main(string[] args)
         {
@@ -20,11 +20,11 @@ namespace JsonSGTest
             Func<JsongTests3, bool> check = toCheck => toCheck.First == byte.MaxValue && toCheck.Second == byte.MaxValue && toCheck.Third == byte.MaxValue;
 
             TestFromJson("System.Text.Json", json => System.Text.Json.JsonSerializer.Deserialize<JsongTests3>(json), check, ExpectedJson);
-            TestFromJson("FromJsonSG", json => FromJsonSG(testClass, json), check, ExpectedJson);
+            TestFromJson("FromJsonSGen", json => FromJsonSGen(testClass, json), check, ExpectedJson);
             TestFromJson("FromJsonUtf8", json => FromJsonUtf8(json), check, ExpectedJson);
 
             TestToJson("To System.Text.Json", jsonClass => System.Text.Json.JsonSerializer.Serialize<JsongTests3>(jsonClass), testClass, ExpectedJson);
-            TestToJson("ToJsonSG", jsonClass => ToJsonSG(jsonClass), testClass, ExpectedJson);
+            TestToJson("ToJsonSGen", jsonClass => ToJsonSGen(jsonClass), testClass, ExpectedJson);
             TestToJson("ToJsonUtf8", jsonClass => ToJsonUtf8(jsonClass), testClass, ExpectedJson);
         }
 
@@ -32,12 +32,12 @@ namespace JsonSGTest
         static byte[] ExpectedJsonByte = Encoding.UTF8.GetBytes(ExpectedJson);
 
 
-        static string ToJsonSG(JsongTests3 testClass)
+        static string ToJsonSGen(JsongTests3 testClass)
         {
             return _convert.ToJson(testClass);//Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
 
-        static JsongTests3 FromJsonSG(JsongTests3 testClass, string jsonString)
+        static JsongTests3 FromJsonSGen(JsongTests3 testClass, string jsonString)
         {
             _convert.FromJson(testClass, jsonString);
             return testClass;

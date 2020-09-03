@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 
-namespace JsonSG.Generator.PropertyHashing
+namespace JsonSGen.Generator.PropertyHashing
 {
     internal class PropertyHash
     {

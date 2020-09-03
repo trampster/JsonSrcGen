@@ -1,10 +1,10 @@
 using System.Text;
 using System;
 using System.Linq;
-using JsonSG.Generator.PropertyHashing;
+using JsonSGen.Generator.PropertyHashing;
 using System.Collections.Generic;
 
-namespace JsonSG.Generator
+namespace JsonSGen.Generator
 {
     public class FromJsonGenerator
     {

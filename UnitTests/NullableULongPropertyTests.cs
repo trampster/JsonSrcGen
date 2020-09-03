@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using JsonSG;
+using JsonSGen;
 
 
 namespace UnitTests
@@ -16,13 +16,13 @@ namespace UnitTests
 
     public class NullableULongPropertyTests
     {
-        JsonSG.JsonSGConvert _convert;
+        JsonSGen.JsonSGenConvert _convert;
         const string ExpectedJson = "{\"Age\":42,\"Height\":176,\"Max\":18446744073709551615,\"Min\":0,\"Null\":null}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSGConvert();
+            _convert = new JsonSGenConvert();
         }
 
         [Test]

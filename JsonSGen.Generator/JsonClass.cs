@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace JsonSG.Generator
+namespace JsonSGen.Generator
 {
     public class JsonClass
     {

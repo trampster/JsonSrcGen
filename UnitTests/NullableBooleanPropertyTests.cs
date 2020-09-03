@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using JsonSG;
+using JsonSGen;
 
 
 namespace UnitTests
@@ -14,14 +14,14 @@ namespace UnitTests
 
     public class NullableBooleanPropertyTests
     {
-        JsonSG.JsonSGConvert _convert;
+        JsonSGen.JsonSGenConvert _convert;
 
         const string _json = "{\"IsFalse\":false,\"IsNull\":null,\"IsTrue\":true}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSGConvert();
+            _convert = new JsonSGenConvert();
         }
 
         [Test]

@@ -1,6 +1,6 @@
 using System;
 
-namespace JsonSG
+namespace JsonSGen
 {
     public class JsonAttribute : Attribute
     {

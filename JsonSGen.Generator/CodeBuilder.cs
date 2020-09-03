@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace JsonSG.Generator
+namespace JsonSGen.Generator
 {
     public class CodeBuilder
     {

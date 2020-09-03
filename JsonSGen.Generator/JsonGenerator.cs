@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace JsonSG.Generator
+namespace JsonSGen.Generator
 {
     [Generator]
     public class JsonGenerator : ISourceGenerator
@@ -25,9 +25,9 @@ namespace JsonSG.Generator
                 context.ReportDiagnostic(Diagnostic.Create(
                     new DiagnosticDescriptor(
                         "SI0000",
-                        "An exception was thrown by the JsonSG generator",
-                        "An exception was thrown by the JsonSG generator: '{0}'",
-                        "JsonSG",
+                        "An exception was thrown by the JsonSGen generator",
+                        "An exception was thrown by the JsonSGen generator: '{0}'",
+                        "JsonSGen",
                         DiagnosticSeverity.Error,
                         isEnabledByDefault: true), 
                     Location.None,
@@ -48,9 +48,9 @@ namespace JsonSG.Generator
 using System;
 using System.Text;
 
-namespace JsonSG
+namespace JsonSGen
 {
-    public class JsonSGConvert
+    public class JsonSGenConvert
     {
         [ThreadStatic]
         StringBuilder Builder;
@@ -82,7 +82,7 @@ namespace JsonSG
                 //ignore because if it hasn't changed the current path is in the snap directory
             }
 
-            context.AddSource("JsonSGConvert", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
+            context.AddSource("JsonSGenConvert", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
         }
 
         IReadOnlyCollection<JsonClass> GetJsonClassInfo(List<ClassDeclarationSyntax> classDeclarations, Compilation compilation)
@@ -95,7 +95,7 @@ namespace JsonSG
                 SemanticModel model = compilation.GetSemanticModel(candidateClass.SyntaxTree);
                 var classSymbol = model.GetDeclaredSymbol(candidateClass);
 
-                if (classSymbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "JsonAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSG"))
+                if (classSymbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "JsonAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSGen"))
                 {
                     string jsonClassName = classSymbol.Name;
                     string jsonClassNamespace = classSymbol.ContainingNamespace.ToString();

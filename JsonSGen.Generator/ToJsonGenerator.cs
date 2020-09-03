@@ -2,7 +2,7 @@ using System.Text;
 using System.Linq;
 using System;
 
-namespace JsonSG.Generator
+namespace JsonSGen.Generator
 {
     public class ToJsonGenerator
     {

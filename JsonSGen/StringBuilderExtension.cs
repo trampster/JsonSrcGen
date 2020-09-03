@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace JsonSG
+namespace JsonSGen
 {
     public static class StringBuilderExtension
     {

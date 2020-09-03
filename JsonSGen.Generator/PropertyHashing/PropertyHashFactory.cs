@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-namespace JsonSG.Generator.PropertyHashing
+namespace JsonSGen.Generator.PropertyHashing
 {
     internal class PropertyHashFactory
     {
