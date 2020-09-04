@@ -12,7 +12,7 @@ namespace JsonSGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, $"json = json.ReadDateTime(out DateTime property{property.Name}Value);");
         }
 
-        public void GenerateToJsonProperty(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonProperty property)
+        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonProperty property)
         {
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
             codeBuilder.AppendLine(indentLevel, $"builder.AppendDate(value.{property.Name});");
