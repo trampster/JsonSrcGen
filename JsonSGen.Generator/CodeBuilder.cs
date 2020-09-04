@@ -24,5 +24,11 @@ namespace JsonSGen.Generator
         {
             return _stringBuilder.ToString();
         }
+
+        public void MakeAppend(int indentLevel, StringBuilder appendContent)
+        {
+            AppendLine(indentLevel, $"builder.Append(\"{appendContent.ToString()}\");");
+            appendContent.Clear();
+        }
     }
 }

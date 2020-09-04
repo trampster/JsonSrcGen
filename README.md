@@ -20,7 +20,10 @@ Json object with the following properties:
 * ulong
 * ulong?
 * float
+* float?
 * double
+* double?
 * boolean
 * boolean?
 * string
+* DateTime

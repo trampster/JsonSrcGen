@@ -3,11 +3,22 @@ using System;
 using System.Linq;
 using JsonSGen.Generator.PropertyHashing;
 using System.Collections.Generic;
+using JsonSGen.TypeGenerators;
 
 namespace JsonSGen.Generator
 {
     public class FromJsonGenerator
     {
+        readonly Dictionary<string, IJsonGenerator> _generators;
+
+        public FromJsonGenerator(IEnumerable<IJsonGenerator> generators)
+        {
+            _generators = new Dictionary<string, IJsonGenerator>();
+            foreach(var generator in generators)
+            {
+                _generators.Add(generator.TypeName, generator);
+            }
+        }
 
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
         {
@@ -152,6 +163,11 @@ namespace JsonSGen.Generator
                         classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool? property{property.Name}Value);");
                         break;
                     default:
+                        if(_generators.TryGetValue(property.Type, out var generator))
+                        {
+                            generator.GenerateFromJson(classBuilder, indentLevel, property);
+                            break;
+                        }
                         throw new Exception($"Unsupported type {property.Type} in from json generator"); 
                 }
                 classBuilder.AppendLine(indentLevel+2, $"value.{property.Name} = property{property.Name}Value;");

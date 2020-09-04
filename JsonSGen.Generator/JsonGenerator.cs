@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using JsonSGen.TypeGenerators;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -61,8 +62,13 @@ namespace JsonSGen
 
             var classes = GetJsonClassInfo(receiver.CandidateClases, compilation);
 
-            var toJsonGenerator = new ToJsonGenerator();
-            var fromJsonGenerator = new FromJsonGenerator();
+            var generators = new IJsonGenerator[]
+            {
+                new DateTimeGenerator()
+            };
+
+            var toJsonGenerator = new ToJsonGenerator(generators);
+            var fromJsonGenerator = new FromJsonGenerator(generators);
 
             foreach (var jsonClass in classes)
             {

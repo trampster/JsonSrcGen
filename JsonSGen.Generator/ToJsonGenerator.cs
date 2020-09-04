@@ -1,6 +1,8 @@
 using System.Text;
 using System.Linq;
 using System;
+using System.Collections.Generic;
+using JsonSGen.TypeGenerators;
 
 namespace JsonSGen.Generator
 {
@@ -14,6 +16,17 @@ namespace JsonSGen.Generator
                 Builder = builder;
             }
             builder.Clear();";
+
+        readonly Dictionary<string, IJsonGenerator> _generators;
+
+        public ToJsonGenerator(IEnumerable<IJsonGenerator> generators)
+        {
+            _generators = new Dictionary<string, IJsonGenerator>();
+            foreach(var generator in generators)
+            {
+                _generators.Add(generator.TypeName, generator);
+            }
+        }
 
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
         {
@@ -41,16 +54,16 @@ namespace JsonSGen.Generator
                         classBuilder.AppendLine(3, "{");
                         var nullAppendBuilder = new StringBuilder(appendBuilder.ToString());
                         nullAppendBuilder.Append("null");
-                        MakeAppend(4, classBuilder, nullAppendBuilder);
+                        classBuilder.MakeAppend(4, nullAppendBuilder);
                         classBuilder.AppendLine(3, "}");
 
                         classBuilder.AppendLine(3, "else");
                         classBuilder.AppendLine(3, "{");
                         appendBuilder.Append($"\\\"");
-                        MakeAppend(4, classBuilder, appendBuilder);
+                        classBuilder.MakeAppend(4, appendBuilder);
                         classBuilder.AppendLine(4, $"builder.Append(value.{property.Name});");
                         appendBuilder.Append($"\\\"");
-                        MakeAppend(4, classBuilder, appendBuilder);
+                        classBuilder.MakeAppend(4, appendBuilder);
                         classBuilder.AppendLine(3, "}");
                         break;
                     case "Int32":
@@ -62,12 +75,12 @@ namespace JsonSGen.Generator
                     case "Byte":
                     case "Single":
                     case "Double":
-                        MakeAppend(3, classBuilder, appendBuilder);
+                        classBuilder.MakeAppend(3, appendBuilder);
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
                         break;
                     case "Single?":
                     case "Double?":
-                        MakeAppend(3, classBuilder, appendBuilder);
+                        classBuilder.MakeAppend(3, appendBuilder);
                         classBuilder.AppendLine(3, $"if(value.{property.Name} == null)");
                         classBuilder.AppendLine(3, "{");
                         classBuilder.AppendLine(4, $"builder.Append(\"null\");");
@@ -84,7 +97,7 @@ namespace JsonSGen.Generator
                     case "Int16?":
                     case "UInt64?":
                     case "Int64?":
-                        MakeAppend(3, classBuilder, appendBuilder);
+                        classBuilder.MakeAppend(3, appendBuilder);
                         classBuilder.AppendLine(3, $"if(value.{property.Name} == null)");
                         classBuilder.AppendLine(3, "{");
                         classBuilder.AppendLine(4, $"builder.Append(\"null\");");
@@ -95,14 +108,19 @@ namespace JsonSGen.Generator
                         classBuilder.AppendLine(3, "}");
                         break;
                     case "Boolean":
-                        MakeAppend(3, classBuilder, appendBuilder);
+                        classBuilder.MakeAppend(3, appendBuilder);
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name} ? \"true\" : \"false\");");
                         break;
                     case "Boolean?":
-                        MakeAppend(3, classBuilder, appendBuilder);
+                        classBuilder.MakeAppend(3, appendBuilder);
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.Name} == null ? \"null\" : value.{property.Name}.Value ? \"true\" : \"false\");");
                         break;
                     default:
+                        if(_generators.TryGetValue(property.Type, out var generator))
+                        {
+                            generator.GenerateToJsonProperty(classBuilder, 3, appendBuilder, property);
+                            break;
+                        }
                         throw new Exception($"Unsupported type {property.Type} in to json generator");
 
                 }
@@ -110,15 +128,9 @@ namespace JsonSGen.Generator
                 if(isFirst) isFirst = false;
             }
             appendBuilder.Append("}"); 
-            MakeAppend(3, classBuilder, appendBuilder);
+            classBuilder.MakeAppend(3, appendBuilder);
             classBuilder.AppendLine(3, "return builder.ToString();"); 
             classBuilder.AppendLine(2, "}");
-        }
-
-        void MakeAppend(int indentLevel, CodeBuilder classBuilder, StringBuilder appendContent)
-        {
-            classBuilder.AppendLine(indentLevel, $"builder.Append(\"{appendContent.ToString()}\");");
-            appendContent.Clear();
         }
     }
 }
