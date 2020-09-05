@@ -875,5 +875,144 @@ namespace JsonSGen
             value = new DateTime(year, month, day, hour, minute, second, kind).AddMilliseconds(milliseonds);
             return json.Slice(index + 1);
         }
+
+        public static ReadOnlySpan<char> ReadNullableDateTime(this ReadOnlySpan<char> json, out DateTime? value)
+        {
+            int index = 0;
+
+            json = json.SkipWhitespace();
+
+            switch(json[0])
+            {
+                case 'n':
+                     value = null;
+                     return json.Slice(4);
+                case '\"':
+                    break;
+                default:
+                    throw new InvalidJsonException($"Expected DateTime property to start with a quote but instead got '{json[0]}'");
+            }
+
+            json = json.Slice(1);
+
+            int year = 
+                (json[0] - 48)*1000 + 
+                (json[1] - 48)*100 +
+                (json[2] - 48)*10 +
+                (json[3] - 48);
+            int month =
+                (json[5] - 48)*10 +
+                (json[6] - 48);
+            int day =
+                (json[8] - 48)*10 +
+                (json[9] - 48);
+
+            if(json[index + 10] == '\"')
+            {
+                value = new DateTime(year, month, day);
+                return json.Slice(11);
+            }
+
+            int hour =
+                (json[11] - 48)*10 +
+                (json[12] - 48);
+
+            int minute =
+                (json[14] - 48)*10 +
+                (json[15] - 48);
+
+            int second =
+                (json[17] - 48)*10 +
+                (json[18] - 48);
+
+            
+            index += 19;
+            var character = json[index];
+            if(character == '\"')
+            {
+                value = new DateTime(year, month, day, hour, minute, second);
+                return json.Slice(20);
+            }
+
+            double milliseonds = 0;
+            if(character == '.')
+            {
+                index++;
+                //milliseconds
+                int subSeconds = 0;
+                int millisecondsStart = index;
+                
+                while(true)
+                {
+                    character = json[index];
+                    if(character >= '0' && character <= '9')
+                    {
+                        subSeconds = (subSeconds * 10) + (character - 48);
+                        index++;
+                    }
+                    else
+                    {
+                        int millisecondsLength = index - millisecondsStart;
+                        double multiplier = 1;
+                        switch(millisecondsLength)
+                        {
+                            case 1: 
+                                multiplier = 100;
+                                break;
+                            case 2:
+                                multiplier = 10;
+                                break;
+                            case 3:
+                                multiplier = 1;
+                                break;
+                            case 4:
+                                multiplier = 0.1d;
+                                break;
+                            case 5:
+                                multiplier = 0.01d;
+                                break;
+                            case 6:
+                                multiplier = 0.001d;
+                                break;
+                            case 7:
+                                multiplier = 0.0001d;
+                                break;
+                            case 8:
+                                multiplier = 0.00001d;
+                                break;
+                        }
+                        milliseonds = subSeconds*multiplier;
+                        break;
+                    }
+                }
+            }
+            DateTimeKind kind = DateTimeKind.Unspecified;
+            if(character == '\"')
+            {
+
+            }
+            else if(character == 'Z')
+            {
+                kind = DateTimeKind.Utc;
+                index++;
+            }
+            else
+            {
+                int offsetSign = character == '-' ? -1 : 1;
+                int offsetHours = 
+                    (json[index + 1] - 48)*10 +
+                    (json[index + 2] - 48);
+                int offsetMinutes = 
+                    (json[index + 4] - 48)*10 +
+                    (json[index + 5] - 48);
+                var offset = new TimeSpan(offsetSign*offsetHours, offsetMinutes, 0);
+                var localDateTime = new DateTimeOffset(year, month, day, hour, minute, second, offset).AddMilliseconds(milliseonds).LocalDateTime;
+                value = localDateTime;
+                return json.Slice(index + 7);
+            }
+
+            value = new DateTime(year, month, day, hour, minute, second, kind).AddMilliseconds(milliseonds);
+            return json.Slice(index + 1);
+        }
     }
 }

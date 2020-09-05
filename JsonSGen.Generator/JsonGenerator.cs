@@ -64,7 +64,8 @@ namespace JsonSGen
 
             var generators = new IJsonGenerator[]
             {
-                new DateTimeGenerator()
+                new DateTimeGenerator(),
+                new NullableDateTimeGenerator()
             };
 
             var toJsonGenerator = new ToJsonGenerator(generators);
