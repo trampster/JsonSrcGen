@@ -661,9 +661,13 @@ namespace JsonSGen
             for(int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                if(value == ' ' || value == '\t')
+                switch(value)
                 {
-                    continue;
+                    case ' ':
+                    case '\t':
+                    case '\n':
+                    case '\r':
+                        continue;
                 }
                 return json.Slice(index);
             }
@@ -675,9 +679,13 @@ namespace JsonSGen
             for(int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                if(value == ' ' || value == '\t')
+                switch(value)
                 {
-                    continue;
+                    case ' ':
+                    case '\t':
+                    case '\n':
+                    case '\r':
+                        continue;
                 }
                 if(value == to)
                 {
@@ -694,9 +702,13 @@ namespace JsonSGen
             for(int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                if(value == ' ' && value == '\t')
+                switch(value)
                 {
-                    continue;
+                    case ' ':
+                    case '\t':
+                    case '\n':
+                    case '\r':
+                        continue;
                 }
                 if(value == to1)
                 {
@@ -1097,7 +1109,7 @@ namespace JsonSGen
         {
             json.SkipWhitespace();
 
-                        switch(json[0])
+            switch(json[0])
             {
                 case 'n':
                      value = null;
