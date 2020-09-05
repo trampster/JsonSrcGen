@@ -165,7 +165,7 @@ namespace JsonSGen.Generator
                     default:
                         if(_generators.TryGetValue(property.Type, out var generator))
                         {
-                            generator.GenerateFromJson(classBuilder, indentLevel, property);
+                            generator.GenerateFromJson(classBuilder, indentLevel+2, property);
                             break;
                         }
                         throw new Exception($"Unsupported type {property.Type} in from json generator"); 

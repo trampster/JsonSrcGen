@@ -1014,5 +1014,136 @@ namespace JsonSGen
             value = new DateTime(year, month, day, hour, minute, second, kind).AddMilliseconds(milliseonds);
             return json.Slice(index + 1);
         }
+
+        public static byte FromHexChar(char character)
+        {
+            switch(character)
+            {
+                case '0': return 0;
+                case '1': return 1;
+                case '2': return 2;
+                case '3': return 3;
+                case '4': return 4;
+                case '5': return 5;
+                case '6': return 6;
+                case '7': return 7;
+                case '8': return 8;
+                case '9': return 9;
+                case 'a': return 10;
+                case 'A': return 10;
+                case 'b': return 11;
+                case 'B': return 11;
+                case 'c': return 12;
+                case 'C': return 12;
+                case 'd': return 13;
+                case 'D': return 13;
+                case 'e': return 14;
+                case 'E': return 14;
+                case 'f': return 15;
+                case 'F': return 15;
+                default: 
+                    throw new InvalidJsonException("character must be a hex value");
+            }
+        }
+
+        public static ReadOnlySpan<char> ReadGuid(this ReadOnlySpan<char> json, out Guid value)
+        {
+            json.SkipWhitespace();
+
+            if(json[0] != '\"')
+            {
+                throw new InvalidJsonException($"Expected DateTime property to start with a quote but instead got '{json[0]}'");
+            }
+            json = json.Slice(1);
+
+            uint a =
+                ((uint)FromHexChar(json[0]) << 28) + 
+                ((uint)FromHexChar(json[1]) << 24) + 
+                (uint)(FromHexChar(json[2]) << 20) +
+                (uint)(FromHexChar(json[3]) << 16) +
+                (uint)(FromHexChar(json[4]) << 12) +
+                (uint)(FromHexChar(json[5]) << 8) +
+                (uint)(FromHexChar(json[6]) << 4) +
+                (uint)FromHexChar(json[7]);
+            
+            ushort b = (ushort)
+                ((FromHexChar(json[9]) << 12) +
+                (FromHexChar(json[10]) << 8) +
+                (FromHexChar(json[11]) << 4) +
+                FromHexChar(json[12]));
+
+            ushort c = (ushort)
+                ((FromHexChar(json[14]) << 12) +
+                (FromHexChar(json[15]) << 8) +
+                (FromHexChar(json[16]) << 4) +
+                FromHexChar(json[17]));
+
+            byte d = (byte)((FromHexChar(json[19]) << 4) + FromHexChar(json[20]));
+            byte e = (byte)((FromHexChar(json[21]) << 4) + FromHexChar(json[22]));
+
+            byte f = (byte)((FromHexChar(json[24]) << 4) + FromHexChar(json[25]));
+            byte g = (byte)((FromHexChar(json[26]) << 4) + FromHexChar(json[27]));
+            byte h = (byte)((FromHexChar(json[28]) << 4) + FromHexChar(json[29]));
+            byte i = (byte)((FromHexChar(json[30]) << 4) + FromHexChar(json[31]));
+            byte j = (byte)((FromHexChar(json[32]) << 4) + FromHexChar(json[33]));
+            byte k = (byte)((FromHexChar(json[34]) << 4) + FromHexChar(json[35]));
+
+            value = new Guid(a, b, c, d, e, f, g, h, i, j, k);
+
+            return json.Slice(37);
+        }
+
+        public static ReadOnlySpan<char> ReadNullableGuid(this ReadOnlySpan<char> json, out Guid? value)
+        {
+            json.SkipWhitespace();
+
+                        switch(json[0])
+            {
+                case 'n':
+                     value = null;
+                     return json.Slice(4);
+                case '\"':
+                    break;
+                default:
+                    throw new InvalidJsonException($"Expected Guid property to start with a quote but instead got '{json[0]}'");
+            }
+            json = json.Slice(1);
+
+            uint a =
+                ((uint)FromHexChar(json[0]) << 28) + 
+                ((uint)FromHexChar(json[1]) << 24) + 
+                (uint)(FromHexChar(json[2]) << 20) +
+                (uint)(FromHexChar(json[3]) << 16) +
+                (uint)(FromHexChar(json[4]) << 12) +
+                (uint)(FromHexChar(json[5]) << 8) +
+                (uint)(FromHexChar(json[6]) << 4) +
+                (uint)FromHexChar(json[7]);
+            
+            ushort b = (ushort)
+                ((FromHexChar(json[9]) << 12) +
+                (FromHexChar(json[10]) << 8) +
+                (FromHexChar(json[11]) << 4) +
+                FromHexChar(json[12]));
+
+            ushort c = (ushort)
+                ((FromHexChar(json[14]) << 12) +
+                (FromHexChar(json[15]) << 8) +
+                (FromHexChar(json[16]) << 4) +
+                FromHexChar(json[17]));
+
+            byte d = (byte)((FromHexChar(json[19]) << 4) + FromHexChar(json[20]));
+            byte e = (byte)((FromHexChar(json[21]) << 4) + FromHexChar(json[22]));
+
+            byte f = (byte)((FromHexChar(json[24]) << 4) + FromHexChar(json[25]));
+            byte g = (byte)((FromHexChar(json[26]) << 4) + FromHexChar(json[27]));
+            byte h = (byte)((FromHexChar(json[28]) << 4) + FromHexChar(json[29]));
+            byte i = (byte)((FromHexChar(json[30]) << 4) + FromHexChar(json[31]));
+            byte j = (byte)((FromHexChar(json[32]) << 4) + FromHexChar(json[33]));
+            byte k = (byte)((FromHexChar(json[34]) << 4) + FromHexChar(json[35]));
+
+            value = new Guid(a, b, c, d, e, f, g, h, i, j, k);
+
+            return json.Slice(37);
+        }
     }
 }
