@@ -27,3 +27,6 @@ Json object with the following properties:
 * boolean?
 * string
 * DateTime
+* DateTime?
+* Guid
+* Guid?
