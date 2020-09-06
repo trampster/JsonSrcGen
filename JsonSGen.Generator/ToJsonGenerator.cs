@@ -61,7 +61,7 @@ namespace JsonSGen.Generator
                         classBuilder.AppendLine(3, "{");
                         appendBuilder.Append($"\\\"");
                         classBuilder.MakeAppend(4, appendBuilder);
-                        classBuilder.AppendLine(4, $"builder.Append(value.{property.Name});");
+                        classBuilder.AppendLine(4, $"builder.AppendEscaped(value.{property.Name});");
                         appendBuilder.Append($"\\\"");
                         classBuilder.MakeAppend(4, appendBuilder);
                         classBuilder.AppendLine(3, "}");

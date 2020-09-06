@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace JsonSGen
 {
@@ -651,9 +652,100 @@ namespace JsonSGen
                 value = null;
                 return json.Slice(3);
             }
-            var propertyValue = json.ReadTo('\"');
-            value = new string(propertyValue);
-            return json.Slice(value.Length + 1);
+            for(int index = 0; index < json.Length; index++)
+            {
+                switch(json[index])
+                {
+                    case '\\':
+                        json = ReadEscapedString(json, index, out value);
+                        return json;
+                    case '\"':
+                        value = new string(json.Slice(0, index));
+                        return json.Slice(index+1);
+                }
+            }
+            throw new InvalidJsonException("Failed to find end of string");
+        }
+
+        [ThreadStatic]
+        static StringBuilder _builder;
+
+        static ReadOnlySpan<char> ReadEscapedString(this ReadOnlySpan<char> json, int firstEscapeCharacterIndex, out string value)
+        {
+            var builder = _builder;
+            if(_builder == null)
+            {
+                _builder = new StringBuilder();
+                builder = _builder;
+            }
+            builder.Clear();
+            int index = firstEscapeCharacterIndex;
+            while(true)
+            {
+                char character = json[index];
+
+                if(character == '\\')
+                {
+                    _builder.Append(json.Slice(0, index)); //append
+                    //escape character
+                    index++;
+                    character = json[index];
+                    switch(character)
+                    {
+                        case '\"':
+                        case '\\':
+                        case '/':
+                            Console.WriteLine($"Appending {character}");
+                            _builder.Append(character);
+                            break;
+                        case 'b':
+                            _builder.Append('\b');
+                            break;
+                        case 'f':
+                            _builder.Append('\f');
+                            break;
+                        case 'n':
+                            _builder.Append('\n');
+                            break;
+                        case 'r':
+                            _builder.Append('\r');
+                            break;
+                        case 't':
+                            _builder.Append('\t');
+                            break;
+                        case 'u':
+                            index++;
+                            _builder.Append(FromHex(json, index));
+                            index += 3;
+                            break;
+                    }
+
+                    json = json.Slice(index + 1);
+                    index = 0;
+                    continue;
+                }
+                else if(character == '\"')
+                {
+                    //end of string value
+                    _builder.Append(json.Slice(0, index));
+                    value = builder.ToString();
+                    return json.Slice(index + 1);
+                }
+                index++;
+                
+            }
+            //we got to the end of the span without finding the end of string character
+            throw new InvalidJsonException("Missing end of string value");
+        }
+
+        static char FromHex(this ReadOnlySpan<char> json, int internalStart)
+        {
+            int value =
+                (FromHexChar(json[internalStart]) << 12) +
+                (FromHexChar(json[internalStart + 1]) << 8) +
+                (FromHexChar(json[internalStart + 2]) << 4) +
+                (FromHexChar(json[internalStart + 3]));
+            return (char)value;
         }
 
         public static ReadOnlySpan<char> SkipWhitespace(this ReadOnlySpan<char> json)

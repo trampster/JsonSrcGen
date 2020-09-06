@@ -47,16 +47,11 @@ namespace JsonSGen
 
         public static StringBuilder AppendEscaped(this StringBuilder builder, string input)
         {
-            if(input == null)
-            {
-                return builder.Append("null");
-            }
-
-            builder.Append('\"');
             int start = 0;
             for(int index = 0; index < input.Length; index++)
             {
                 char character = input[index];
+
                 if(character < 93 && _needsEscaping[character])
                 {
                     builder.Append(input, start, index - start);
@@ -65,8 +60,7 @@ namespace JsonSGen
                 }
             }
             return builder
-                .Append(input, start, input.Length - start)
-                .Append('\"');
+                .Append(input, start, input.Length - start);
         }
 
         public static StringBuilder AppendEscaped(this StringBuilder builder, char input)
