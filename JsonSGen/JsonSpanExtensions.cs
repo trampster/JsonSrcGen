@@ -819,6 +819,42 @@ namespace JsonSGen
             throw new InvalidJsonException($"Unexpected end of json while looking for '{to1}' or {to2}");
         }
 
+        public static ReadOnlySpan<char> SkipProperty(this ReadOnlySpan<char> json)
+        {
+            int numberOfOpenBrackets = 0;
+
+            bool inString = false;
+
+            for(int index = 0; index < json.Length; index++)
+            {
+                var character = json[index];
+                switch(character)
+                {
+                    case '{':
+                        numberOfOpenBrackets++;
+                        break;
+                    case '}':
+                        if(numberOfOpenBrackets == 0)
+                        {
+                            //end of class that the property is in
+                            return json.Slice(index);
+                        }
+                        numberOfOpenBrackets--;
+                        break;
+                    case '\"':
+                        inString = !inString;
+                        break;
+                    case ',':
+                        if(numberOfOpenBrackets == 0 && !inString)
+                        {
+                            return json.Slice(index);
+                        }
+                        break;
+                }
+            }
+            throw new InvalidJsonException($"Failed to find end of property at {new string(json)}");
+        }
+
         public static ReadOnlySpan<char> ReadTo(this ReadOnlySpan<char> json, char to)
         {
             for(int index = 0; index < json.Length; index++)

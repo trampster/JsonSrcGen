@@ -96,6 +96,7 @@ namespace JsonSGen.Generator
                 string jsonName = propertyNameBuilder.ToString();
                 classBuilder.AppendLine(indentLevel+2, $"if(!propertyName.EqualsString(\"{jsonName}\"))");
                 classBuilder.AppendLine(indentLevel+2, "{");
+                classBuilder.AppendLine(indentLevel+3, "json = json.SkipProperty();");
                 classBuilder.AppendLine(indentLevel+3, "break;"); //todo: need to read to the next property (could be an object list so need to count '{' and '}')
                 classBuilder.AppendLine(indentLevel+2, "}");
                 switch(property.Type)
