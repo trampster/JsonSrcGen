@@ -9,13 +9,13 @@ namespace JsonSGen.TypeGenerators
 
         public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonProperty property)
         {
-            codeBuilder.AppendLine(indentLevel, $"json = json.ReadDateTime(out DateTime property{property.Name}Value);");
+            codeBuilder.AppendLine(indentLevel, $"json = json.ReadDateTime(out DateTime property{property.CodeName}Value);");
         }
 
         public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonProperty property)
         {
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
-            codeBuilder.AppendLine(indentLevel, $"builder.AppendDate(value.{property.Name});");
+            codeBuilder.AppendLine(indentLevel, $"builder.AppendDate(value.{property.CodeName});");
         }
     }
 }

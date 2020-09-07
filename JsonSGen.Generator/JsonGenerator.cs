@@ -112,11 +112,22 @@ namespace JsonSGen
                     var jsonProperties = new List<JsonProperty>();
 
                     foreach(var member in classSymbol.GetMembers().Where(member => member.Kind == SymbolKind.Property))
-                    {
+                    { 
                         var property = member as IPropertySymbol;
-                        string jsonPropertyName = member.Name;
+
+                        string jsonPropertyName = null;
+                        var attributes = property.GetAttributes();
+                        foreach(var attribute in attributes)
+                        {
+                            if(attribute.AttributeClass.Name == "JsonNameAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSGen")
+                            {
+                                jsonPropertyName = (string)attribute.ConstructorArguments.First().Value;
+                            }
+                        } 
+
+                        string codePropertyName = member.Name;
                         string jsonPropertyType = GetType(member);
-                        jsonProperties.Add(new JsonProperty(jsonPropertyType, jsonPropertyName));
+                        jsonProperties.Add(new JsonProperty(jsonPropertyType, jsonPropertyName ?? codePropertyName, codePropertyName));
                     }
 
                     jsonClasses.Add(new JsonClass(jsonClassName, jsonClassNamespace, jsonProperties));

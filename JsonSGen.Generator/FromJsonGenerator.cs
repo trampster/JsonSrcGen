@@ -52,11 +52,11 @@ namespace JsonSGen.Generator
         public void GenerateProperties(IReadOnlyCollection<JsonProperty> properties, int indentLevel, CodeBuilder classBuilder)
         {
             var propertyHashFactory = new PropertyHashFactory();
-            var propertyHash = propertyHashFactory.FindBestHash(properties.Select(p => p.Name).ToArray());
+            var propertyHash = propertyHashFactory.FindBestHash(properties.Select(p => p.JsonName).ToArray());
 
             var hashesQuery =
                 from property in properties
-                let hash = propertyHash.Hash(property.Name)
+                let hash = propertyHash.Hash(property.JsonName)
                 group property by hash into hashGroup
                 orderby hashGroup.Key
                 select hashGroup;
@@ -91,76 +91,79 @@ namespace JsonSGen.Generator
                     continue;
                 }
                 var property = subProperties[0];
-                classBuilder.AppendLine(indentLevel+2, $"if(!propertyName.EqualsString(\"{property.Name}\"))");
+                var propertyNameBuilder = new StringBuilder();
+                propertyNameBuilder.AppendDoubleEscaped(property.JsonName);
+                string jsonName = propertyNameBuilder.ToString();
+                classBuilder.AppendLine(indentLevel+2, $"if(!propertyName.EqualsString(\"{jsonName}\"))");
                 classBuilder.AppendLine(indentLevel+2, "{");
                 classBuilder.AppendLine(indentLevel+3, "break;"); //todo: need to read to the next property (could be an object list so need to count '{' and '}')
                 classBuilder.AppendLine(indentLevel+2, "}");
                 switch(property.Type)
                 {
                     case "Int32":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadInt(out int property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadInt(out int property{property.CodeName}Value);");
                         break;
                     case "UInt32":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadUInt(out uint property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadUInt(out uint property{property.CodeName}Value);");
                         break;
                     case "UInt64":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadULong(out ulong property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadULong(out ulong property{property.CodeName}Value);");
                         break;
                     case "UInt64?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableULong(out ulong? property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableULong(out ulong? property{property.CodeName}Value);");
                         break;
                     case "Int64":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadLong(out long property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadLong(out long property{property.CodeName}Value);");
                         break;
                     case "Int64?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableLong(out long? property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableLong(out long? property{property.CodeName}Value);");
                         break;
                     case "Int16":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadShort(out short property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadShort(out short property{property.CodeName}Value);");
                         break;
                     case "Int32?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableInt(out int? property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableInt(out int? property{property.CodeName}Value);");
                         break;
                     case "Int16?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableInt(out int? property{property.Name}Int);");
-                        classBuilder.AppendLine(indentLevel+2, $"var property{property.Name}Value = ({property.Type})property{property.Name}Int;");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableInt(out int? property{property.CodeName}Int);");
+                        classBuilder.AppendLine(indentLevel+2, $"var property{property.CodeName}Value = ({property.Type})property{property.CodeName}Int;");
                         break;
                     case "UInt32?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableUInt(out uint? property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableUInt(out uint? property{property.CodeName}Value);");
                         break;
                     case "UInt16?":
                     case "Byte?": 
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableUInt(out uint? property{property.Name}Uint);");
-                        classBuilder.AppendLine(indentLevel+2, $"var property{property.Name}Value = ({property.Type})property{property.Name}Uint;");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableUInt(out uint? property{property.CodeName}Uint);");
+                        classBuilder.AppendLine(indentLevel+2, $"var property{property.CodeName}Value = ({property.Type})property{property.CodeName}Uint;");
                         break;
                     case "UInt16":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadUShort(out ushort property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadUShort(out ushort property{property.CodeName}Value);");
                         break;
                     case "Byte":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadByte(out byte property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadByte(out byte property{property.CodeName}Value);");
                         break;
                     case "Double":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadDouble(out double property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadDouble(out double property{property.CodeName}Value);");
                         break;
                     case "Single":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadDouble(out double property{property.Name}Double);");
-                        classBuilder.AppendLine(indentLevel+2, $"var property{property.Name}Value = (float)property{property.Name}Double;");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadDouble(out double property{property.CodeName}Double);");
+                        classBuilder.AppendLine(indentLevel+2, $"var property{property.CodeName}Value = (float)property{property.CodeName}Double;");
                         break;
                     case "Double?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableDouble(out double? property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableDouble(out double? property{property.CodeName}Value);");
                         break;
                     case "Single?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableDouble(out double? property{property.Name}Double);");
-                        classBuilder.AppendLine(indentLevel+2, $"var property{property.Name}Value = (float?)property{property.Name}Double;");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableDouble(out double? property{property.CodeName}Double);");
+                        classBuilder.AppendLine(indentLevel+2, $"var property{property.CodeName}Value = (float?)property{property.CodeName}Double;");
                         break;
                     case "String":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadString(out string property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadString(out string property{property.CodeName}Value);");
                         break;
                     case "Boolean":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool property{property.CodeName}Value);");
                         break;
                     case "Boolean?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool? property{property.Name}Value);");
+                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool? property{property.CodeName}Value);");
                         break;
                     default:
                         if(_generators.TryGetValue(property.Type, out var generator))
@@ -170,7 +173,7 @@ namespace JsonSGen.Generator
                         }
                         throw new Exception($"Unsupported type {property.Type} in from json generator"); 
                 }
-                classBuilder.AppendLine(indentLevel+2, $"value.{property.Name} = property{property.Name}Value;");
+                classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
                 classBuilder.AppendLine(indentLevel+2, "break;");
             }
 

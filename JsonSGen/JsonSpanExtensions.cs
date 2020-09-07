@@ -784,7 +784,7 @@ namespace JsonSGen
                     index++;
                     return json.Slice(index);
                 }
-                throw new InvalidJsonException($"Unexpected character expected '{to}' but got '{value}' in '{new string(json)}'");
+                throw new InvalidJsonException($"Unexpected character! expected '{to}' but got '{value}' in '{new string(json)}'");
             }
             throw new InvalidJsonException($"Unexpected end of json while looking for '{to}'");
         }
@@ -814,7 +814,7 @@ namespace JsonSGen
                     found = to2;
                     return json.Slice(index);
                 }
-                throw new InvalidJsonException($"Unexpected character expected '{to1}' or '{to2}' but got '{value}'");
+                throw new InvalidJsonException($"Unexpected character! expected '{to1}' or '{to2}' but got '{value}' at {new string(json)}");
             }
             throw new InvalidJsonException($"Unexpected end of json while looking for '{to1}' or {to2}");
         }

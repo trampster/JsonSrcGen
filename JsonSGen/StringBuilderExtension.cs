@@ -45,6 +45,14 @@ namespace JsonSGen
             _escapeLookup['\t'] = "\\t";
         }
 
+        public static StringBuilder AppendDoubleEscaped(this StringBuilder builder, string input)
+        {
+            var firstBuilder = new StringBuilder();
+            firstBuilder.AppendEscaped(input);
+            builder.AppendEscaped(firstBuilder.ToString());
+            return builder;
+        }
+
         public static StringBuilder AppendEscaped(this StringBuilder builder, string input)
         {
             int start = 0;

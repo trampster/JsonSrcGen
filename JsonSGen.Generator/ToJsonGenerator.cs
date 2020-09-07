@@ -3,6 +3,7 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using JsonSGen.TypeGenerators;
+using JsonSGen;
 
 namespace JsonSGen.Generator
 {
@@ -38,19 +39,22 @@ namespace JsonSGen.Generator
             appendBuilder.Append("{");
 
             bool isFirst = true;
-            foreach(var property in jsonClass.Properties.OrderBy(p => p.Name))
+            foreach(var property in jsonClass.Properties.OrderBy(p => p.JsonName))
             {
                 if(!isFirst)
                 {
                     appendBuilder.Append(",");
                 }
 
-                appendBuilder.Append($"\\\"{property.Name}\\\":");
+                appendBuilder.Append($"\\\"");
+                appendBuilder.AppendDoubleEscaped(property.JsonName);
+                appendBuilder.Append($"\\\":");
+
 
                 switch(property.Type)
                 {
                     case "String":
-                        classBuilder.AppendLine(3, $"if(value.{property.Name} == null)");
+                        classBuilder.AppendLine(3, $"if(value.{property.CodeName} == null)");
                         classBuilder.AppendLine(3, "{");
                         var nullAppendBuilder = new StringBuilder(appendBuilder.ToString());
                         nullAppendBuilder.Append("null");
@@ -61,7 +65,7 @@ namespace JsonSGen.Generator
                         classBuilder.AppendLine(3, "{");
                         appendBuilder.Append($"\\\"");
                         classBuilder.MakeAppend(4, appendBuilder);
-                        classBuilder.AppendLine(4, $"builder.AppendEscaped(value.{property.Name});");
+                        classBuilder.AppendLine(4, $"builder.AppendEscaped(value.{property.CodeName});");
                         appendBuilder.Append($"\\\"");
                         classBuilder.MakeAppend(4, appendBuilder);
                         classBuilder.AppendLine(3, "}");
@@ -76,18 +80,18 @@ namespace JsonSGen.Generator
                     case "Single":
                     case "Double":
                         classBuilder.MakeAppend(3, appendBuilder);
-                        classBuilder.AppendLine(3, $"builder.Append(value.{property.Name});");
+                        classBuilder.AppendLine(3, $"builder.Append(value.{property.CodeName});");
                         break;
                     case "Single?":
                     case "Double?":
                         classBuilder.MakeAppend(3, appendBuilder);
-                        classBuilder.AppendLine(3, $"if(value.{property.Name} == null)");
+                        classBuilder.AppendLine(3, $"if(value.{property.CodeName} == null)");
                         classBuilder.AppendLine(3, "{");
                         classBuilder.AppendLine(4, $"builder.Append(\"null\");");
                         classBuilder.AppendLine(3, "}");
                         classBuilder.AppendLine(3, "else");
                         classBuilder.AppendLine(3, "{");
-                        classBuilder.AppendLine(4, $"builder.Append(value.{property.Name});");
+                        classBuilder.AppendLine(4, $"builder.Append(value.{property.CodeName});");
                         classBuilder.AppendLine(3, "}");
                         break;
                     case "UInt32?":
@@ -98,22 +102,22 @@ namespace JsonSGen.Generator
                     case "UInt64?":
                     case "Int64?":
                         classBuilder.MakeAppend(3, appendBuilder);
-                        classBuilder.AppendLine(3, $"if(value.{property.Name} == null)");
+                        classBuilder.AppendLine(3, $"if(value.{property.CodeName} == null)");
                         classBuilder.AppendLine(3, "{");
                         classBuilder.AppendLine(4, $"builder.Append(\"null\");");
                         classBuilder.AppendLine(3, "}");
                         classBuilder.AppendLine(3, "else");
                         classBuilder.AppendLine(3, "{");
-                        classBuilder.AppendLine(4, $"builder.Append(value.{property.Name});");
+                        classBuilder.AppendLine(4, $"builder.Append(value.{property.CodeName});");
                         classBuilder.AppendLine(3, "}");
                         break;
                     case "Boolean":
                         classBuilder.MakeAppend(3, appendBuilder);
-                        classBuilder.AppendLine(3, $"builder.Append(value.{property.Name} ? \"true\" : \"false\");");
+                        classBuilder.AppendLine(3, $"builder.Append(value.{property.CodeName} ? \"true\" : \"false\");");
                         break;
                     case "Boolean?":
                         classBuilder.MakeAppend(3, appendBuilder);
-                        classBuilder.AppendLine(3, $"builder.Append(value.{property.Name} == null ? \"null\" : value.{property.Name}.Value ? \"true\" : \"false\");");
+                        classBuilder.AppendLine(3, $"builder.Append(value.{property.CodeName} == null ? \"null\" : value.{property.CodeName}.Value ? \"true\" : \"false\");");
                         break;
                     default:
                         if(_generators.TryGetValue(property.Type, out var generator))
