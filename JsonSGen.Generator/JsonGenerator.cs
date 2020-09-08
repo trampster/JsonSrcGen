@@ -104,7 +104,7 @@ namespace JsonSGen
                 SemanticModel model = compilation.GetSemanticModel(candidateClass.SyntaxTree);
                 var classSymbol = model.GetDeclaredSymbol(candidateClass);
 
-                if (classSymbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "JsonAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSGen"))
+                if (HasJsonClassAttribute(classSymbol))
                 {
                     string jsonClassName = classSymbol.Name;
                     string jsonClassNamespace = classSymbol.ContainingNamespace.ToString();
@@ -126,7 +126,7 @@ namespace JsonSGen
                         } 
 
                         string codePropertyName = member.Name;
-                        string jsonPropertyType = GetType(member);
+                        var jsonPropertyType = GetType(member);
                         jsonProperties.Add(new JsonProperty(jsonPropertyType, jsonPropertyName ?? codePropertyName, codePropertyName));
                     }
 
@@ -136,8 +136,12 @@ namespace JsonSGen
             return jsonClasses; 
         }
 
+        bool HasJsonClassAttribute(ISymbol symbol)
+        {
+            return symbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "JsonAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSGen");
+        }
 
-        string GetType(ISymbol symbol)
+        JsonType GetType(ISymbol symbol)
         {
             var property = symbol as IPropertySymbol;
             if(property != null)
@@ -147,10 +151,11 @@ namespace JsonSGen
                     var namedType = property.Type as INamedTypeSymbol;
                     if(namedType != null)
                     {
-                        return $"{namedType.TypeArguments.First().Name}?";
+                        return new JsonType($"{namedType.TypeArguments.First().Name}?", null, false);
                     }
                 }
-                return property.Type.Name;
+                bool isCustomType = HasJsonClassAttribute(property.Type);
+                return new JsonType(property.Type.Name, property.Type.ContainingNamespace.Name, isCustomType);
             }
 
             throw new Exception($"unsupported member type {symbol}");

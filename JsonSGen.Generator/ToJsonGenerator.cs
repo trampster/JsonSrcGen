@@ -18,6 +18,7 @@ namespace JsonSGen.Generator
             }
             builder.Clear();";
 
+        readonly IJsonGenerator _customTypeGenerator = new CustomTypeGenerator();
         readonly Dictionary<string, IJsonGenerator> _generators;
 
         public ToJsonGenerator(IEnumerable<IJsonGenerator> generators)
@@ -34,6 +35,13 @@ namespace JsonSGen.Generator
             classBuilder.AppendLine(2, $"public string ToJson({jsonClass.Namespace}.{jsonClass.Name} value)");
             classBuilder.AppendLine(2, "{");
             classBuilder.AppendLine(0, BuilderText);
+            classBuilder.AppendLine(3, "ToJson(value, builder);");
+            classBuilder.AppendLine(3, "return builder.ToString();");
+            classBuilder.AppendLine(2, "}"); 
+
+
+            classBuilder.AppendLine(2, $"public void ToJson({jsonClass.Namespace}.{jsonClass.Name} value, StringBuilder builder)");
+            classBuilder.AppendLine(2, "{");
 
             var appendBuilder = new StringBuilder();
             appendBuilder.Append("{");
@@ -51,7 +59,7 @@ namespace JsonSGen.Generator
                 appendBuilder.Append($"\\\":");
 
 
-                switch(property.Type)
+                switch(property.Type.Name)
                 {
                     case "String":
                         classBuilder.AppendLine(3, $"if(value.{property.CodeName} == null)");
@@ -120,21 +128,29 @@ namespace JsonSGen.Generator
                         classBuilder.AppendLine(3, $"builder.Append(value.{property.CodeName} == null ? \"null\" : value.{property.CodeName}.Value ? \"true\" : \"false\");");
                         break;
                     default:
-                        if(_generators.TryGetValue(property.Type, out var generator))
-                        {
-                            generator.GenerateToJson(classBuilder, 3, appendBuilder, property);
-                            break;
-                        }
-                        throw new Exception($"Unsupported type {property.Type} in to json generator");
-
+                        var generator = GetGeneratorForType(property.Type);
+                        generator.GenerateToJson(classBuilder, 3, appendBuilder, property);
+                        break;
                 }
 
                 if(isFirst) isFirst = false;
             }
             appendBuilder.Append("}"); 
             classBuilder.MakeAppend(3, appendBuilder);
-            classBuilder.AppendLine(3, "return builder.ToString();"); 
             classBuilder.AppendLine(2, "}");
+        }
+
+        IJsonGenerator GetGeneratorForType(JsonType type)
+        {
+            if(type.IsCustomType)
+            {
+                return _customTypeGenerator;
+            } 
+            if(_generators.TryGetValue(type.Name, out var generator))
+            {
+                return generator;
+            }
+            throw new Exception($"Unsupported type {type.FullName} in to json generator");
         }
     }
 }
