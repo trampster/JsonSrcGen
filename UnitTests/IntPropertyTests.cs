@@ -43,9 +43,9 @@ namespace UnitTests
 
             //assert
             Assert.That(json, Is.EqualTo(ExpectedJson));
-        }
+        } 
 
-        [Test]
+        [Test] 
         public void FromJson_CorrectJsonClass()
         {
             //arrange

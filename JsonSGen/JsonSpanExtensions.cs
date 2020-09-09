@@ -5,7 +5,7 @@ namespace JsonSGen
 {
     public static class JsonSpanExtensions
     {
-        public static ReadOnlySpan<char> ReadBool(this ReadOnlySpan<char> json, out bool value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out bool value)
         {
             json = json.SkipWhitespace();
             if(json[0] == 't')
@@ -17,7 +17,7 @@ namespace JsonSGen
             return json.Slice(5);
         }
 
-        public static ReadOnlySpan<char> ReadBool(this ReadOnlySpan<char> json, out bool? value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out bool? value)
         {
             json = json.SkipWhitespace();
             switch(json[0])
@@ -33,7 +33,7 @@ namespace JsonSGen
             return json.Slice(5);
         }
 
-        public static ReadOnlySpan<char> ReadShort(this ReadOnlySpan<char> json, out short value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out short value)
         {
             json = json.SkipWhitespace();
             int sign = 1;
@@ -77,7 +77,7 @@ namespace JsonSGen
             return json.Slice(afterIntIndex);
         }
 
-        public static ReadOnlySpan<char> ReadNullableLong(this ReadOnlySpan<char> json, out long? value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out long? value)
         {
             json = json.SkipWhitespace();
             int sign = 1;
@@ -125,7 +125,7 @@ namespace JsonSGen
             return json.Slice(afterIntIndex);
         }
 
-        public static ReadOnlySpan<char> ReadLong(this ReadOnlySpan<char> json, out long value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out long value)
         {
             json = json.SkipWhitespace();
             int sign = 1;
@@ -169,7 +169,7 @@ namespace JsonSGen
         }
 
 
-        public static ReadOnlySpan<char> ReadNullableInt(this ReadOnlySpan<char> json, out int? value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out int? value)
         {
             json = json.SkipWhitespace();
             int sign = 1;
@@ -220,7 +220,7 @@ namespace JsonSGen
             return json.Slice(afterIntIndex);
         }
 
-        public static ReadOnlySpan<char> ReadInt(this ReadOnlySpan<char> json, out int value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out int value)
         {
             json = json.SkipWhitespace();
             int sign = 1;
@@ -269,7 +269,7 @@ namespace JsonSGen
             return character >= '0' && character <= '9';
         }
 
-        public static ReadOnlySpan<char> ReadNullableDouble(this ReadOnlySpan<char> json, out double? value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out double? value)
         {
             json = json.SkipWhitespace();
 
@@ -346,7 +346,7 @@ namespace JsonSGen
             return json.Slice(index);
         }
 
-        public static ReadOnlySpan<char> ReadDouble(this ReadOnlySpan<char> json, out double value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out double value)
         {
             json = json.SkipWhitespace();
 
@@ -418,7 +418,7 @@ namespace JsonSGen
             return json.Slice(index);
         }
 
-        public static ReadOnlySpan<char> ReadByte(this ReadOnlySpan<char> json, out byte value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out byte value)
         {
             json = json.SkipWhitespace();
             int afterIntIndex = 0;
@@ -453,7 +453,7 @@ namespace JsonSGen
             return json.Slice(afterIntIndex);
         }
 
-        public static ReadOnlySpan<char> ReadUShort(this ReadOnlySpan<char> json, out ushort value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out ushort value)
         {
             json = json.SkipWhitespace();
             int afterIntIndex = 0;
@@ -490,7 +490,7 @@ namespace JsonSGen
             return json.Slice(afterIntIndex);
         }
 
-        public static ReadOnlySpan<char> ReadNullableULong(this ReadOnlySpan<char> json, out ulong? value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out ulong? value)
         {
             json = json.SkipWhitespace();
             if(json[0] == 'n')
@@ -530,7 +530,7 @@ namespace JsonSGen
             return json.Slice(afterIntIndex);
         }
 
-        public static ReadOnlySpan<char> ReadULong(this ReadOnlySpan<char> json, out ulong value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out ulong value)
         {
             json = json.SkipWhitespace();
             int afterIntIndex = 0;
@@ -565,7 +565,7 @@ namespace JsonSGen
             return json.Slice(afterIntIndex);
         }
 
-        public static ReadOnlySpan<char> ReadNullableUInt(this ReadOnlySpan<char> json, out uint? value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out uint? value)
         {
             json = json.SkipWhitespace();
             if(json[0] == 'n')
@@ -607,7 +607,7 @@ namespace JsonSGen
             return json.Slice(afterIntIndex);
         }
 
-        public static ReadOnlySpan<char> ReadUInt(this ReadOnlySpan<char> json, out uint value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out uint value)
         {
             json = json.SkipWhitespace();
             int afterIntIndex = 0;
@@ -644,7 +644,7 @@ namespace JsonSGen
             return json.Slice(afterIntIndex);
         }
 
-        public static ReadOnlySpan<char> ReadString(this ReadOnlySpan<char> json, out string value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out string value)
         {
             json = json.SkipWhitespaceTo('\"', 'n', out char found);
             if(found == 'n')

@@ -59,79 +59,8 @@ namespace JsonSGen.Generator
                 appendBuilder.Append($"\\\":");
 
 
-                switch(property.Type.Name)
-                {
-                    case "String":
-                        classBuilder.AppendLine(3, $"if(value.{property.CodeName} == null)");
-                        classBuilder.AppendLine(3, "{");
-                        var nullAppendBuilder = new StringBuilder(appendBuilder.ToString());
-                        nullAppendBuilder.Append("null");
-                        classBuilder.MakeAppend(4, nullAppendBuilder);
-                        classBuilder.AppendLine(3, "}");
-
-                        classBuilder.AppendLine(3, "else");
-                        classBuilder.AppendLine(3, "{");
-                        appendBuilder.Append($"\\\"");
-                        classBuilder.MakeAppend(4, appendBuilder);
-                        classBuilder.AppendLine(4, $"builder.AppendEscaped(value.{property.CodeName});");
-                        appendBuilder.Append($"\\\"");
-                        classBuilder.MakeAppend(4, appendBuilder);
-                        classBuilder.AppendLine(3, "}");
-                        break;
-                    case "Int32":
-                    case "UInt32":
-                    case "Int64":
-                    case "UInt64":
-                    case "Int16":
-                    case "UInt16":
-                    case "Byte":
-                    case "Single":
-                    case "Double":
-                        classBuilder.MakeAppend(3, appendBuilder);
-                        classBuilder.AppendLine(3, $"builder.Append(value.{property.CodeName});");
-                        break;
-                    case "Single?":
-                    case "Double?":
-                        classBuilder.MakeAppend(3, appendBuilder);
-                        classBuilder.AppendLine(3, $"if(value.{property.CodeName} == null)");
-                        classBuilder.AppendLine(3, "{");
-                        classBuilder.AppendLine(4, $"builder.Append(\"null\");");
-                        classBuilder.AppendLine(3, "}");
-                        classBuilder.AppendLine(3, "else");
-                        classBuilder.AppendLine(3, "{");
-                        classBuilder.AppendLine(4, $"builder.Append(value.{property.CodeName});");
-                        classBuilder.AppendLine(3, "}");
-                        break;
-                    case "UInt32?":
-                    case "UInt16?":
-                    case "Byte?":
-                    case "Int32?":
-                    case "Int16?":
-                    case "UInt64?":
-                    case "Int64?":
-                        classBuilder.MakeAppend(3, appendBuilder);
-                        classBuilder.AppendLine(3, $"if(value.{property.CodeName} == null)");
-                        classBuilder.AppendLine(3, "{");
-                        classBuilder.AppendLine(4, $"builder.Append(\"null\");");
-                        classBuilder.AppendLine(3, "}");
-                        classBuilder.AppendLine(3, "else");
-                        classBuilder.AppendLine(3, "{");
-                        classBuilder.AppendLine(4, $"builder.Append(value.{property.CodeName});");
-                        classBuilder.AppendLine(3, "}");
-                        break;
-                    case "Boolean":
-                        classBuilder.MakeAppend(3, appendBuilder);
-                        classBuilder.AppendLine(3, $"builder.Append(value.{property.CodeName} ? \"true\" : \"false\");");
-                        break;
-                    case "Boolean?":
-                        classBuilder.MakeAppend(3, appendBuilder);
-                        classBuilder.AppendLine(3, $"builder.Append(value.{property.CodeName} == null ? \"null\" : value.{property.CodeName}.Value ? \"true\" : \"false\");");
-                        break;
-                    default:
-                        var generator = GetGeneratorForType(property.Type);
-                        generator.GenerateToJson(classBuilder, 3, appendBuilder, property);
-                        break;
-                }
+                var generator = GetGeneratorForType(property.Type);
+                generator.GenerateToJson(classBuilder, 3, appendBuilder, property);
 
                 if(isFirst) isFirst = false;
             }

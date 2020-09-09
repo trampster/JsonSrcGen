@@ -67,7 +67,28 @@ namespace JsonSGen
                 new DateTimeGenerator(),
                 new NullableDateTimeGenerator(),
                 new GuidGenerator(),
-                new NullableGuidGenerator()
+                new NullableGuidGenerator(),
+                new AppendReadGenerator("Int32"),
+                new AppendReadGenerator("UInt32"),
+                new AppendReadGenerator("UInt64"),
+                new AppendReadGenerator("Int64"),
+                new AppendReadGenerator("Int16"),
+                new AppendReadGenerator("UInt16"),
+                new AppendReadGenerator("Byte"),
+                new AppendReadGenerator("Double"),
+                new AppendReadGenerator("Single") {ReadType="Double"},
+                new NullableAppendReadGenerator("UInt64?"),
+                new NullableAppendReadGenerator("UInt32?"),
+                new NullableAppendReadGenerator("UInt16?") {ReadType="UInt32?"},
+                new NullableAppendReadGenerator("Byte?") {ReadType="UInt32?"},
+                new NullableAppendReadGenerator("Int32?"),
+                new NullableAppendReadGenerator("Int16?") {ReadType="Int32?"},
+                new NullableAppendReadGenerator("Int64?"),
+                new NullableAppendReadGenerator("Double?"),
+                new NullableAppendReadGenerator("Single?") {ReadType="Double?"},
+                new BoolGenerator(),
+                new NullableBoolGenerator(),
+                new StringGenerator()
             };
 
             var toJsonGenerator = new ToJsonGenerator(generators);

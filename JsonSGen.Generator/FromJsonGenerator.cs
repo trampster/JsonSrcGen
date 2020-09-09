@@ -70,11 +70,6 @@ namespace JsonSGen.Generator
 
             foreach(var switchGroup in switchGroups)
             {
-                // if(switchGroup.Count <= 2)
-                // {
-                //     GenerateIfGroup(switchGroup, propertyHandlers, unknownPropertyLabel, loopCheckLabel, hashLocal);
-                //     continue;
-                // }
                 GenerateSwitchGroup(switchGroup, classBuilder, indentLevel, propertyHash);
             }
         }
@@ -101,97 +96,12 @@ namespace JsonSGen.Generator
                 classBuilder.AppendLine(indentLevel+2, $"if(!propertyName.EqualsString(\"{jsonName}\"))");
                 classBuilder.AppendLine(indentLevel+2, "{");
                 classBuilder.AppendLine(indentLevel+3, "json = json.SkipProperty();");
-                classBuilder.AppendLine(indentLevel+3, "break;"); //todo: need to read to the next property (could be an object list so need to count '{' and '}')
+                classBuilder.AppendLine(indentLevel+3, "break;"); 
                 classBuilder.AppendLine(indentLevel+2, "}");
 
-                switch(property.Type.Name)
-                {
-                    case "Int32":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadInt(out int property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "UInt32":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadUInt(out uint property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "UInt64":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadULong(out ulong property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "UInt64?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableULong(out ulong? property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "Int64":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadLong(out long property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "Int64?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableLong(out long? property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "Int16":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadShort(out short property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "Int32?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableInt(out int? property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "Int16?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableInt(out int? property{property.CodeName}Int);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = ({property.Type.Name})property{property.CodeName}Int;");
-                        break;
-                    case "UInt32?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableUInt(out uint? property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "UInt16?":
-                    case "Byte?": 
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableUInt(out uint? property{property.CodeName}Uint);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = ({property.Type.Name})property{property.CodeName}Uint;");
-                        break;
-                    case "UInt16":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadUShort(out ushort property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "Byte":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadByte(out byte property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "Double":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadDouble(out double property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "Single":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadDouble(out double property{property.CodeName}Double);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = (float)property{property.CodeName}Double;");
-                        break;
-                    case "Double?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableDouble(out double? property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "Single?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadNullableDouble(out double? property{property.CodeName}Double);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = (float?)property{property.CodeName}Double;");
-                        break;
-                    case "String":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadString(out string property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "Boolean":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    case "Boolean?":
-                        classBuilder.AppendLine(indentLevel+2, $"json = json.ReadBool(out bool? property{property.CodeName}Value);");
-                        classBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
-                        break;
-                    default:
-                        var generator = GetGeneratorForType(property.Type);
-                        generator.GenerateFromJson(classBuilder, indentLevel+2, property);
-                        break;
-                }
+                var generator = GetGeneratorForType(property.Type);
+                generator.GenerateFromJson(classBuilder, indentLevel+2, property);
+
                 classBuilder.AppendLine(indentLevel+2, "break;"); 
             }
 
