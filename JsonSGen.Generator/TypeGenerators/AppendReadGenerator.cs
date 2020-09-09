@@ -27,10 +27,10 @@ namespace JsonSGen.TypeGenerators
             }
         }
 
-        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonProperty property)
+        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter)
         {
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
-            codeBuilder.AppendLine(indentLevel, $"builder.Append(value.{property.CodeName});");
+            codeBuilder.AppendLine(indentLevel, $"builder.Append({valueGetter});");
         }
     }
 }

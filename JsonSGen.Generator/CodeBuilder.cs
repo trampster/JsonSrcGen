@@ -27,6 +27,10 @@ namespace JsonSGen.Generator
 
         public void MakeAppend(int indentLevel, StringBuilder appendContent)
         {
+            if(appendContent.Length == 0)
+            {
+                return;
+            }
             AppendLine(indentLevel, $"builder.Append(\"{appendContent.ToString()}\");");
             appendContent.Clear();
         }

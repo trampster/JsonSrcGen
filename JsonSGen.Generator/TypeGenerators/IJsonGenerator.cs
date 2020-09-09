@@ -9,6 +9,6 @@ namespace JsonSGen.TypeGenerators
 
         void GenerateFromJson(CodeBuilder codeBuilder, int inputLevel, JsonProperty jsonProperty);
 
-        void GenerateToJson(CodeBuilder codeBuilder, int inputLevel, StringBuilder appendBuilder, JsonProperty jsonProperty);
+        void GenerateToJson(CodeBuilder codeBuilder, int inputLevel, StringBuilder appendBuilder, JsonType type, string valueGetter);
     }
 }

@@ -36,6 +36,17 @@ namespace JsonSGen.Generator
             }
         }
 
+        Dictionary<string, IJsonGenerator> _generators;
+
+        IJsonGenerator GetGeneratorForType(JsonType type)
+        {
+            if(_generators.TryGetValue(type.GeneratorId, out var generator))
+            {
+                return generator;
+            }
+            throw new Exception($"Unsupported type {type.FullName} in from json generator");
+        }
+
         public void Generate(SourceGeneratorContext context)
         {
 
@@ -88,11 +99,19 @@ namespace JsonSGen
                 new NullableAppendReadGenerator("Single?") {ReadType="Double?"},
                 new BoolGenerator(),
                 new NullableBoolGenerator(),
-                new StringGenerator()
+                new StringGenerator(),
+                new ListGenerator(type => GetGeneratorForType(type)),
+                new CustomTypeGenerator()
             };
 
-            var toJsonGenerator = new ToJsonGenerator(generators);
-            var fromJsonGenerator = new FromJsonGenerator(generators);
+            _generators = new Dictionary<string, IJsonGenerator>();
+            foreach(var generator in generators)
+            {
+                _generators.Add(generator.TypeName, generator);
+            }
+
+            var toJsonGenerator = new ToJsonGenerator(GetGeneratorForType);
+            var fromJsonGenerator = new FromJsonGenerator(GetGeneratorForType);
 
             foreach (var jsonClass in classes)
             {
@@ -105,7 +124,7 @@ namespace JsonSGen
 
             try
             {
-               File.WriteAllText(Path.Combine($"..", "Generated", "Generated.cs"), classBuilder.ToString());
+               File.WriteAllText(Path.Combine("/home/daniel/Work/JsonSG", "Generated", "Generated.cs"), classBuilder.ToString());
             }
             catch(DirectoryNotFoundException)
             {
@@ -167,19 +186,38 @@ namespace JsonSGen
             var property = symbol as IPropertySymbol;
             if(property != null)
             {
-                if(property.Type.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
-                {
-                    var namedType = property.Type as INamedTypeSymbol;
-                    if(namedType != null)
-                    {
-                        return new JsonType($"{namedType.TypeArguments.First().Name}?", null, false);
-                    }
-                }
-                bool isCustomType = HasJsonClassAttribute(property.Type);
-                return new JsonType(property.Type.Name, property.Type.ContainingNamespace.Name, isCustomType);
+                return GetType(property.Type);
             }
+            throw new Exception($"unsupported member type {symbol} {symbol.GetType()}");
+        }
 
-            throw new Exception($"unsupported member type {symbol}");
+        JsonType GetType(ITypeSymbol typeSymbol)
+        {
+            if(typeSymbol.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
+            {
+                var namedType = typeSymbol as INamedTypeSymbol;
+                if(namedType != null)
+                {
+                    string name = $"{namedType.TypeArguments.First().Name}?";
+                    return new JsonType(name, name, null, false, GetGenericArguments(typeSymbol));
+                }
+            }
+            bool isCustomType = HasJsonClassAttribute(typeSymbol);
+            return new JsonType(isCustomType ? "Custom" : typeSymbol.Name, typeSymbol.Name, typeSymbol.ContainingNamespace.Name, isCustomType, GetGenericArguments(typeSymbol));
+        }
+
+        List<JsonType> GetGenericArguments(ITypeSymbol typeSymbol)
+        {
+            var list = new List<JsonType>();
+            var namedType = typeSymbol as INamedTypeSymbol;
+            if(namedType != null)
+            {
+                foreach(var typeArgument in namedType.TypeArguments)
+                {
+                    list.Add(GetType(typeArgument));
+                }
+            }
+            return list;
         }
 
         public void Initialize(InitializationContext context)

@@ -9,16 +9,11 @@ namespace JsonSGen.Generator
 {
     public class FromJsonGenerator
     {
-        readonly IJsonGenerator _customTypeGenerator = new CustomTypeGenerator();
-        readonly Dictionary<string, IJsonGenerator> _generators;
+        readonly Func<JsonType, IJsonGenerator> _getGeneratorForType;
 
-        public FromJsonGenerator(IEnumerable<IJsonGenerator> generators)
+        public FromJsonGenerator(Func<JsonType, IJsonGenerator> getGeneratorForType)
         {
-            _generators = new Dictionary<string, IJsonGenerator>();
-            foreach(var generator in generators)
-            {
-                _generators.Add(generator.TypeName, generator);
-            }
+            _getGeneratorForType = getGeneratorForType;
         }
 
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
@@ -99,7 +94,7 @@ namespace JsonSGen.Generator
                 classBuilder.AppendLine(indentLevel+3, "break;"); 
                 classBuilder.AppendLine(indentLevel+2, "}");
 
-                var generator = GetGeneratorForType(property.Type);
+                var generator = _getGeneratorForType(property.Type);
                 generator.GenerateFromJson(classBuilder, indentLevel+2, property);
 
                 classBuilder.AppendLine(indentLevel+2, "break;"); 
@@ -108,23 +103,9 @@ namespace JsonSGen.Generator
             classBuilder.AppendLine(indentLevel, "}"); // end of switch
         }
 
-        IJsonGenerator GetGeneratorForType(JsonType type)
-        {
-            if(type.IsCustomType)
-            {
-                return _customTypeGenerator;
-            } 
-            if(_generators.TryGetValue(type.Name, out var generator))
-            {
-                return generator;
-            }
-            throw new Exception($"Unsupported type {type.FullName} in from json generator");
-
-        }
-
         class SwitchGroup : List<IGrouping<int, JsonProperty>>{}
 
-        IEnumerable<SwitchGroup> FindSwitchGroups(IGrouping<int, JsonProperty>[] hashes)
+        IEnumerable<SwitchGroup> FindSwitchGroups(IGrouping<int, JsonProperty>[] hashes) 
         {
             int last = 0;
             int gaps = 0;

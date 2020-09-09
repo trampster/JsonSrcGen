@@ -13,10 +13,10 @@ namespace JsonSGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, $"value.{property.CodeName} = property{property.CodeName}Value;");
         }
 
-        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonProperty property)
+        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter)
         {
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
-            codeBuilder.AppendLine(indentLevel, $"builder.Append(value.{property.CodeName} == null ? \"null\" : value.{property.CodeName}.Value ? \"true\" : \"false\");");
+            codeBuilder.AppendLine(indentLevel, $"builder.Append({valueGetter} == null ? \"null\" : {valueGetter}.Value ? \"true\" : \"false\");");
         }
     }
 }

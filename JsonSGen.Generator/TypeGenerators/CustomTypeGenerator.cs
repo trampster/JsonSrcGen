@@ -25,9 +25,9 @@ namespace JsonSGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel+2, $"json = FromJson(value.{property.CodeName}, json);");
         }
 
-        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonProperty property)
+        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter)
         {
-            codeBuilder.AppendLine(indentLevel, $"if(value.{property.CodeName} == null)");
+            codeBuilder.AppendLine(indentLevel, $"if({valueGetter} == null)");
             codeBuilder.AppendLine(indentLevel, "{");
             var nullAppendBuilder = new StringBuilder(appendBuilder.ToString());
             nullAppendBuilder.Append("null");
@@ -36,7 +36,7 @@ namespace JsonSGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, "else"); 
             codeBuilder.AppendLine(indentLevel, "{");
             codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
-            codeBuilder.AppendLine(indentLevel+1, $"ToJson(value.{property.CodeName}, builder);");
+            codeBuilder.AppendLine(indentLevel+1, $"ToJson({valueGetter}, builder);");
             codeBuilder.AppendLine(indentLevel, "}");
         }
     }

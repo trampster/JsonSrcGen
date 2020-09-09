@@ -27,16 +27,16 @@ namespace JsonSGen.TypeGenerators
             }
         }
 
-        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonProperty property)
+        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter)
         {
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
-            codeBuilder.AppendLine(indentLevel, $"if(value.{property.CodeName} == null)");
+            codeBuilder.AppendLine(indentLevel, $"if({valueGetter} == null)");
             codeBuilder.AppendLine(indentLevel, "{");
             codeBuilder.AppendLine(indentLevel+1, $"builder.Append(\"null\");");
             codeBuilder.AppendLine(indentLevel, "}");
             codeBuilder.AppendLine(indentLevel, "else");
             codeBuilder.AppendLine(indentLevel, "{");
-            codeBuilder.AppendLine(indentLevel+1, $"builder.Append(value.{property.CodeName});");
+            codeBuilder.AppendLine(indentLevel+1, $"builder.Append({valueGetter});");
             codeBuilder.AppendLine(indentLevel, "}");
         }
     }

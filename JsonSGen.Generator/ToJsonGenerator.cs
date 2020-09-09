@@ -18,16 +18,11 @@ namespace JsonSGen.Generator
             }
             builder.Clear();";
 
-        readonly IJsonGenerator _customTypeGenerator = new CustomTypeGenerator();
-        readonly Dictionary<string, IJsonGenerator> _generators;
+        readonly Func<JsonType, IJsonGenerator> _getGeneratorForType;
 
-        public ToJsonGenerator(IEnumerable<IJsonGenerator> generators)
+        public ToJsonGenerator(Func<JsonType, IJsonGenerator> getGeneratorForType)
         {
-            _generators = new Dictionary<string, IJsonGenerator>();
-            foreach(var generator in generators)
-            {
-                _generators.Add(generator.TypeName, generator);
-            }
+            _getGeneratorForType = getGeneratorForType;
         }
 
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
@@ -60,7 +55,7 @@ namespace JsonSGen.Generator
 
 
                 var generator = GetGeneratorForType(property.Type);
-                generator.GenerateToJson(classBuilder, 3, appendBuilder, property);
+                generator.GenerateToJson(classBuilder, 3, appendBuilder, property.Type, $"value.{property.CodeName}");
 
                 if(isFirst) isFirst = false;
             }
@@ -71,15 +66,7 @@ namespace JsonSGen.Generator
 
         IJsonGenerator GetGeneratorForType(JsonType type)
         {
-            if(type.IsCustomType)
-            {
-                return _customTypeGenerator;
-            } 
-            if(_generators.TryGetValue(type.Name, out var generator))
-            {
-                return generator;
-            }
-            throw new Exception($"Unsupported type {type.FullName} in to json generator");
+            return _getGeneratorForType(type);
         }
     }
 }

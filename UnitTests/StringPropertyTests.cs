@@ -47,7 +47,7 @@ namespace UnitTests
             System.Console.WriteLine($"ActualJson:   {json}");
             //assert
             Assert.That(json, Is.EqualTo(ExpectedJson));
-        }
+        } 
 
 
         [Test]
