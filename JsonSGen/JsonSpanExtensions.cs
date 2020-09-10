@@ -8,13 +8,16 @@ namespace JsonSGen
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out bool value)
         {
             json = json.SkipWhitespace();
-            if(json[0] == 't')
+            switch(json[0])
             {
-                value = true;
-                return json.Slice(4);
+                case 't':
+                    value = true;
+                    return json.Slice(4);
+                case 'f':
+                    value = false;
+                    return json.Slice(5);
             }
-            value = false;
-            return json.Slice(5);
+            throw new InvalidJsonException($"Expected 'true' or 'false' but got {new string(json)}");
         }
 
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out bool? value)

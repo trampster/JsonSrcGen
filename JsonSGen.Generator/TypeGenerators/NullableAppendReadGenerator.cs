@@ -1,7 +1,8 @@
+using System;
 using System.Text;
 using JsonSGen.Generator;
 
-namespace JsonSGen.TypeGenerators
+namespace JsonSGen.Generator.TypeGenerators
 {
     public class NullableAppendReadGenerator : IJsonGenerator
     {
@@ -13,17 +14,18 @@ namespace JsonSGen.TypeGenerators
             TypeName = typeName;
         }
 
-        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonProperty property)
+        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
         {
+            string propertyValueName = $"property{UniqueNumberGenerator.UniqueNumber}Value";
             if(ReadType == null)
             {
-                codeBuilder.AppendLine(indentLevel, $"json = json.Read(out {TypeName} property{property.CodeName}Value);");
-                codeBuilder.AppendLine(indentLevel, $"value.{property.CodeName} = property{property.CodeName}Value;");
+                codeBuilder.AppendLine(indentLevel, $"json = json.Read(out {TypeName} {propertyValueName});");
+                codeBuilder.AppendLine(indentLevel, valueSetter(propertyValueName));
             }
             else
             {
-                codeBuilder.AppendLine(indentLevel, $"json = json.Read(out {ReadType} property{property.CodeName}Value);");
-                codeBuilder.AppendLine(indentLevel, $"value.{property.CodeName} = ({TypeName})property{property.CodeName}Value;");
+                codeBuilder.AppendLine(indentLevel, $"json = json.Read(out {ReadType} {propertyValueName});");
+                codeBuilder.AppendLine(indentLevel, valueSetter($"({TypeName}){propertyValueName}"));
             }
         }
 

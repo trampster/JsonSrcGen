@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using JsonSGen.Generator.PropertyHashing;
 using System.Collections.Generic;
-using JsonSGen.TypeGenerators;
+using JsonSGen.Generator.TypeGenerators;
 
 namespace JsonSGen.Generator
 {
@@ -95,7 +95,7 @@ namespace JsonSGen.Generator
                 classBuilder.AppendLine(indentLevel+2, "}");
 
                 var generator = _getGeneratorForType(property.Type);
-                generator.GenerateFromJson(classBuilder, indentLevel+2, property);
+                generator.GenerateFromJson(classBuilder, indentLevel+2, property.Type, propertyValue => $"value.{property.CodeName} = {propertyValue};", $"value.{property.CodeName}");
 
                 classBuilder.AppendLine(indentLevel+2, "break;"); 
             }

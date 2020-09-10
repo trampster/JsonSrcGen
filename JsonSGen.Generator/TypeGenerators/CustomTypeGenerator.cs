@@ -1,28 +1,38 @@
+using System;
 using System.Text;
 using JsonSGen.Generator;
 
-namespace JsonSGen.TypeGenerators
+namespace JsonSGen.Generator.TypeGenerators
 {
     public class CustomTypeGenerator : IJsonGenerator
     {
         public string TypeName => "Custom"; 
 
-        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonProperty property)
+        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
         {
+            string propertyValueName = $"property{UniqueNumberGenerator.UniqueNumber}Value";
+
             codeBuilder.AppendLine(indentLevel+2, "json = json.SkipWhitespace();");
             codeBuilder.AppendLine(indentLevel+2, "if(json[0] == 'n')");
             codeBuilder.AppendLine(indentLevel+2, "{");
-            codeBuilder.AppendLine(indentLevel+3, $"value.{property.CodeName} = null;");
+            codeBuilder.AppendLine(indentLevel+3, valueSetter("null"));
             codeBuilder.AppendLine(indentLevel+3, $"json = json.Slice(4);");
             codeBuilder.AppendLine(indentLevel+3, $"break;");
-            codeBuilder.AppendLine(indentLevel+2, "}"); 
-
-            codeBuilder.AppendLine(indentLevel+2, $"if(value.{property.CodeName} == null)"); 
-            codeBuilder.AppendLine(indentLevel+2, "{");
-            codeBuilder.AppendLine(indentLevel+3, $"value.{property.CodeName} = new {property.Type.FullName}();");
             codeBuilder.AppendLine(indentLevel+2, "}");
 
-            codeBuilder.AppendLine(indentLevel+2, $"json = FromJson(value.{property.CodeName}, json);");
+            if(valueGetter != null)
+            {
+                codeBuilder.AppendLine(indentLevel+2, $"if({valueGetter} == null)"); 
+                codeBuilder.AppendLine(indentLevel+2, "{");
+                codeBuilder.AppendLine(indentLevel+3, valueSetter($"new {type.FullName}()"));
+                codeBuilder.AppendLine(indentLevel+2, "}");
+            }
+            else
+            {
+                codeBuilder.AppendLine(indentLevel+2, valueSetter($"new {type.FullName}()"));
+            }
+
+            codeBuilder.AppendLine(indentLevel+2, $"json = FromJson({valueGetter}, json);");
         }
 
         public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter)

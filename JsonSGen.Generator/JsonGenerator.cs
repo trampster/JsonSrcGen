@@ -1,4 +1,4 @@
-﻿using JsonSGen.TypeGenerators;
+﻿using JsonSGen.Generator.TypeGenerators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -59,6 +59,7 @@ namespace JsonSGen.Generator
             classBuilder.Append(@"
 using System;
 using System.Text;
+using System.Collections.Generic;
 
 namespace JsonSGen
 {

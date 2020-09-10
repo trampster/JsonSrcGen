@@ -2,7 +2,7 @@ using System.Text;
 using System.Linq;
 using System;
 using System.Collections.Generic;
-using JsonSGen.TypeGenerators;
+using JsonSGen.Generator.TypeGenerators;
 using JsonSGen;
 
 namespace JsonSGen.Generator

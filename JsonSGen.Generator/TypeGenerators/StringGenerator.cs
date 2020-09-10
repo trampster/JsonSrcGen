@@ -1,16 +1,18 @@
+using System;
 using System.Text;
 using JsonSGen.Generator;
 
-namespace JsonSGen.TypeGenerators
+namespace JsonSGen.Generator.TypeGenerators
 {
     public class StringGenerator : IJsonGenerator
     {
         public string TypeName => "String";
 
-        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonProperty property)
+        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
         {
-            codeBuilder.AppendLine(indentLevel+2, $"json = json.Read(out string property{property.CodeName}Value);");
-            codeBuilder.AppendLine(indentLevel+2, $"value.{property.CodeName} = property{property.CodeName}Value;");
+            string propertyValueName = $"property{UniqueNumberGenerator.UniqueNumber}Value";
+            codeBuilder.AppendLine(indentLevel+2, $"json = json.Read(out string {propertyValueName});");
+            codeBuilder.AppendLine(indentLevel+2, valueSetter(propertyValueName));
         }
 
         public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter)
