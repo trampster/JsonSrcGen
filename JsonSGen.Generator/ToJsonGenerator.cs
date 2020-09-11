@@ -64,6 +64,20 @@ namespace JsonSGen.Generator
             classBuilder.AppendLine(2, "}");
         }
 
+        public void GenerateList(JsonType type, CodeBuilder codeBuilder) 
+        {
+            codeBuilder.AppendLine(2, $"public string ToJson(List<{type.Namespace}.{type.Name}> value)");
+            codeBuilder.AppendLine(2, "{");
+            codeBuilder.AppendLine(0, BuilderText);
+
+            var arrayJsonType = new JsonType("List", "List", "System.Coolection.Generic", false, new List<JsonType>(){type});
+            var generator = _getGeneratorForType(arrayJsonType);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value" );
+
+            codeBuilder.AppendLine(3, "return builder.ToString();");
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
         IJsonGenerator GetGeneratorForType(JsonType type)
         {
             return _getGeneratorForType(type);

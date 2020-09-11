@@ -16,6 +16,22 @@ namespace JsonSGen.Generator
             _getGeneratorForType = getGeneratorForType;
         }
 
+        public void GenerateList(JsonType type, CodeBuilder codeBuilder) 
+        {
+            codeBuilder.AppendLine(2, $"public List<{type.Namespace}.{type.Name}> FromJson(List<{type.Namespace}.{type.Name}> value, string jsonString)");
+            codeBuilder.AppendLine(2, "{");
+
+            codeBuilder.AppendLine(3, "var json = jsonString.AsSpan();");
+            
+            var arrayJsonType = new JsonType("List", "List", "System.Coolection.Generic", false, new List<JsonType>(){type});
+            var generator = _getGeneratorForType(arrayJsonType);
+
+            generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value"); //generator will only set the value to null
+
+            codeBuilder.AppendLine(3, "return value;"); 
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
         {
             classBuilder.AppendLine(2, $"public void FromJson({jsonClass.Namespace}.{jsonClass.Name} value, string jsonString)");

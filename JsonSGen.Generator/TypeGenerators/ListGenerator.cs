@@ -19,6 +19,19 @@ namespace JsonSGen.Generator.TypeGenerators
             var listElementType = type.GenericArguments[0];
             var generator = _getGeneratorForType(listElementType);
 
+            string foundVariable = $"found{UniqueNumberGenerator.UniqueNumber}";
+            codeBuilder.AppendLine(indentLevel, $"json = json.SkipWhitespaceTo('[', 'n', out char {foundVariable});");
+
+            codeBuilder.AppendLine(indentLevel, $"if({foundVariable} == 'n')");
+            codeBuilder.AppendLine(indentLevel, "{");
+            codeBuilder.AppendLine(indentLevel+1, "json = json.Slice(3);");
+            codeBuilder.AppendLine(indentLevel+1, valueSetter("null"));
+            codeBuilder.AppendLine(indentLevel, "}");
+            codeBuilder.AppendLine(indentLevel, "else");
+            codeBuilder.AppendLine(indentLevel, "{");
+
+            indentLevel++;
+
             codeBuilder.AppendLine(indentLevel, $"if({valueGetter} == null)");
             codeBuilder.AppendLine(indentLevel, "{");
             codeBuilder.AppendLine(indentLevel+1, valueSetter($"new List<{listElementType.FullName}>()"));
@@ -30,7 +43,6 @@ namespace JsonSGen.Generator.TypeGenerators
 
             
 
-            codeBuilder.AppendLine(indentLevel, $"json = json.SkipWhitespaceTo('[');");
             
             Func<string, string> listAdder = value => $"{valueGetter}.Add({value});";
 
@@ -52,6 +64,9 @@ namespace JsonSGen.Generator.TypeGenerators
             codeBuilder.AppendLine(indentLevel+1, "}");
             codeBuilder.AppendLine(indentLevel+1, "break;");
             codeBuilder.AppendLine(indentLevel, "}");
+            indentLevel--;
+            codeBuilder.AppendLine(indentLevel, "}");
+
         }
 
         int _listNumber = 0;

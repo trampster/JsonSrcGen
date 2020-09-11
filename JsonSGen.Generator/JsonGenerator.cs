@@ -114,6 +114,9 @@ namespace JsonSGen
             var toJsonGenerator = new ToJsonGenerator(GetGeneratorForType);
             var fromJsonGenerator = new FromJsonGenerator(GetGeneratorForType);
 
+            toJsonGenerator.GenerateList(new JsonType("Boolean", "Boolean", "System", false, new List<JsonType>()), classBuilder);
+            fromJsonGenerator.GenerateList(new JsonType("Boolean", "Boolean", "System", false, new List<JsonType>()), classBuilder);
+
             foreach (var jsonClass in classes)
             {
                 toJsonGenerator.Generate(jsonClass, classBuilder);
