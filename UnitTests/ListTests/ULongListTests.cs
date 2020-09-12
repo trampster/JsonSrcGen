@@ -3,15 +3,15 @@ using JsonSGen;
 using System.Collections.Generic;
 using System;
 
-[assembly: JsonList(typeof(bool))] 
+[assembly: JsonList(typeof(ulong))] 
 
 namespace UnitTests.ListTests
 {
-    public class BooleanListTests
+    public class ULongListTests
     { 
         JsonSGen.JsonSGenConvert _convert;
 
-        string ExpectedJson = "[true,false]";
+        string ExpectedJson = "[0,1,42,18446744073709551615]";
 
         [SetUp]
         public void Setup()
@@ -23,21 +23,21 @@ namespace UnitTests.ListTests
         public void ToJson_CorrectString()
         {
             //arrange
-            var list = new List<bool>(){true, false};
+            var list = new List<ulong>(){0, 1, 42, ulong.MaxValue};
 
             //act
             var json = _convert.ToJson(list);
 
             //assert
             Assert.That(json, Is.EqualTo(ExpectedJson));
-        } 
+        }
 
         [Test]
         public void ToJson_Null_CorrectString()
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<bool>)null);
+            var json = _convert.ToJson((List<ulong>)null);
 
             //assert
             Assert.That(json, Is.EqualTo("null"));
@@ -47,37 +47,41 @@ namespace UnitTests.ListTests
         public void FromJson_EmptyList_CorrectList()
         {
             //arrange
-            var list = new List<bool>();
+            var list = new List<ulong>();
 
             //act
             _convert.FromJson(list, ExpectedJson);
 
             //assert
-            Assert.That(list.Count, Is.EqualTo(2));
-            Assert.That(list[0], Is.True);
-            Assert.That(list[1], Is.False);
+            Assert.That(list.Count, Is.EqualTo(4));
+            Assert.That(list[0], Is.EqualTo(0));
+            Assert.That(list[1], Is.EqualTo(1));
+            Assert.That(list[2], Is.EqualTo(42));
+            Assert.That(list[3], Is.EqualTo(ulong.MaxValue));
         }
 
         [Test] 
         public void FromJson_PopulatedList_CorrectList()
         {
             //arrange
-            var list = new List<bool>(){false, false, false};
+            var list = new List<ulong>(){1, 2, 3};
 
             //act
             list =_convert.FromJson(list, ExpectedJson);
 
             //assert
-            Assert.That(list.Count, Is.EqualTo(2));
-            Assert.That(list[0], Is.True);
-            Assert.That(list[1], Is.False);
+            Assert.That(list.Count, Is.EqualTo(4));
+            Assert.That(list[0], Is.EqualTo(0));
+            Assert.That(list[1], Is.EqualTo(1));
+            Assert.That(list[2], Is.EqualTo(42));
+            Assert.That(list[3], Is.EqualTo(ulong.MaxValue));
         }
 
         [Test] 
         public void FromJson_JsonNull_ReturnsNull()
         {
             //arrange
-            var list = new List<bool>(){false, false, false};
+            var list = new List<ulong>(){1, 2, 3};
 
             //act
             list = _convert.FromJson(list, "null");
@@ -91,12 +95,14 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var list = _convert.FromJson((List<bool>)null, ExpectedJson);
+            var list = _convert.FromJson((List<ulong>)null, ExpectedJson);
 
             //assert
-            Assert.That(list.Count, Is.EqualTo(2));
-            Assert.That(list[0], Is.True);
-            Assert.That(list[1], Is.False);
+            Assert.That(list.Count, Is.EqualTo(4));
+            Assert.That(list[0], Is.EqualTo(0));
+            Assert.That(list[1], Is.EqualTo(1));
+            Assert.That(list[2], Is.EqualTo(42));
+            Assert.That(list[3], Is.EqualTo(ulong.MaxValue));
         }
     }
 }

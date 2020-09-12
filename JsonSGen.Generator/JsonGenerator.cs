@@ -72,7 +72,7 @@ namespace JsonSGen
 
             Compilation compilation = context.Compilation;
 
-            var classes = GetJsonClassInfo(receiver.CandidateClases, compilation);
+            var classes = GetJsonClassInfo(receiver.CandidateClasses, compilation);
 
             var generators = new IJsonGenerator[]
             {
@@ -111,11 +111,16 @@ namespace JsonSGen
                 _generators.Add(generator.TypeName, generator);
             }
 
+
             var toJsonGenerator = new ToJsonGenerator(GetGeneratorForType);
             var fromJsonGenerator = new FromJsonGenerator(GetGeneratorForType);
 
-            toJsonGenerator.GenerateList(new JsonType("Boolean", "Boolean", "System", false, new List<JsonType>()), classBuilder);
-            fromJsonGenerator.GenerateList(new JsonType("Boolean", "Boolean", "System", false, new List<JsonType>()), classBuilder);
+            var listTypes = GetListAttributesInfo(receiver.CandidateAttributes, compilation);
+            foreach(var listType in listTypes)
+            {
+                toJsonGenerator.GenerateList(listType, classBuilder);
+                fromJsonGenerator.GenerateList(listType, classBuilder);
+            }
 
             foreach (var jsonClass in classes)
             {
@@ -136,6 +141,35 @@ namespace JsonSGen
             }
 
             context.AddSource("JsonSGenConvert", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
+        }
+
+        IReadOnlyCollection<JsonType> GetListAttributesInfo(List<AttributeSyntax> attributeDeclarations, Compilation compilation)
+        {
+            string logPath = Path.Combine("/home/daniel/Work/JsonSG", "Generated", "Attributes.log");
+            File.Delete(logPath);
+            var listTypes = new List<JsonType>();
+            foreach(var attribute in attributeDeclarations)
+            {
+                if(attribute.Name.ToString() == "JsonList") 
+                {
+                    SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
+
+                    foreach (AttributeArgumentSyntax arg in attribute.ArgumentList.Arguments)
+                    {
+                        
+                        ExpressionSyntax expr = arg.Expression;
+                        if(expr is TypeOfExpressionSyntax typeofExpr)
+                        {
+                            TypeSyntax typeSyntax = typeofExpr.Type;
+                            var typeInfo = model.GetTypeInfo(typeSyntax);
+                            var jsonType = GetType(typeInfo.Type);
+                            listTypes.Add(jsonType);
+                        }
+                    }
+                }
+
+            }
+            return listTypes;
         }
 
         IReadOnlyCollection<JsonClass> GetJsonClassInfo(List<ClassDeclarationSyntax> classDeclarations, Compilation compilation)
@@ -236,7 +270,9 @@ namespace JsonSGen
     /// </summary>
     class SyntaxReceiver : ISyntaxReceiver
     {
-        public List<ClassDeclarationSyntax> CandidateClases { get; } = new List<ClassDeclarationSyntax>();
+        public List<ClassDeclarationSyntax> CandidateClasses { get; } = new List<ClassDeclarationSyntax>();
+
+        public List<AttributeSyntax> CandidateAttributes { get; } = new List<AttributeSyntax>();
 
         /// <summary>
         /// Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation
@@ -248,7 +284,12 @@ namespace JsonSGen
             if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
                 && classDeclarationSyntax.AttributeLists.Count > 0)
             {
-                CandidateClases.Add(classDeclarationSyntax);
+                CandidateClasses.Add(classDeclarationSyntax);
+            }
+
+            if (syntaxNode is AttributeSyntax attributeSyntax)
+            {
+                CandidateAttributes.Add(attributeSyntax);
             }
         }
     }

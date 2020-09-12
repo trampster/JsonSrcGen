@@ -3,15 +3,15 @@ using JsonSGen;
 using System.Collections.Generic;
 using System;
 
-[assembly: JsonList(typeof(bool))] 
+[assembly: JsonList(typeof(string))] 
 
 namespace UnitTests.ListTests
 {
-    public class BooleanListTests
+    public class StringListTests
     { 
         JsonSGen.JsonSGenConvert _convert;
 
-        string ExpectedJson = "[true,false]";
+        string ExpectedJson = "[\"one\",null,\"two\"]";
 
         [SetUp]
         public void Setup()
@@ -23,21 +23,21 @@ namespace UnitTests.ListTests
         public void ToJson_CorrectString()
         {
             //arrange
-            var list = new List<bool>(){true, false};
+            var list = new List<string>(){"one", null, "two"};
 
             //act
             var json = _convert.ToJson(list);
 
             //assert
             Assert.That(json, Is.EqualTo(ExpectedJson));
-        } 
+        }
 
         [Test]
         public void ToJson_Null_CorrectString()
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<bool>)null);
+            var json = _convert.ToJson((List<string>)null);
 
             //assert
             Assert.That(json, Is.EqualTo("null"));
@@ -47,37 +47,39 @@ namespace UnitTests.ListTests
         public void FromJson_EmptyList_CorrectList()
         {
             //arrange
-            var list = new List<bool>();
+            var list = new List<string>();
 
             //act
             _convert.FromJson(list, ExpectedJson);
 
             //assert
-            Assert.That(list.Count, Is.EqualTo(2));
-            Assert.That(list[0], Is.True);
-            Assert.That(list[1], Is.False);
+            Assert.That(list.Count, Is.EqualTo(3));
+            Assert.That(list[0], Is.EqualTo("one"));
+            Assert.That(list[1], Is.Null);
+            Assert.That(list[2], Is.EqualTo("two"));
         }
 
         [Test] 
         public void FromJson_PopulatedList_CorrectList()
         {
             //arrange
-            var list = new List<bool>(){false, false, false};
+            var list = new List<string>(){"asfd", "gggg"};
 
             //act
             list =_convert.FromJson(list, ExpectedJson);
 
             //assert
-            Assert.That(list.Count, Is.EqualTo(2));
-            Assert.That(list[0], Is.True);
-            Assert.That(list[1], Is.False);
+            Assert.That(list.Count, Is.EqualTo(3));
+            Assert.That(list[0], Is.EqualTo("one"));
+            Assert.That(list[1], Is.Null);
+            Assert.That(list[2], Is.EqualTo("two"));;
         }
 
         [Test] 
         public void FromJson_JsonNull_ReturnsNull()
         {
             //arrange
-            var list = new List<bool>(){false, false, false};
+            var list = new List<string>(){"asfd", "gggg"};
 
             //act
             list = _convert.FromJson(list, "null");
@@ -91,12 +93,13 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var list = _convert.FromJson((List<bool>)null, ExpectedJson);
+            var list = _convert.FromJson((List<string>)null, ExpectedJson);
 
             //assert
-            Assert.That(list.Count, Is.EqualTo(2));
-            Assert.That(list[0], Is.True);
-            Assert.That(list[1], Is.False);
+            Assert.That(list.Count, Is.EqualTo(3));
+            Assert.That(list[0], Is.EqualTo("one"));
+            Assert.That(list[1], Is.Null);
+            Assert.That(list[2], Is.EqualTo("two"));
         }
     }
 }
