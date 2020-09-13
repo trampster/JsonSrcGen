@@ -237,7 +237,7 @@ namespace JsonSGen
                 if(namedType != null)
                 {
                     string name = $"{namedType.TypeArguments.First().Name}?";
-                    return new JsonType(name, name, null, false, GetGenericArguments(typeSymbol));
+                    return new JsonType(name, name, FullNamespace(namedType.TypeArguments.First()), false, GetGenericArguments(typeSymbol));
                 }
             }
             bool isCustomType = HasJsonClassAttribute(typeSymbol);
