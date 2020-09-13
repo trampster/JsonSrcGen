@@ -241,7 +241,30 @@ namespace JsonSGen
                 }
             }
             bool isCustomType = HasJsonClassAttribute(typeSymbol);
-            return new JsonType(isCustomType ? "Custom" : typeSymbol.Name, typeSymbol.Name, typeSymbol.ContainingNamespace.Name, isCustomType, GetGenericArguments(typeSymbol));
+            return new JsonType(isCustomType ? "Custom" : typeSymbol.Name, typeSymbol.Name, FullNamespace(typeSymbol), isCustomType, GetGenericArguments(typeSymbol));
+        }
+
+        string FullNamespace(ITypeSymbol symbol)
+        {
+            var namespaceBuilder = new List<string>();
+            var containingNamespace  = symbol.ContainingNamespace;
+            while(true)
+            {
+                if(containingNamespace.Name != "")
+                {
+                    namespaceBuilder.Add(containingNamespace.Name);
+                }
+                if(containingNamespace.ContainingNamespace != null)
+                {
+                    containingNamespace = containingNamespace.ContainingNamespace;
+                    continue;
+                }
+                break;
+            }
+            namespaceBuilder.Reverse();
+
+            string fullNamespace = string.Join('.', namespaceBuilder);
+            return fullNamespace;
         }
 
         List<JsonType> GetGenericArguments(ITypeSymbol typeSymbol)

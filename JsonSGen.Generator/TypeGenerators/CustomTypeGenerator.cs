@@ -12,27 +12,35 @@ namespace JsonSGen.Generator.TypeGenerators
         {
             string propertyValueName = $"property{UniqueNumberGenerator.UniqueNumber}Value";
 
-            codeBuilder.AppendLine(indentLevel+2, "json = json.SkipWhitespace();");
-            codeBuilder.AppendLine(indentLevel+2, "if(json[0] == 'n')");
-            codeBuilder.AppendLine(indentLevel+2, "{");
-            codeBuilder.AppendLine(indentLevel+3, valueSetter("null"));
-            codeBuilder.AppendLine(indentLevel+3, $"json = json.Slice(4);");
-            codeBuilder.AppendLine(indentLevel+3, $"break;");
-            codeBuilder.AppendLine(indentLevel+2, "}");
+            codeBuilder.AppendLine(indentLevel, "json = json.SkipWhitespace();");
+            codeBuilder.AppendLine(indentLevel, "if(json[0] == 'n')");
+            codeBuilder.AppendLine(indentLevel, "{");
+            codeBuilder.AppendLine(indentLevel+1, valueSetter("null"));
+            codeBuilder.AppendLine(indentLevel+1, $"json = json.Slice(4);");
+            codeBuilder.AppendLine(indentLevel, "}");
+            codeBuilder.AppendLine(indentLevel, "else");
+            codeBuilder.AppendLine(indentLevel, "{");
+
+            indentLevel++;
 
             if(valueGetter != null)
             {
-                codeBuilder.AppendLine(indentLevel+2, $"if({valueGetter} == null)"); 
-                codeBuilder.AppendLine(indentLevel+2, "{");
-                codeBuilder.AppendLine(indentLevel+3, valueSetter($"new {type.FullName}()"));
-                codeBuilder.AppendLine(indentLevel+2, "}");
+                codeBuilder.AppendLine(indentLevel, $"if({valueGetter} == null)"); 
+                codeBuilder.AppendLine(indentLevel, "{");
+                codeBuilder.AppendLine(indentLevel+1, valueSetter($"new {type.FullName}()"));
+                codeBuilder.AppendLine(indentLevel, "}");
             }
             else
             {
-                codeBuilder.AppendLine(indentLevel+2, valueSetter($"new {type.FullName}()"));
+                string valueName = $"value{UniqueNumberGenerator.UniqueNumber}";
+                valueGetter = valueName;
+                codeBuilder.AppendLine(indentLevel, $"var {valueName} = new {type.FullName}();");
+                codeBuilder.AppendLine(indentLevel, valueSetter(valueName));
             }
 
-            codeBuilder.AppendLine(indentLevel+2, $"json = FromJson({valueGetter}, json);");
+            codeBuilder.AppendLine(indentLevel, $"json = FromJson({valueGetter}, json);");
+            indentLevel--;
+            codeBuilder.AppendLine(indentLevel, "}");
         }
 
         public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter)
