@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using JsonSGen;
+using JsonSrcGen;
 using System.Collections.Generic;
 
 
@@ -13,14 +13,14 @@ namespace UnitTests
 
     public class ListPropertyTests
     { 
-        JsonSGen.JsonSGenConvert _convert;
+        JsonSrcGen.JsonSrcGenConvert _convert;
 
         string ExpectedJson = $"{{\"BooleanList\":[true,false]}}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSGenConvert();
+            _convert = new JsonSrcGenConvert();
         }
 
         [Test] 

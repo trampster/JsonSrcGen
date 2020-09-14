@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using JsonSGen;
+using JsonSrcGen;
 using System.Collections.Generic;
 using System;
 
@@ -9,14 +9,14 @@ namespace UnitTests.ArrayTests
 {
     public class ByteArrayTests
     { 
-        JsonSGen.JsonSGenConvert _convert;
+        JsonSrcGen.JsonSrcGenConvert _convert;
 
         string ExpectedJson = "[0,1,255]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSGenConvert();
+            _convert = new JsonSrcGenConvert();
         }
 
         [Test] 

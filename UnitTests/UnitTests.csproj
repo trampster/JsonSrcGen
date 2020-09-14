@@ -11,10 +11,10 @@
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0"/>
-    <ProjectReference Include="../JsonSGen.Generator/JsonSGen.Generator.csproj" 
+    <ProjectReference Include="../JsonSrcGen.Generator/JsonSrcGen.Generator.csproj" 
                         OutputItemType="Analyzer"
                         ReferenceOutputAssembly="false" />
-    <ProjectReference Include="../JsonSGen/JsonSGen.csproj" />
+    <ProjectReference Include="../JsonSrcGen/JsonSrcGen.csproj" />
   </ItemGroup>
 
 </Project>

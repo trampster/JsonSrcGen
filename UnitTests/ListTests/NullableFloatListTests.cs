@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using JsonSGen;
+using JsonSrcGen;
 using System.Collections.Generic;
 using System;
 
@@ -9,14 +9,14 @@ namespace UnitTests.ListTests
 {
     public class NullableFloatListTests
     { 
-        JsonSGen.JsonSGenConvert _convert;
+        JsonSrcGen.JsonSrcGenConvert _convert;
 
         string ExpectedJson = "[42.21,176.568,3.4028235E+38,-3.4028235E+38,null,0]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSGenConvert();
+            _convert = new JsonSrcGenConvert();
         }
 
         [Test] 

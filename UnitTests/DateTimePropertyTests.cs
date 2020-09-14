@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using JsonSGen;
+using JsonSrcGen;
 using System;
 using System.Collections;
 
@@ -50,7 +50,7 @@ namespace UnitTests
     [TestFixture]
     public class DateTimePropertyTests
     {
-        JsonSGenConvert _convert = new JsonSGenConvert();
+        JsonSrcGenConvert _convert = new JsonSrcGenConvert();
 
         [Test, TestCaseSource(typeof(DateTimeTestCaseData), "TestCases")]
         public void DateTimeProperty_CorrectlyDeserialized(string value, DateTime expectedDateTime, DateTimeKind expectedKind)

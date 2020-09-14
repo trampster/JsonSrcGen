@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using JsonSGen;
+using JsonSrcGen;
 
 
 namespace UnitTests
@@ -16,13 +16,13 @@ namespace UnitTests
 
     public class DoublePropertyTests 
     {
-        JsonSGen.JsonSGenConvert _convert;
+        JsonSrcGen.JsonSrcGenConvert _convert;
         const string ExpectedJson = "{\"Age\":42.21,\"Height\":176.568,\"Max\":1.7976931348623157E+308,\"Min\":-1.7976931348623157E+308,\"Zero\":0}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSGenConvert();
+            _convert = new JsonSrcGenConvert();
         }
 
         [Test]

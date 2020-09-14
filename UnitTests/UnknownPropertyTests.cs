@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using JsonSGen;
+using JsonSrcGen;
 
 
 namespace UnitTests
@@ -14,13 +14,13 @@ namespace UnitTests
 
     public class UnknownPropertyTests
     {
-        JsonSGen.JsonSGenConvert _convert; 
+        JsonSrcGen.JsonSrcGenConvert _convert; 
         const string ExpectedJson = "{\"Age\":42,\"UnknownOne\":\"adf,adf\",\"Height\":176,\"UnknownList\":{1,2,3},\"Size\":12,\"UnknownClass\":{\"property\":13}}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSGenConvert();
+            _convert = new JsonSrcGenConvert();
         }
 
         [Test]

@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using JsonSGen;
+using JsonSrcGen;
 
 
 namespace UnitTests
@@ -20,14 +20,14 @@ namespace UnitTests
 
     public class NestedClassTests
     {
-        JsonSGen.JsonSGenConvert _convert;
+        JsonSrcGen.JsonSrcGenConvert _convert;
 
         string ExpectedJson = "{\"Child\":{\"Age\":8,\"Name\":\"Samuel\"},\"Null\":null}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSGenConvert();
+            _convert = new JsonSrcGenConvert();
         }
 
         [Test]

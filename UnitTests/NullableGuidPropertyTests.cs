@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using JsonSGen;
+using JsonSrcGen;
 using System;
 
 
@@ -14,13 +14,13 @@ namespace UnitTests
 
     public class NullableGuidPropertyTests
     {
-        JsonSGen.JsonSGenConvert _convert;
+        JsonSrcGen.JsonSrcGenConvert _convert;
         const string ExpectedJson = "{\"GuidProperty\":\"00000001-0002-0003-0405-060708090a0b\",\"Null\":null}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSGenConvert();
+            _convert = new JsonSrcGenConvert();
         }
 
         [Test]
