@@ -20,5 +20,7 @@ namespace JsonSGen.Generator.TypeGenerators
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
             codeBuilder.AppendLine(indentLevel, $"builder.AppendDate({valueGetter});");
         }
+        
+        public CodeBuilder ClassLevelBuilder => null;
     }
 }

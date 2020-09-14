@@ -70,7 +70,21 @@ namespace JsonSGen.Generator
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
-            var arrayJsonType = new JsonType("List", "List", "System.Coolection.Generic", false, new List<JsonType>(){type});
+            var arrayJsonType = new JsonType("List", "List", "System.Collection.Generic", false, new List<JsonType>(){type});
+            var generator = _getGeneratorForType(arrayJsonType);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value" );
+
+            codeBuilder.AppendLine(3, "return builder.ToString();");
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
+        public void GenerateArray(JsonType type, CodeBuilder codeBuilder) 
+        {
+            codeBuilder.AppendLine(2, $"public string ToJson({type.Namespace}.{type.Name}[] value)");
+            codeBuilder.AppendLine(2, "{");
+            codeBuilder.AppendLine(0, BuilderText);
+
+            var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type});
             var generator = _getGeneratorForType(arrayJsonType);
             generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value" );
 

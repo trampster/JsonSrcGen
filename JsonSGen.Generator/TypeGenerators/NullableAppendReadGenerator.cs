@@ -41,5 +41,7 @@ namespace JsonSGen.Generator.TypeGenerators
             codeBuilder.AppendLine(indentLevel+1, $"builder.Append({valueGetter});");
             codeBuilder.AppendLine(indentLevel, "}");
         }
+
+        public CodeBuilder ClassLevelBuilder => null;        
     }
 }

@@ -102,6 +102,7 @@ namespace JsonSGen
                 new NullableBoolGenerator(),
                 new StringGenerator(),
                 new ListGenerator(type => GetGeneratorForType(type)),
+                new ArrayGenerator(type => GetGeneratorForType(type), new CodeBuilder()),
                 new CustomTypeGenerator()
             };
 
@@ -110,7 +111,6 @@ namespace JsonSGen
             {
                 _generators.Add(generator.TypeName, generator);
             }
-
 
             var toJsonGenerator = new ToJsonGenerator(GetGeneratorForType);
             var fromJsonGenerator = new FromJsonGenerator(GetGeneratorForType);
@@ -122,10 +122,26 @@ namespace JsonSGen
                 fromJsonGenerator.GenerateList(listType, classBuilder);
             }
 
+            var arrayTypes = GetArrayAttributesInfo(receiver.CandidateAttributes, compilation);
+            foreach(var arrayType in arrayTypes)
+            {
+                toJsonGenerator.GenerateArray(arrayType, classBuilder);
+                fromJsonGenerator.GenerateArray(arrayType, classBuilder);
+            }
+
             foreach (var jsonClass in classes)
             {
                 toJsonGenerator.Generate(jsonClass, classBuilder);
                 fromJsonGenerator.Generate(jsonClass, classBuilder);
+            }
+
+            foreach(var generator in _generators)
+            {
+                var codeBuilder = generator.Value.ClassLevelBuilder;
+                if(codeBuilder != null)
+                {
+                    classBuilder.Append(codeBuilder.ToString());
+                }
             }
 
             classBuilder.AppendLine(1, "}");
@@ -145,8 +161,6 @@ namespace JsonSGen
 
         IReadOnlyCollection<JsonType> GetListAttributesInfo(List<AttributeSyntax> attributeDeclarations, Compilation compilation)
         {
-            string logPath = Path.Combine("/home/daniel/Work/JsonSG", "Generated", "Attributes.log");
-            File.Delete(logPath);
             var listTypes = new List<JsonType>();
             foreach(var attribute in attributeDeclarations)
             {
@@ -156,7 +170,6 @@ namespace JsonSGen
 
                     foreach (AttributeArgumentSyntax arg in attribute.ArgumentList.Arguments)
                     {
-                        
                         ExpressionSyntax expr = arg.Expression;
                         if(expr is TypeOfExpressionSyntax typeofExpr)
                         {
@@ -167,9 +180,33 @@ namespace JsonSGen
                         }
                     }
                 }
-
             }
             return listTypes;
+        }
+
+        IReadOnlyCollection<JsonType> GetArrayAttributesInfo(List<AttributeSyntax> attributeDeclarations, Compilation compilation)
+        {
+            var arrayTypes = new List<JsonType>();
+            foreach(var attribute in attributeDeclarations)
+            {
+                if(attribute.Name.ToString() == "JsonArray") 
+                {
+                    SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
+
+                    foreach (AttributeArgumentSyntax arg in attribute.ArgumentList.Arguments)
+                    {
+                        ExpressionSyntax expr = arg.Expression;
+                        if(expr is TypeOfExpressionSyntax typeofExpr)
+                        {
+                            TypeSyntax typeSyntax = typeofExpr.Type;
+                            var typeInfo = model.GetTypeInfo(typeSyntax);
+                            var jsonType = GetType(typeInfo.Type);
+                            arrayTypes.Add(jsonType);
+                        }
+                    }
+                }
+            }
+            return arrayTypes;
         }
 
         IReadOnlyCollection<JsonClass> GetJsonClassInfo(List<ClassDeclarationSyntax> classDeclarations, Compilation compilation)
@@ -239,6 +276,11 @@ namespace JsonSGen
                     string name = $"{namedType.TypeArguments.First().Name}?";
                     return new JsonType(name, name, FullNamespace(namedType.TypeArguments.First()), false, GetGenericArguments(typeSymbol));
                 }
+            }
+            if(typeSymbol.TypeKind == TypeKind.Array)
+            {
+                var arraySymbol = typeSymbol as IArrayTypeSymbol;
+                return new JsonType("Array", "", "", false, new List<JsonType>(){GetType(arraySymbol.ElementType)});
             }
             bool isCustomType = HasJsonClassAttribute(typeSymbol);
             return new JsonType(isCustomType ? "Custom" : typeSymbol.Name, typeSymbol.Name, FullNamespace(typeSymbol), isCustomType, GetGenericArguments(typeSymbol));
