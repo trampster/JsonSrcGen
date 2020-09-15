@@ -14,7 +14,7 @@ namespace JsonSrcGen.Generator
     [Generator]
     public class JsonGenerator : ISourceGenerator
     {
-        public void Execute(SourceGeneratorContext context)
+        public void Execute(GeneratorExecutionContext context)
         {
             try
             {
@@ -47,7 +47,7 @@ namespace JsonSrcGen.Generator
             throw new Exception($"Unsupported type {type.FullName} in from json generator");
         }
 
-        public void Generate(SourceGeneratorContext context)
+        public void Generate(GeneratorExecutionContext context)
         {
 
             // retreive the populated receiver 
@@ -305,7 +305,7 @@ namespace JsonSrcGen
             }
             namespaceBuilder.Reverse();
 
-            string fullNamespace = string.Join('.', namespaceBuilder);
+            string fullNamespace = string.Join(".", namespaceBuilder);
             return fullNamespace;
         }
 
@@ -323,7 +323,7 @@ namespace JsonSrcGen
             return list;
         }
 
-        public void Initialize(InitializationContext context)
+        public void Initialize(GeneratorInitializationContext context)
         {
             // Register a factory that can create our custom syntax receiver
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver()); 
