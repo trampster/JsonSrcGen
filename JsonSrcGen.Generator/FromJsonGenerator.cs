@@ -32,6 +32,22 @@ namespace JsonSrcGen.Generator
             codeBuilder.AppendLine(2, "}"); 
         }
 
+        public void GenerateDictionary(JsonType keyType, JsonType valueType, CodeBuilder codeBuilder) 
+        {
+            codeBuilder.AppendLine(2, $"public Dictionary<{keyType.FullName}, {valueType.FullName}> FromJson(Dictionary<{keyType.FullName}, {valueType.FullName}> value, string jsonString)");
+            codeBuilder.AppendLine(2, "{");
+
+            codeBuilder.AppendLine(3, "var json = jsonString.AsSpan();");
+            
+            var arrayJsonType = new JsonType("Dictionary", "Dictionary", "System.Coolection.Generic", false, new List<JsonType>(){keyType, valueType});
+            var generator = _getGeneratorForType(arrayJsonType);
+
+            generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value");
+
+            codeBuilder.AppendLine(3, "return value;"); 
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
         public void GenerateArray(JsonType type, CodeBuilder codeBuilder) 
         {
             codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name}[] FromJson({type.Namespace}.{type.Name}[] value, string jsonString)");

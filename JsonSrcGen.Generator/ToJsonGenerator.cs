@@ -92,6 +92,20 @@ namespace JsonSrcGen.Generator
             codeBuilder.AppendLine(2, "}"); 
         }
 
+        public void GenerateDictionary(JsonType keyType, JsonType valueType, CodeBuilder codeBuilder) 
+        {
+            codeBuilder.AppendLine(2, $"public string ToJson(Dictionary<{keyType.FullName},{valueType.FullName}> value)");
+            codeBuilder.AppendLine(2, "{");
+            codeBuilder.AppendLine(0, BuilderText);
+
+            var arrayJsonType = new JsonType("Dictionary", "Dictionary", "NA", false, new List<JsonType>(){keyType, valueType});
+            var generator = _getGeneratorForType(arrayJsonType);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value" );
+
+            codeBuilder.AppendLine(3, "return builder.ToString();");
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
         IJsonGenerator GetGeneratorForType(JsonType type)
         {
             return _getGeneratorForType(type);

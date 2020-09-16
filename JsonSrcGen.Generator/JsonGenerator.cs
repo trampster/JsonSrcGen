@@ -103,7 +103,8 @@ namespace JsonSrcGen
                 new StringGenerator(),
                 new ListGenerator(type => GetGeneratorForType(type)),
                 new ArrayGenerator(type => GetGeneratorForType(type), new CodeBuilder()),
-                new CustomTypeGenerator()
+                new CustomTypeGenerator(),
+                new DictionaryGenerator(type => GetGeneratorForType(type))
             };
 
             _generators = new Dictionary<string, IJsonGenerator>();
@@ -129,6 +130,13 @@ namespace JsonSrcGen
                 fromJsonGenerator.GenerateArray(arrayType, classBuilder);
             }
 
+            var dictionaryTypes = GetDictionaryAttributesInfo(receiver.CandidateAttributes, compilation);
+            foreach(var dictionaryType in dictionaryTypes)
+            {
+                toJsonGenerator.GenerateDictionary(dictionaryType.Item1, dictionaryType.Item2, classBuilder);
+                fromJsonGenerator.GenerateDictionary(dictionaryType.Item1, dictionaryType.Item2, classBuilder);
+            }
+
             foreach (var jsonClass in classes)
             {
                 toJsonGenerator.Generate(jsonClass, classBuilder);
@@ -149,7 +157,7 @@ namespace JsonSrcGen
 
             try
             {
-               File.WriteAllText(Path.Combine("/home/daniel/Work/JsonSG", "Generated", "Generated.cs"), classBuilder.ToString());
+               File.WriteAllText(Path.Combine("/home/daniel/Work/JsonSrcGen", "Generated", "Generated.cs"), classBuilder.ToString());
             }
             catch(DirectoryNotFoundException)
             {
@@ -182,6 +190,39 @@ namespace JsonSrcGen
                 }
             }
             return listTypes;
+        }
+
+        IReadOnlyCollection<(JsonType, JsonType)> GetDictionaryAttributesInfo(List<AttributeSyntax> attributeDeclarations, Compilation compilation)
+        {
+            var listTypes = new List<(JsonType, JsonType)>();
+            foreach(var attribute in attributeDeclarations)
+            {
+                if(attribute.Name.ToString() == "JsonDictionary") 
+                {
+                    SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
+                    var keyType = GetJsonType(attribute.ArgumentList.Arguments[0], model);
+                    if(keyType.FullName != "System.String")
+                    {
+                        throw new NotSupportedException("JsonSrcGen only supports Dictionary with String keys.");
+                    }
+                    var valueType = GetJsonType(attribute.ArgumentList.Arguments[1], model);
+                    listTypes.Add((keyType, valueType));
+                }
+            }
+            return listTypes;
+        }
+
+        JsonType GetJsonType(AttributeArgumentSyntax attributeArgumentSyntax, SemanticModel model)
+        {
+            ExpressionSyntax expr = attributeArgumentSyntax.Expression;
+            if(expr is TypeOfExpressionSyntax typeofExpr)
+            {
+                TypeSyntax typeSyntax = typeofExpr.Type;
+                var typeInfo = model.GetTypeInfo(typeSyntax);
+                var jsonType = GetType(typeInfo.Type);
+                return jsonType;
+            }
+            return null;
         }
 
         IReadOnlyCollection<JsonType> GetArrayAttributesInfo(List<AttributeSyntax> attributeDeclarations, Compilation compilation)
