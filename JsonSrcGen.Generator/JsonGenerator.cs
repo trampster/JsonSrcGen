@@ -232,13 +232,23 @@ namespace JsonSrcGen
 
                         string jsonPropertyName = null;
                         var attributes = property.GetAttributes();
+                        bool hasIgnoreAttribute = false;
                         foreach(var attribute in attributes)
                         {
+                            if(attribute.AttributeClass.Name == "JsonIgnoreAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen")
+                            {
+                                hasIgnoreAttribute = true;
+                                break;
+                            }
                             if(attribute.AttributeClass.Name == "JsonNameAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen")
                             {
                                 jsonPropertyName = (string)attribute.ConstructorArguments.First().Value;
                             }
-                        } 
+                        }
+                        if(hasIgnoreAttribute)
+                        {
+                            continue;
+                        }
 
                         string codePropertyName = member.Name;
                         var jsonPropertyType = GetType(member);

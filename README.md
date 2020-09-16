@@ -13,6 +13,9 @@ public class MyType
 {
     [JsonName("my_name")]
     public string MyProperty {get;set}
+
+    [JsonIgnore]
+    public string IgnoredProperty {get;set;}
 }
 ```
 Properties with the following types are supported:
