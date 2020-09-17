@@ -98,5 +98,16 @@ namespace UnitTests.ListTests
             Assert.That(list[0], Is.True);
             Assert.That(list[1], Is.False);
         }
+
+        [Test]
+        public void FromJson_EmptyListJson_EmptyList()
+        {
+            //arrange
+            //act
+            var list = _convert.FromJson((List<bool>)null, "[]");
+
+            //assert
+            Assert.That(list.Count, Is.EqualTo(0));
+        }
     }
 }

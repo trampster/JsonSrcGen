@@ -101,5 +101,16 @@ namespace UnitTests.ArrayTests
             Assert.That(array[1], Is.EqualTo(1));
             Assert.That(array[2], Is.EqualTo(255));
         }
+
+        [Test]
+        public void FromJson_EmptyListJson_EmptyArray()
+        {
+            //arrange
+            //act
+            var array = _convert.FromJson((byte[])null, "[]");
+
+            //assert
+            Assert.That(array.Length, Is.EqualTo(0));
+        }
     }
 }

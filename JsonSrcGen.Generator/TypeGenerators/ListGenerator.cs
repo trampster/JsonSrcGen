@@ -49,6 +49,12 @@ namespace JsonSrcGen.Generator.TypeGenerators
             codeBuilder.AppendLine(indentLevel, "while(true)");
             codeBuilder.AppendLine(indentLevel, "{");
 
+            codeBuilder.AppendLine(indentLevel+1, "if(json[0] == ']')");
+            codeBuilder.AppendLine(indentLevel+1, "{");
+            codeBuilder.AppendLine(indentLevel+2, "json = json.Slice(1);");
+            codeBuilder.AppendLine(indentLevel+2, "break;");
+            codeBuilder.AppendLine(indentLevel+1, "}");
+
             generator.GenerateFromJson(codeBuilder, indentLevel+1, listElementType, listAdder, null);
             codeBuilder.AppendLine(indentLevel+1, "json = json.SkipWhitespace();");
             codeBuilder.AppendLine(indentLevel+1, "switch (json[0])");
