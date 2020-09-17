@@ -6,6 +6,20 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <PackageId>JsonSrcGen.Generator</PackageId>
+    <Authors>Daniel Hughes</Authors>
+    <Description>
+        Json Library that generates serializaton code at compile time using .NET 5 c# Source Generators, 
+        The generated code depends on the JsonSrcGen nuget package.
+    </Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright (c) Daniel Hughes 2020</Copyright>
+    <PackageProjectUrl>https://github.com/trampster/JsonSrcGen</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/trampster/JsonSrcGen</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <RestoreAdditionalProjectSources>https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json ;$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
   </PropertyGroup>
 

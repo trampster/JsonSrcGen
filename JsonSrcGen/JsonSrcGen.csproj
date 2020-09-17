@@ -5,4 +5,17 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <PackageId>JsonSrcGen</PackageId>
+    <Authors>Daniel Hughes</Authors>
+    <Description>
+        Runtime library for JsonSrcGen Generated code. You must also install JsonSrcGen.Generator to have the 
+        Json code generated.
+    </Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright (c) Daniel Hughes 2020</Copyright>
+    <PackageProjectUrl>https://github.com/trampster/JsonSrcGen</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/trampster/JsonSrcGen</RepositoryUrl>
+  </PropertyGroup>
 </Project>
