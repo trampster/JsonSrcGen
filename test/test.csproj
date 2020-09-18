@@ -10,7 +10,7 @@
     <ItemGroup>
         <!-- Note that this is not a "normal" ProjectReference.
             It needs the additional 'OutputItemType' and 'ReferenceOutputAssmbly' attributes. -->
-        <ProjectReference Include="../JsonSrcGen.Generator/JsonSrcGen.Generator.csproj" 
+        <ProjectReference Include="../JsonSrcGen/JsonSrcGen.csproj" 
                         OutputItemType="Analyzer"
                         ReferenceOutputAssembly="false" />
 

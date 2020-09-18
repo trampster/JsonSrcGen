@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
@@ -10,12 +10,36 @@
     <PackageId>JsonSrcGen</PackageId>
     <Authors>Daniel Hughes</Authors>
     <Description>
-        Runtime library for JsonSrcGen Generated code. You must also install JsonSrcGen.Generator to have the 
-        Json code generated.
+        Json Library that generates serializaton code at compile time using .NET 5 c# Source Generators, 
+        The generated code depends on the JsonSrcGen nuget package.
     </Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Copyright (c) Daniel Hughes 2020</Copyright>
     <PackageProjectUrl>https://github.com/trampster/JsonSrcGen</PackageProjectUrl>
     <RepositoryUrl>https://github.com/trampster/JsonSrcGen</RepositoryUrl>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <RestoreAdditionalProjectSources>https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json ;$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0-4.20464.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\JsonSrcGen.Inputs\StringBuilderExtension.cs" Link="StringBuilderExtension.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\GenerationOutputFolderAttribute.cs" Link="GenerationOutputFolderAttribute.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\InvalidJsonException.cs" Link="InvalidJsonException.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonArrayAttribute.cs" Link="JsonArrayAttribute.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonAttribute.cs" Link="JsonAttribute.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonDictionaryAttribute.cs" Link="JsonDictionaryAttribute.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonIgnoreAttribute.cs" Link="JsonIgnoreAttribute.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonListAttribute.cs" Link="JsonListAttribute.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonNameAttribute.cs" Link="JsonNameAttribute.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonSpanExtensions.cs" Link="JsonSpanExtensions.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\StringBuilderExtension.cs" Link="StringBuilderExtension.cs" />
+  </ItemGroup>
+
 </Project>
