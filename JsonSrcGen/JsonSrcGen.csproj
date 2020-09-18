@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.1.0-alpha.1</PackageVersion>
+    <Version>0.1.0.2</Version>
+    <PackageVersion>0.1.0.2-alpha</PackageVersion>
     <PackageId>JsonSrcGen</PackageId>
     <Authors>Daniel Hughes</Authors>
     <Description>
