@@ -169,7 +169,14 @@ namespace JsonSrcGen
 
             if(generationFolder != null)
             {
-                File.WriteAllText(Path.Combine(generationFolder, "Generated.cs"), classBuilder.ToString());
+                try
+                {
+                    File.WriteAllText(Path.Combine(generationFolder, "Generated.cs"), classBuilder.ToString());
+                }
+                catch(DirectoryNotFoundException)
+                {
+                    //Don't fail the generation as this makes the CI Unit Tests fail
+                }
             }
 
             context.AddSource("JsonSrcGenConvert", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
@@ -189,7 +196,14 @@ namespace JsonSrcGen
 
                 if(generationFolder != null)
                 {
-                    File.WriteAllText(Path.Combine(generationFolder, name), content);
+                    try
+                    {
+                        File.WriteAllText(Path.Combine(generationFolder, name), content);
+                    }
+                    catch(DirectoryNotFoundException)
+                    {
+                        //Don't fail the generation as this makes the CI Unit Tests fail
+                    }
                 }
 
                 return compilation;
