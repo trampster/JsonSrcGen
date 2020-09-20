@@ -4,7 +4,7 @@ using System.Text;
 
 namespace JsonSrcGen
 {
-    public static class StringBuilderExtension
+    internal static class StringBuilderExtension
     {
         static StringBuilderExtension()
         {
