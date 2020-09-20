@@ -13,7 +13,6 @@
     <Authors>Daniel Hughes</Authors>
     <Description>
         Json Library that generates serializaton code at compile time using .NET 5 c# Source Generators, 
-        The generated code depends on the JsonSrcGen nuget package.
     </Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Copyright (c) Daniel Hughes 2020</Copyright>
