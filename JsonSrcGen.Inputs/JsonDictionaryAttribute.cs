@@ -3,7 +3,7 @@ using System;
 namespace JsonSrcGen
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple=true)]
-    public class JsonDictionaryAttribute : Attribute
+    internal class JsonDictionaryAttribute : Attribute
     {
         public JsonDictionaryAttribute(Type keyType, Type valueType)
         {

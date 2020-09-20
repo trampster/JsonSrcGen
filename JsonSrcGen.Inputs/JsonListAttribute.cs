@@ -3,7 +3,7 @@ using System;
 namespace JsonSrcGen
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple=true)]
-    public class JsonListAttribute : Attribute
+    internal class JsonListAttribute : Attribute
     {
         public JsonListAttribute(Type listType)
         {

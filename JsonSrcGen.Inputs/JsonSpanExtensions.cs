@@ -3,7 +3,7 @@ using System.Text;
 
 namespace JsonSrcGen
 {
-    public static class JsonSpanExtensions
+    internal static class JsonSpanExtensions
     {
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out bool value)
         {

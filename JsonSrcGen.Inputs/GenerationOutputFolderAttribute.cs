@@ -3,7 +3,7 @@ using System;
 namespace JsonSrcGen
 {
     [AttributeUsage(AttributeTargets.Assembly)]
-    public class GenerationOutputFolderAttribute : Attribute
+    internal class GenerationOutputFolderAttribute : Attribute
     {
         public GenerationOutputFolderAttribute(string path)
         {

@@ -2,7 +2,7 @@ using System;
 
 namespace JsonSrcGen
 {
-    public class InvalidJsonException : Exception
+    internal class InvalidJsonException : Exception
     {
         public InvalidJsonException(string message) : base(message)
         {
