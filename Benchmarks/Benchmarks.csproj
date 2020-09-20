@@ -13,12 +13,9 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.1.1420" />
-    <PackageReference Include="JsonSrcGen" Version="0.1.0.4-alpha" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <PackageReference Include="JsonSrcGen" Version="0.1.0.6-alpha" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Utf8Json" Version="1.3.7" />
-
-
-    <!-- <ProjectReference Include="../JsonSrcGen/JsonSrcGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" /> -->
   </ItemGroup>
 
 </Project>
