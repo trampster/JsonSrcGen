@@ -18,6 +18,10 @@
     <Copyright>Copyright (c) Daniel Hughes 2020</Copyright>
     <PackageProjectUrl>https://github.com/trampster/JsonSrcGen</PackageProjectUrl>
     <RepositoryUrl>https://github.com/trampster/JsonSrcGen</RepositoryUrl>
+
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
   <PropertyGroup>
