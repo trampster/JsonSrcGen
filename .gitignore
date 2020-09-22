@@ -3,3 +3,4 @@ bin
 .vscode
 Generated/Generated.cs
 Benchmarks/BenchmarkDotNet.Artifacts
+Generated
