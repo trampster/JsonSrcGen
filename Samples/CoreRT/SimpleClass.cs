@@ -1,6 +1,6 @@
 using JsonSrcGen;
 
-namespace CoreRTTest
+namespace JsonSrcGen.Samples.CoreRT
 {
     [Json]
     public class SimpleClass

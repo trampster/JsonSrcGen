@@ -1,7 +1,7 @@
 ﻿using System;
 using JsonSrcGen;
 
-namespace CoreRTTest
+namespace JsonSrcGen.Samples.CoreRT
 {
     class Program
     {
