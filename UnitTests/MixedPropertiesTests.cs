@@ -15,12 +15,12 @@ namespace UnitTests
 
     public class MixedPropertiesTests
     {
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test]

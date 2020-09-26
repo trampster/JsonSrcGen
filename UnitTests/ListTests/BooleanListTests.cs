@@ -9,14 +9,14 @@ namespace UnitTests.ListTests
 {
     public class BooleanListTests
     { 
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[true,false]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test] 

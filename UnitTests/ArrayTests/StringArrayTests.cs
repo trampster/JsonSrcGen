@@ -9,14 +9,14 @@ namespace UnitTests.ArrayTests
 {
     public class StringArrayTests
     { 
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[\"one\",null,\"two\"]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test] 

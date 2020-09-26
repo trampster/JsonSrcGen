@@ -16,13 +16,13 @@ namespace UnitTests
 
     public class IntPropertyTests
     {
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
         const string ExpectedJson = "{\"Age\":42,\"Height\":176,\"Max\":2147483647,\"Min\":-2147483648,\"Zero\":0}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test]

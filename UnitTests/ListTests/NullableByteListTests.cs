@@ -9,14 +9,14 @@ namespace UnitTests.ListTests
 {
     public class NullableByteListTests
     { 
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[0,1,null,255]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test] 

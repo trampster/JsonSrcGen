@@ -9,14 +9,14 @@ namespace UnitTests.ListTests
 {
     public class NullableDateTimeListTests
     { 
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[\"2017-07-25T00:00:00\",\"2017-07-25T23:59:58\",null,\"2017-07-25T23:59:58.196\"]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test] 

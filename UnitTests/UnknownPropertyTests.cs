@@ -14,13 +14,13 @@ namespace UnitTests
 
     public class UnknownPropertyTests
     {
-        JsonSrcGen.JsonSrcGenConvert _convert; 
+        JsonSrcGen.JsonConverter _convert; 
         const string ExpectedJson = "{\"Age\":42,\"UnknownOne\":\"adf,adf\",\"Height\":176,\"UnknownList\":{1,2,3},\"Size\":12,\"UnknownClass\":{\"property\":13}}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test]

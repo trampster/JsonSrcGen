@@ -78,7 +78,7 @@ using System.Collections.Generic;
 
 namespace JsonSrcGen
 {
-    public class JsonSrcGenConvert
+    public class JsonConverter
     {
         [ThreadStatic]
         StringBuilder Builder;
@@ -179,7 +179,7 @@ namespace JsonSrcGen
                 }
             }
 
-            context.AddSource("JsonSrcGenConvert", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
+            context.AddSource("JsonConverter", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
         } 
 
         Compilation GenerateFromResource(string name, GeneratorExecutionContext context, Compilation compilation, string generationFolder)

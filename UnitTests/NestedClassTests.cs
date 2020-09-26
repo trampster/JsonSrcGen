@@ -20,14 +20,14 @@ namespace UnitTests
 
     public class NestedClassTests
     {
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "{\"Child\":{\"Age\":8,\"Name\":\"Samuel\"},\"Null\":null}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test]

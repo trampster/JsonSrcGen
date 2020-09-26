@@ -50,7 +50,7 @@ namespace UnitTests
     [TestFixture]
     public class DateTimePropertyTests
     {
-        JsonSrcGenConvert _convert = new JsonSrcGenConvert();
+        JsonConverter _convert = new JsonConverter();
 
         [Test, TestCaseSource(typeof(DateTimeTestCaseData), "TestCases")]
         public void DateTimeProperty_CorrectlyDeserialized(string value, DateTime expectedDateTime, DateTimeKind expectedKind)

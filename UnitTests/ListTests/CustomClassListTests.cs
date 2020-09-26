@@ -16,14 +16,14 @@
 
 //     public class CustomClassListTests
 //     { 
-//         JsonSrcGen.JsonSrcGenConvert _convert;
+//         JsonSrcGen.JsonConverter _convert;
 
 //         string ExpectedJson = "[{\"Name\":\"William\"},null,{\"Name\":\"Susen\"}]";
 
 //         [SetUp]
 //         public void Setup()
 //         {
-//             _convert = new JsonSrcGenConvert();
+//             _convert = new JsonConverter();
 //         }
 
 //         [Test] 

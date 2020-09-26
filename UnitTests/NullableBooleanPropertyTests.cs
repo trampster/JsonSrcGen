@@ -14,14 +14,14 @@ namespace UnitTests
 
     public class NullableBooleanPropertyTests
     {
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
 
         const string _json = "{\"IsFalse\":false,\"IsNull\":null,\"IsTrue\":true}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test]

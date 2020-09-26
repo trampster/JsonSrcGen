@@ -9,14 +9,14 @@ namespace UnitTests.ListTests
 {
     public class DoubleListTests
     { 
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[42.21,176.568,1.7976931348623157E+308,-1.7976931348623157E+308,0]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test] 

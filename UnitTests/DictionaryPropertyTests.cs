@@ -13,14 +13,14 @@ namespace UnitTests
 
     public class DictionaryPropertyTests
     { 
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "{\"Dictionary\":{\"FirstName\":\"Luke\",\"LastName\":\"Skywalker\"}}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test] 

@@ -9,14 +9,14 @@ namespace UnitTests.ListTests
 {
     public class IntDictionaryArrayTests 
     { 
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "{\"First\":1,\"Second\":2,\"Third\":3}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test] 

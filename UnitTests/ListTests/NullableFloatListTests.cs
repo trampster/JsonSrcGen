@@ -9,14 +9,14 @@ namespace UnitTests.ListTests
 {
     public class NullableFloatListTests
     { 
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[42.21,176.568,3.4028235E+38,-3.4028235E+38,null,0]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test] 

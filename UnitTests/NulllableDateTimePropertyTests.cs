@@ -51,7 +51,7 @@ namespace UnitTests
     [TestFixture]
     public class NullableDateTimePropertyTests
     {
-        JsonSrcGenConvert _convert = new JsonSrcGenConvert();
+        JsonConverter _convert = new JsonConverter();
 
         [Test, TestCaseSource(typeof(NullableDateTimeTestCaseData), "TestCases")]
         public void DateTimeProperty_CorrectlyDeserialized(string value, DateTime? expectedDateTime, DateTimeKind expectedKind)

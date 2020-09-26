@@ -6,7 +6,7 @@ namespace JsonSrcGenTest
 {
     class Program
     {
-        static JsonSrcGenConvert _convert = new JsonSrcGenConvert();
+        static JsonConverter _convert = new JsonConverter();
 
         static void Main(string[] args)
         {

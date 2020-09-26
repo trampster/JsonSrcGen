@@ -13,13 +13,13 @@ namespace UnitTests
 
     public class GuidPropertyTests
     {
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
         const string ExpectedJson = "{\"GuidProperty\":\"00000001-0002-0003-0405-060708090a0b\"}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert();
+            _convert = new JsonConverter();
         }
 
         [Test]

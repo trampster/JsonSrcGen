@@ -16,13 +16,13 @@ namespace UnitTests
 
     public class IgnoredPropertyTests
     {
-        JsonSrcGen.JsonSrcGenConvert _convert;
+        JsonSrcGen.JsonConverter _convert;
         const string ExpectedJson = "{\"Age\":42,\"Escaping\":12,\"Height\":176}";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonSrcGenConvert(); 
+            _convert = new JsonConverter(); 
         }
 
         [Test]
