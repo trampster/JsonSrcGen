@@ -116,7 +116,8 @@ namespace JsonSrcGen
                 new ListGenerator(type => GetGeneratorForType(type)),
                 new ArrayGenerator(type => GetGeneratorForType(type), new CodeBuilder()),
                 new CustomTypeGenerator(),
-                new DictionaryGenerator(type => GetGeneratorForType(type))
+                new DictionaryGenerator(type => GetGeneratorForType(type)),
+                new CharGenerator()
             };
 
             _generators = new Dictionary<string, IJsonGenerator>();

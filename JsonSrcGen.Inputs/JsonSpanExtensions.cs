@@ -670,6 +670,58 @@ namespace JsonSrcGen
             throw new InvalidJsonException("Failed to find end of string");
         }
 
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out char value)
+        {
+            json = json.SkipWhitespace();
+            if(json[0] != '\"')
+            {
+                throw new InvalidJsonException($"Expected Char value to start with \" but instead got {json[0]} at {new string(json)}");
+            }
+            switch(json[1])
+            {
+                case '\\':
+                    json = ReadEscapedChar(json.Slice(2), out value);
+                    return json.Slice(1);
+                default:
+                    value = json[1];
+                    return json.Slice(3);
+            }
+        }
+
+        static ReadOnlySpan<char> ReadEscapedChar(this ReadOnlySpan<char> json, out char value)
+        {
+            char character = json[0];
+            switch(character)
+            {
+                case '\"':
+                case '\\':
+                case '/':
+                    value = character;
+                    break;
+                case 'b':
+                    value = '\b';
+                    break;
+                case 'f':
+                    value = '\f';
+                    break;
+                case 'n':
+                    value = '\n';
+                    break;
+                case 'r':
+                    value = '\r';
+                    break;
+                case 't':
+                    value = '\t';
+                    break;
+                case 'u':
+                    value = FromHex(json, 1);
+                    return json.Slice(5);
+                default:
+                    throw new InvalidJsonException($"Unrecognized escape sequence at {new string(json)}");
+            }
+            return json.Slice(1);
+        }
+
         [ThreadStatic]
         static StringBuilder _builder;
 
@@ -698,7 +750,6 @@ namespace JsonSrcGen
                         case '\"':
                         case '\\':
                         case '/':
-                            Console.WriteLine($"Appending {character}");
                             _builder.Append(character);
                             break;
                         case 'b':

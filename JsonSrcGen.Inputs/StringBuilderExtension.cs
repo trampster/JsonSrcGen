@@ -53,6 +53,15 @@ namespace JsonSrcGen
             return builder;
         }
 
+        public static StringBuilder AppendEscaped(this StringBuilder builder, char input)
+        {
+            if(input < 93 && _needsEscaping[input])
+            {
+                return builder.Append(_escapeLookup[input]);
+            }
+            return builder.Append(input);
+        }
+
         public static StringBuilder AppendEscaped(this StringBuilder builder, string input)
         {
             int start = 0;
@@ -69,42 +78,6 @@ namespace JsonSrcGen
             }
             return builder
                 .Append(input, start, input.Length - start);
-        }
-
-        public static StringBuilder AppendEscaped(this StringBuilder builder, char input)
-        {
-            builder.Append('\"');
-            if(input < 93 && _needsEscaping[input])
-            {
-                return builder
-                    .Append(_escapeLookup[input])
-                    .Append('\"');
-            }
-            
-            return builder
-                .Append(input)
-                .Append('\"');
-        }
-
-        public static StringBuilder AppendEscaped(this StringBuilder builder, char? input)
-        {
-            if(input == null)
-            {
-                return builder.Append("null");
-            }
-            char character = input.Value;
-
-            builder.Append('\"');
-            if(input < 93 && _needsEscaping[character])
-            {
-                return builder
-                    .Append(_escapeLookup[character])
-                    .Append('\"');
-            }
-            
-            return builder
-                .Append(character)
-                .Append('\"');
         }
 
         public static StringBuilder AppendList(this StringBuilder builder, List<int> property)
