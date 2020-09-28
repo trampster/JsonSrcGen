@@ -69,6 +69,7 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("JsonSpanExtensions.cs", context, compilation, generationFolder);
             compilation = GenerateFromResource("StringBuilderExtension.cs", context, compilation, generationFolder);
             compilation = GenerateFromResource("ICustomConverter.cs", context, compilation, generationFolder);
+            compilation = GenerateFromResource("CustomConverterAttribute.cs", context, compilation, generationFolder);
         
             var classBuilder = new CodeBuilder();
 
