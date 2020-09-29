@@ -70,6 +70,8 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("StringBuilderExtension.cs", context, compilation, generationFolder);
             compilation = GenerateFromResource("ICustomConverter.cs", context, compilation, generationFolder);
             compilation = GenerateFromResource("CustomConverterAttribute.cs", context, compilation, generationFolder);
+            compilation = GenerateFromResource("IJsonBuilder.cs", context, compilation, generationFolder);
+            compilation = GenerateFromResource("JsonStringBuilder.cs", context, compilation, generationFolder);
         
             var classBuilder = new CodeBuilder();
 

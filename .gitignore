@@ -2,5 +2,6 @@ obj
 bin
 .vscode
 Generated/Generated.cs
-Benchmarks/BenchmarkDotNet.Artifacts
 Generated
+*.log
+BenchmarkDotNet.Artifacts

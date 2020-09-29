@@ -47,6 +47,8 @@
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\StringBuilderExtension.cs" Link="StringBuilderExtension.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\ICustomConverter.cs" Link="ICustomConverter.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\CustomConverterAttribute.cs" Link="CustomConverterAttribute.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\IJsonBuilder.cs" Link="IJsonBuilder.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonStringBuilder.cs" Link="JsonStringBuilder.cs" />
   </ItemGroup>
 
   <ItemGroup>
