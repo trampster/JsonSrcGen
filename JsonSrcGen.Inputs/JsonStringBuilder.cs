@@ -20,6 +20,7 @@ namespace JsonSrcGen
             _buffer = newArray;
         }
 
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public IJsonBuilder Append(string value)
         {
             if (_index + value.Length > _buffer.Length)
@@ -28,10 +29,9 @@ namespace JsonSrcGen
             }
 
             var span = _buffer.AsSpan(_index);
-            for (int valueIndex = 0; valueIndex < value.Length; valueIndex++)
-            {
-                span[valueIndex] = value[valueIndex];
-            }
+
+            value.AsSpan().CopyTo(span);
+
             _index += value.Length;
             return this;
         }
@@ -44,10 +44,9 @@ namespace JsonSrcGen
             }
 
             var span = _buffer.AsSpan(_index);
-            for (int valueIndex = 0; valueIndex < value.Length; valueIndex++)
-            {
-                span[valueIndex] = value[valueIndex];
-            }
+
+            value.CopyTo(span);
+
             _index += value.Length;
             return this;
         }
@@ -148,6 +147,11 @@ namespace JsonSrcGen
         public override string ToString()
         {
             return new string(_buffer.AsSpan(0, _index));
+        }
+
+        public ReadOnlySpan<char> AsSpan()
+        {
+            return _buffer.AsSpan(0, _index);
         }
 
         bool[] _needsEscaping = new bool[128];
