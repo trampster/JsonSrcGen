@@ -39,7 +39,7 @@ namespace UnitTests
             var json = _convert.ToJson(jsonClass);
 
             //assert
-            Assert.That(json, Is.EqualTo(_json));
+            Assert.That(json.ToString(), Is.EqualTo(_json));
         }
 
 

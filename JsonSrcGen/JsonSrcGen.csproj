@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\JsonSrcGen.Inputs\StringBuilderExtension.cs" Link="StringBuilderExtension.cs" />
+    <!-- <Compile Include="..\JsonSrcGen.Inputs\StringBuilderExtension.cs" Link="StringBuilderExtension.cs" /> -->
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\GenerationOutputFolderAttribute.cs" Link="GenerationOutputFolderAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\InvalidJsonException.cs" Link="InvalidJsonException.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonArrayAttribute.cs" Link="JsonArrayAttribute.cs" />
@@ -44,7 +44,7 @@
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonListAttribute.cs" Link="JsonListAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonNameAttribute.cs" Link="JsonNameAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonSpanExtensions.cs" Link="JsonSpanExtensions.cs" />
-    <EmbeddedResource Include="..\JsonSrcGen.Inputs\StringBuilderExtension.cs" Link="StringBuilderExtension.cs" />
+    <!-- <EmbeddedResource Include="..\JsonSrcGen.Inputs\StringBuilderExtension.cs" Link="StringBuilderExtension.cs" /> -->
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\ICustomConverter.cs" Link="ICustomConverter.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\CustomConverterAttribute.cs" Link="CustomConverterAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\IJsonBuilder.cs" Link="IJsonBuilder.cs" />

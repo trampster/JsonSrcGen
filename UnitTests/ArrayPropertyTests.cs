@@ -34,7 +34,7 @@ namespace UnitTests
             var json = _convert.ToJson(jsonClass);
 
             //assert
-            Assert.That(json, Is.EqualTo(ExpectedJson));
+            Assert.That(json.ToString(), Is.EqualTo(ExpectedJson.ToString()));
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace UnitTests
             var json = _convert.ToJson(jsonClass);
 
             //assert
-            Assert.That(json, Is.EqualTo("{\"BooleanArray\":null}"));
+            Assert.That(json.ToString(), Is.EqualTo("{\"BooleanArray\":null}"));
         }
 
         [Test]

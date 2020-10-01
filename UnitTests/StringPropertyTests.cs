@@ -43,10 +43,8 @@ namespace UnitTests
             //act
             var json = _convert.ToJson(jsonClass);
 
-            System.Console.WriteLine($"ExpectedJson: {ExpectedJson}");
-            System.Console.WriteLine($"ActualJson:   {json}");
             //assert
-            Assert.That(json, Is.EqualTo(ExpectedJson));
+            Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
         } 
 
 

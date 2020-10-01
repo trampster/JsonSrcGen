@@ -51,6 +51,17 @@ namespace JsonSrcGen
             return this;
         }
 
+        public IJsonBuilder Append(char value)
+        {
+            if (_index + 1 > _buffer.Length)
+            {
+                ResizeBuffer(1);
+            }
+            _buffer[_index] = value;
+            _index += 1;
+            return this;
+        }
+
         public IJsonBuilder Append(byte value)
         {
             if (_index + 3 > _buffer.Length)
@@ -122,6 +133,28 @@ namespace JsonSrcGen
             if (_index + 20 > _buffer.Length)
             {
                 ResizeBuffer(20);
+            }
+            value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
+            _index += charsWriten;
+            return this;
+        }
+
+        public IJsonBuilder Append(float value)
+        {
+            if (_index + 19 > _buffer.Length)
+            {
+                ResizeBuffer(19);
+            }
+            value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
+            _index += charsWriten;
+            return this;
+        }
+
+        public IJsonBuilder Append(double value)
+        {
+            if (_index + 19 > _buffer.Length)
+            {
+                ResizeBuffer(19);
             }
             value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
             _index += charsWriten;
@@ -225,7 +258,7 @@ namespace JsonSrcGen
             {
                 _offsetCacheTime = tickCount;
                 var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
-                var builder = new System.Text.StringBuilder();
+                var builder = new JsonStringBuilder();
                 if(offset.TotalMinutes > 0) builder.Append('+');
                 else builder.Append('-');
                 builder.AppendIntTwo(Math.Abs(offset.Hours));

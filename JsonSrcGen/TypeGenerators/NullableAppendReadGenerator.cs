@@ -38,7 +38,7 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, "}");
             codeBuilder.AppendLine(indentLevel, "else");
             codeBuilder.AppendLine(indentLevel, "{");
-            codeBuilder.AppendLine(indentLevel+1, $"builder.Append({valueGetter});");
+            codeBuilder.AppendLine(indentLevel+1, $"builder.Append({valueGetter}.Value);");
             codeBuilder.AppendLine(indentLevel, "}");
         }
 

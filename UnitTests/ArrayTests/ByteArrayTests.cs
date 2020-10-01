@@ -29,7 +29,7 @@ namespace UnitTests.ArrayTests
             var json = _convert.ToJson(list);
 
             //assert
-            Assert.That(json, Is.EqualTo(ExpectedJson));
+            Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
         } 
 
         [Test]
@@ -40,7 +40,7 @@ namespace UnitTests.ArrayTests
             var json = _convert.ToJson((byte[])null);
 
             //assert
-            Assert.That(json, Is.EqualTo("null"));
+            Assert.That(json.ToString(), Is.EqualTo("null"));
         }
 
         [Test]

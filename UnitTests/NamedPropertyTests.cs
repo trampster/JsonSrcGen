@@ -41,8 +41,7 @@ namespace UnitTests
             var json = _convert.ToJson(jsonClass);
 
             //assert
-            System.Console.WriteLine("JSON: " + new string(json));
-            Assert.That(json, Is.EqualTo(ExpectedJson));
+            Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
         }
 
         [Test] 

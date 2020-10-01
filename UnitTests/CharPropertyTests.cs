@@ -52,7 +52,7 @@ namespace UnitTests
             var json = _convert.ToJson(jsonClass);
 
             //assert
-            Assert.That(json, Is.EqualTo($"{{\"Property\":{expectedPropertyValue}}}"));
+            Assert.That(json.ToString(), Is.EqualTo($"{{\"Property\":{expectedPropertyValue}}}"));
         } 
 
         [Test, TestCaseSource(typeof(CharTestCaseData), "TestCases")]

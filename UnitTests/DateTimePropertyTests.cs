@@ -74,10 +74,10 @@ namespace UnitTests
             dateTimeObject.Property = new DateTime(2017,3,7);
 
             //act
-            string json = _convert.ToJson(dateTimeObject);
+            var json = _convert.ToJson(dateTimeObject);
 
             //assert
-            Assert.That(json, Is.EqualTo("{\"Property\":\"2017-03-07T00:00:00\"}"));
+            Assert.That(json.ToString(), Is.EqualTo("{\"Property\":\"2017-03-07T00:00:00\"}"));
         }
 
         [Test]
@@ -88,10 +88,10 @@ namespace UnitTests
             dateTimeObject.Property = new DateTime(2016,1,2,23,59,58,555);
 
             //act
-            string json = _convert.ToJson(dateTimeObject);
+            var json = _convert.ToJson(dateTimeObject);
 
             //assert
-            Assert.That(json, Is.EqualTo("{\"Property\":\"2016-01-02T23:59:58.555\"}"));
+            Assert.That(json.ToString(), Is.EqualTo("{\"Property\":\"2016-01-02T23:59:58.555\"}"));
         }
 
         [Test]
@@ -102,10 +102,10 @@ namespace UnitTests
             dateTimeObject.Property = new DateTime(2016,1,2,23,59,58,555, DateTimeKind.Utc);
 
             //act
-            string json = _convert.ToJson(dateTimeObject);
+            var json = _convert.ToJson(dateTimeObject);
 
             //assert
-            Assert.That(json, Is.EqualTo("{\"Property\":\"2016-01-02T23:59:58.555Z\"}"));
+            Assert.That(json.ToString(), Is.EqualTo("{\"Property\":\"2016-01-02T23:59:58.555Z\"}"));
         }
 
         [Test]
@@ -116,14 +116,14 @@ namespace UnitTests
             dateTimeObject.Property = new DateTime(2016,1,2,23,59,58,555, DateTimeKind.Local);
 
             //act
-            string json = _convert.ToJson(dateTimeObject);
+            var json = _convert.ToJson(dateTimeObject);
 
             //assert
             var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
             var sign = offset.Duration().TotalMinutes > 0 ? "+" : "-";
             var hours = Math.Abs(offset.Hours).ToString("00");
             var minutes = offset.Minutes.ToString("00");
-            Assert.That(json, Is.EqualTo($"{{\"Property\":\"2016-01-02T23:59:58.555{sign}{hours}:{minutes}\"}}"));
+            Assert.That(json.ToString(), Is.EqualTo($"{{\"Property\":\"2016-01-02T23:59:58.555{sign}{hours}:{minutes}\"}}"));
         }
     }
 }

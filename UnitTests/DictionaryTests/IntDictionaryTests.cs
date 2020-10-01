@@ -34,7 +34,7 @@ namespace UnitTests.ListTests
             var json = _convert.ToJson(dictionary);
 
             //assert
-            Assert.That(json, Is.EqualTo(ExpectedJson));
+            Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
         } 
 
         [Test]
@@ -45,7 +45,7 @@ namespace UnitTests.ListTests
             var json = _convert.ToJson((Dictionary<string, int>)null);
 
             //assert
-            Assert.That(json, Is.EqualTo("null"));
+            Assert.That(json.ToString(), Is.EqualTo("null"));
         }
 
         [Test]

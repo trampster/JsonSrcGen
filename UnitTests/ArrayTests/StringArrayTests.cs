@@ -29,7 +29,7 @@ namespace UnitTests.ArrayTests
             var json = _convert.ToJson(array);
 
             //assert
-            Assert.That(json, Is.EqualTo(ExpectedJson));
+            Assert.That(json.ToString(), Is.EqualTo(ExpectedJson.ToString()));
         }
 
         [Test]
@@ -40,17 +40,17 @@ namespace UnitTests.ArrayTests
             var json = _convert.ToJson((string[])null);
 
             //assert
-            Assert.That(json, Is.EqualTo("null"));
+            Assert.That(json.ToString(), Is.EqualTo("null"));
         }
 
         [Test]
-        public void FromJson_EmptyArray_CorrectArray()
+        public void FromJson_EmptyArray_CorrectArray() 
         {
             //arrange
             var array = new string[]{};
 
             //act
-            array = _convert.FromJson(array, ExpectedJson);
+            array = _convert.FromJson(array, ExpectedJson.ToString());
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));
@@ -66,7 +66,7 @@ namespace UnitTests.ArrayTests
             var array = new string[]{"asfd", "gggg"};
 
             //act
-            array =_convert.FromJson(array, ExpectedJson);
+            array =_convert.FromJson(array, ExpectedJson.ToString());
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));
@@ -93,7 +93,7 @@ namespace UnitTests.ArrayTests
         {
             //arrange
             //act
-            var array = _convert.FromJson((string[])null, ExpectedJson);
+            var array = _convert.FromJson((string[])null, ExpectedJson.ToString());
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));

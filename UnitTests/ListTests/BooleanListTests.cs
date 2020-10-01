@@ -11,7 +11,7 @@ namespace UnitTests.ListTests
     { 
         JsonSrcGen.JsonConverter _convert;
 
-        string ExpectedJson = "[true,false]";
+        string ExpectedJson = "[true,false]"; 
 
         [SetUp]
         public void Setup()
@@ -29,7 +29,7 @@ namespace UnitTests.ListTests
             var json = _convert.ToJson(list);
 
             //assert
-            Assert.That(json, Is.EqualTo(ExpectedJson));
+            Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
         } 
 
         [Test]
@@ -40,7 +40,7 @@ namespace UnitTests.ListTests
             var json = _convert.ToJson((List<bool>)null);
 
             //assert
-            Assert.That(json, Is.EqualTo("null"));
+            Assert.That(json.ToString(), Is.EqualTo("null"));
         }
 
         [Test]

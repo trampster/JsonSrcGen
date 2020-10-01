@@ -67,7 +67,6 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("JsonListAttribute.cs", context, compilation, generationFolder);
             compilation = GenerateFromResource("JsonNameAttribute.cs", context, compilation, generationFolder);
             compilation = GenerateFromResource("JsonSpanExtensions.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("StringBuilderExtension.cs", context, compilation, generationFolder);
             compilation = GenerateFromResource("ICustomConverter.cs", context, compilation, generationFolder);
             compilation = GenerateFromResource("CustomConverterAttribute.cs", context, compilation, generationFolder);
             compilation = GenerateFromResource("IJsonBuilder.cs", context, compilation, generationFolder);
@@ -85,7 +84,7 @@ namespace JsonSrcGen
     public class JsonConverter
     {
         [ThreadStatic]
-        StringBuilder Builder;
+        JsonStringBuilder Builder;
 ");
 
             var classes = GetJsonClassInfo(receiver.CandidateClasses, compilation);
