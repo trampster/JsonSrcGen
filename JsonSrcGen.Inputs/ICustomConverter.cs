@@ -7,6 +7,6 @@ namespace JsonSrcGen
     {
         void ToJson(IJsonBuilder builder, T target);
 
-        void FromJson(ReadOnlySpan<char> span, T value);
+        ReadOnlySpan<char> FromJson(ReadOnlySpan<char> span, T value);
     }
 }

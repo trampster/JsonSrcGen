@@ -49,7 +49,8 @@ namespace JsonSrcGen
 
         public void Generate(GeneratorExecutionContext context)
         {
-            // retreive the populated receiver 
+
+            // retreive the populated receiver
             if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
                 return;
 
@@ -57,20 +58,26 @@ namespace JsonSrcGen
 
             compilation = GenerateFromResource("GenerationOutputFolderAttribute.cs", context, compilation, null);
 
-            var generationFolder = GetGenerationOutputFolder(receiver.CandidateAttributes, compilation);
+            GenerationFolder = GetGenerationOutputFolder(receiver.CandidateAttributes, compilation);
+            if(!string.IsNullOrEmpty(GenerationFolder))
+            {
+                File.Delete(Path.Combine(GenerationFolder, "output.log"));
+            }
 
-            compilation = GenerateFromResource("InvalidJsonException.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("JsonArrayAttribute.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("JsonAttribute.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("JsonDictionaryAttribute.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("JsonIgnoreAttribute.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("JsonListAttribute.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("JsonNameAttribute.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("JsonSpanExtensions.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("ICustomConverter.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("CustomConverterAttribute.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("IJsonBuilder.cs", context, compilation, generationFolder);
-            compilation = GenerateFromResource("JsonStringBuilder.cs", context, compilation, generationFolder);
+
+            compilation = GenerateFromResource("InvalidJsonException.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonArrayAttribute.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonAttribute.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonDictionaryAttribute.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonIgnoreAttribute.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonListAttribute.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonNameAttribute.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonSpanExtensions.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("ICustomConverter.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("ICustomConverterValueType.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("CustomConverterAttribute.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("IJsonBuilder.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonStringBuilder.cs", context, compilation, GenerationFolder);
         
             var classBuilder = new CodeBuilder();
 
@@ -129,6 +136,22 @@ namespace JsonSrcGen
                 _generators.Add(generator.TypeName, generator);
             }
 
+            var customTypeConverters = GetCustomTypeConverters(receiver.CandidateClasses, compilation, new CodeBuilder()); 
+            foreach(var customTypeConverter in customTypeConverters)
+            {
+                LogLine($"Adding customTypeConverter TypeName: {customTypeConverter.TypeName}");
+
+                if(_generators.ContainsKey(customTypeConverter.TypeName))
+                {
+                    _generators[customTypeConverter.TypeName] = customTypeConverter;
+                }
+                else
+                {
+                    _generators.Add(customTypeConverter.TypeName, customTypeConverter);
+
+                }
+            }
+
             var toJsonGenerator = new ToJsonGenerator(GetGeneratorForType);
             var fromJsonGenerator = new FromJsonGenerator(GetGeneratorForType);
 
@@ -171,11 +194,11 @@ namespace JsonSrcGen
             classBuilder.AppendLine(1, "}");
             classBuilder.AppendLine(0, "}");
 
-            if(generationFolder != null)
+            if(GenerationFolder != null)
             {
                 try
                 {
-                    File.WriteAllText(Path.Combine(generationFolder, "Generated.cs"), classBuilder.ToString());
+                    File.WriteAllText(Path.Combine(GenerationFolder, "Generated.cs"), classBuilder.ToString());
                 }
                 catch(DirectoryNotFoundException)
                 {
@@ -184,9 +207,14 @@ namespace JsonSrcGen
             }
 
             context.AddSource("JsonConverter", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
-        } 
+        }
 
-        Compilation GenerateFromResource(string name, GeneratorExecutionContext context, Compilation compilation, string generationFolder)
+        void LogLine(string line)
+        {
+            File.AppendAllText(Path.Combine(GenerationFolder, "output.log"), $"{line}{Environment.NewLine}");
+        }
+
+        Compilation GenerateFromResource(string name, GeneratorExecutionContext context, Compilation compilation, string GenerationFolder)
         {
             var assembly = typeof(JsonGenerator).Assembly;
             using(Stream resource = assembly.GetManifestResourceStream($"JsonSrcGen.{name}"))
@@ -198,11 +226,11 @@ namespace JsonSrcGen
                 CSharpParseOptions options = (context.Compilation as CSharpCompilation).SyntaxTrees[0].Options as CSharpParseOptions;
                 compilation = compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(SourceText.From(content, Encoding.UTF8), options));
 
-                if(generationFolder != null)
+                if(GenerationFolder != null)
                 {
                     try
                     {
-                        File.WriteAllText(Path.Combine(generationFolder, name), content);
+                        File.WriteAllText(Path.Combine(GenerationFolder, name), content);
                     }
                     catch(DirectoryNotFoundException)
                     {
@@ -369,10 +397,54 @@ namespace JsonSrcGen
             }
             return jsonClasses; 
         }
+        static string GenerationFolder;
+        IReadOnlyCollection<IJsonGenerator> GetCustomTypeConverters(List<ClassDeclarationSyntax> classDeclarations, Compilation compilation, CodeBuilder classLevelBuilder)
+        {
+            var customTypeConverters = new List<IJsonGenerator>();
+
+            foreach (var candidateClass in classDeclarations)
+            {
+
+                SemanticModel model = compilation.GetSemanticModel(candidateClass.SyntaxTree);
+                var classSymbol = model.GetDeclaredSymbol(candidateClass);
+
+                LogLine($"CustomConverter candidateClass {classSymbol.Name}");
+
+                if (HasCustomConverterAttribute(classSymbol))
+                {
+                    LogLine($"Has converter attribute {classSymbol.Name}");
+
+                    string converterClassName = classSymbol.Name;
+                    string converterNamespace = classSymbol.ContainingNamespace.ToString();
+
+                    string targetType = GetCustomConverterTargetType(classSymbol);
+
+                    customTypeConverters.Add(new CustomConverterValueTypeGenerator(
+                        targetType, 
+                        $"{converterNamespace}.{converterClassName}", 
+                        classLevelBuilder));
+                }
+            }
+            return customTypeConverters; 
+        }
 
         bool HasJsonClassAttribute(ISymbol symbol)
         {
             return symbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "JsonAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSrcGen");
+        }
+
+        bool HasCustomConverterAttribute(ISymbol symbol)
+        {
+            return symbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "CustomConverterAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSrcGen");
+        }
+
+        string GetCustomConverterTargetType(ISymbol symbol)
+        {
+            var query = 
+                from attribute in symbol.GetAttributes()
+                where attribute.AttributeClass.Name == "CustomConverterAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen"
+                select attribute.ConstructorArguments.First().Value.ToString();
+            return query.First();
         }
 
         JsonType GetType(ISymbol symbol)
