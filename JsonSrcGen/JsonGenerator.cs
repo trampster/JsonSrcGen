@@ -61,7 +61,10 @@ namespace JsonSrcGen
             GenerationFolder = GetGenerationOutputFolder(receiver.CandidateAttributes, compilation);
             if(!string.IsNullOrEmpty(GenerationFolder))
             {
-                File.Delete(Path.Combine(GenerationFolder, "output.log"));
+                if(File.Exists(Path.Combine(GenerationFolder, "output.log")))
+                {
+                    File.Delete(Path.Combine(GenerationFolder, "output.log"));
+                }
             }
 
 
