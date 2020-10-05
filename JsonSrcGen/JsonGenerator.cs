@@ -59,6 +59,10 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("GenerationOutputFolderAttribute.cs", context, compilation, null);
 
             GenerationFolder = GetGenerationOutputFolder(receiver.CandidateAttributes, compilation);
+            if(!Directory.Exists(GenerationFolder))
+            {
+                GenerationFolder = null;
+            }
             if(!string.IsNullOrEmpty(GenerationFolder))
             {
                 if(File.Exists(Path.Combine(GenerationFolder, "output.log")))
