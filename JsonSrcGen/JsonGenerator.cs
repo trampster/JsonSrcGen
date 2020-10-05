@@ -218,6 +218,10 @@ namespace JsonSrcGen
 
         void LogLine(string line)
         {
+            if(GenerationFolder == null)
+            {
+                return;
+            }
             File.AppendAllText(Path.Combine(GenerationFolder, "output.log"), $"{line}{Environment.NewLine}");
         }
 
