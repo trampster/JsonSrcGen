@@ -80,7 +80,6 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("JsonNameAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonSpanExtensions.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("ICustomConverter.cs", context, compilation, GenerationFolder);
-            compilation = GenerateFromResource("ICustomConverterValueType.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("CustomConverterAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("IJsonBuilder.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonStringBuilder.cs", context, compilation, GenerationFolder);
@@ -425,13 +424,6 @@ namespace JsonSrcGen
 
                     string targetType = GetCustomConverterTargetType(classSymbol);
 
-                    if(ImplementsInterface(classSymbol, "JsonSrcGen.ICustomConverterValueType"))
-                    {
-                        customTypeConverters.Add(new CustomConverterValueTypeGenerator(
-                            targetType,
-                            $"{converterNamespace}.{converterClassName}", 
-                            new CodeBuilder()));
-                    }
                     if(ImplementsInterface(classSymbol, "JsonSrcGen.ICustomConverter"))
                     {
                         customTypeConverters.Add(new CustomConverterGenerator(

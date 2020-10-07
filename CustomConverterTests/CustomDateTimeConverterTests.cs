@@ -7,7 +7,7 @@ using System;
 namespace CustomConverterTests
 {
     [CustomConverter(typeof(DateTime))]
-    public class CustomDateTimeConverter : ICustomConverterValueType<DateTime>
+    public class CustomDateTimeConverter : ICustomConverter<DateTime>
     {
         public void ToJson(IJsonBuilder builder, DateTime target)
         {
@@ -16,7 +16,7 @@ namespace CustomConverterTests
             builder.Append("\""); 
         }
 
-        public ReadOnlySpan<char> FromJson(ReadOnlySpan<char> json, out DateTime value)
+        public ReadOnlySpan<char> FromJson(ReadOnlySpan<char> json, ref DateTime value)
         {
             json = json.SkipWhitespace();
             if(json[0] != '\"')
