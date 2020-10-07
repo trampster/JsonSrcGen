@@ -4,7 +4,7 @@ using JsonSrcGen;
 
 namespace JsonSrcGen.TypeGenerators
 {
-    public class CustomConverterValueTypeGenerator : IJsonGenerator
+    public class CustomConverterGenerator : IJsonGenerator
     {
         public string TypeName { get; }
         readonly CodeBuilder _classLevelBuilder;
@@ -12,12 +12,12 @@ namespace JsonSrcGen.TypeGenerators
 
         public readonly string _converterName;
 
-        public CustomConverterValueTypeGenerator(string typeName, string converterClassName, CodeBuilder classLevelBuilder)
+        public CustomConverterGenerator(string typeName, string converterClassName, CodeBuilder classLevelBuilder)
         {
             TypeName = typeName;
             _classLevelBuilder = classLevelBuilder;
             _converterName =  $"CustomConverter{UniqueNumberGenerator.UniqueNumber}";
-            classLevelBuilder.AppendLine(2, $"static readonly ICustomConverterValueType<{typeName}> {_converterName} = new {converterClassName}();");
+            classLevelBuilder.AppendLine(2, $"static readonly ICustomConverter<{typeName}> {_converterName} = new {converterClassName}();");
         }
 
         public CodeBuilder ClassLevelBuilder => _classLevelBuilder;
@@ -26,7 +26,9 @@ namespace JsonSrcGen.TypeGenerators
         public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
         {
             string propertyValueName = $"property{UniqueNumberGenerator.UniqueNumber}Value";
-            codeBuilder.AppendLine(indentLevel, $"json = {_converterName}.FromJson(json, out {TypeName} {propertyValueName});");
+
+            codeBuilder.AppendLine(indentLevel, $"var {propertyValueName} = {valueGetter};");
+            codeBuilder.AppendLine(indentLevel, $"json = {_converterName}.FromJson(json, ref {propertyValueName});");
             codeBuilder.AppendLine(indentLevel, valueSetter(propertyValueName));
         }
 

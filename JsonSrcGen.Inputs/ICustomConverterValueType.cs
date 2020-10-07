@@ -3,7 +3,7 @@ using System.Text;
 
 namespace JsonSrcGen
 {
-    internal interface ICustomConverterValueType<T>
+    internal interface ICustomConverterValueType<T> where T : struct
     {
         void ToJson(IJsonBuilder builder, T target);
 

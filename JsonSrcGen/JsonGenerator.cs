@@ -71,7 +71,6 @@ namespace JsonSrcGen
                 }
             }
 
-
             compilation = GenerateFromResource("InvalidJsonException.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonArrayAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonAttribute.cs", context, compilation, GenerationFolder);
@@ -143,7 +142,7 @@ namespace JsonSrcGen
                 _generators.Add(generator.TypeName, generator);
             }
 
-            var customTypeConverters = GetCustomTypeConverters(receiver.CandidateClasses, compilation, new CodeBuilder()); 
+            var customTypeConverters = GetCustomTypeConverters(receiver.CandidateClasses, compilation); 
             foreach(var customTypeConverter in customTypeConverters)
             {
                 LogLine($"Adding customTypeConverter TypeName: {customTypeConverter.TypeName}");
@@ -409,7 +408,7 @@ namespace JsonSrcGen
             return jsonClasses; 
         }
         static string GenerationFolder;
-        IReadOnlyCollection<IJsonGenerator> GetCustomTypeConverters(List<ClassDeclarationSyntax> classDeclarations, Compilation compilation, CodeBuilder classLevelBuilder)
+        IReadOnlyCollection<IJsonGenerator> GetCustomTypeConverters(List<ClassDeclarationSyntax> classDeclarations, Compilation compilation)
         {
             var customTypeConverters = new List<IJsonGenerator>();
 
@@ -419,24 +418,48 @@ namespace JsonSrcGen
                 SemanticModel model = compilation.GetSemanticModel(candidateClass.SyntaxTree);
                 var classSymbol = model.GetDeclaredSymbol(candidateClass);
 
-                LogLine($"CustomConverter candidateClass {classSymbol.Name}");
-
                 if (HasCustomConverterAttribute(classSymbol))
                 {
-                    LogLine($"Has converter attribute {classSymbol.Name}");
-
                     string converterClassName = classSymbol.Name;
                     string converterNamespace = classSymbol.ContainingNamespace.ToString();
 
                     string targetType = GetCustomConverterTargetType(classSymbol);
 
-                    customTypeConverters.Add(new CustomConverterValueTypeGenerator(
-                        targetType, 
-                        $"{converterNamespace}.{converterClassName}", 
-                        classLevelBuilder));
+                    if(ImplementsInterface(classSymbol, "JsonSrcGen.ICustomConverterValueType"))
+                    {
+                        customTypeConverters.Add(new CustomConverterValueTypeGenerator(
+                            targetType,
+                            $"{converterNamespace}.{converterClassName}", 
+                            new CodeBuilder()));
+                    }
+                    if(ImplementsInterface(classSymbol, "JsonSrcGen.ICustomConverter"))
+                    {
+                        customTypeConverters.Add(new CustomConverterGenerator(
+                            targetType, 
+                            $"{converterNamespace}.{converterClassName}", 
+                            new CodeBuilder()));
+                    }
                 }
             }
             return customTypeConverters; 
+        }
+
+        bool ImplementsInterface(INamedTypeSymbol symbol, string interfaceFullName)
+        {
+            foreach(var interfaceSymbol in symbol.Interfaces)
+            {
+                string actualInterfaceFullName = $"{interfaceSymbol.ContainingNamespace}.{interfaceSymbol.Name}";
+                
+                if(actualInterfaceFullName == interfaceFullName)
+                {
+                    return true;
+                }
+                if(ImplementsInterface(interfaceSymbol, interfaceFullName))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         bool HasJsonClassAttribute(ISymbol symbol)
@@ -454,8 +477,14 @@ namespace JsonSrcGen
             var query = 
                 from attribute in symbol.GetAttributes()
                 where attribute.AttributeClass.Name == "CustomConverterAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen"
-                select attribute.ConstructorArguments.First().Value.ToString();
-            return query.First();
+                select attribute.ConstructorArguments.First().Value;
+            var type = query.First();
+            var typeSymbol = type as ITypeSymbol;
+            if(typeSymbol == null)
+            {
+                throw new InvalidOperationException("CustomConverter parameter must be a type");
+            }
+            return GetType(typeSymbol).Name;
         }
 
         JsonType GetType(ISymbol symbol)
