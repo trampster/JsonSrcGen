@@ -64,6 +64,21 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "}"); 
         }
 
+        public void GenerateValue(JsonType type, CodeBuilder codeBuilder) 
+        {
+            codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name} FromJson({type.Namespace}.{type.Name} value, string jsonString)");
+            codeBuilder.AppendLine(2, "{");
+
+            codeBuilder.AppendLine(3, "var json = jsonString.AsSpan();");
+            
+            var generator = _getGeneratorForType(type);
+
+            generator.GenerateFromJson(codeBuilder, 3, type, value => $"value = {value};", "value");
+
+            codeBuilder.AppendLine(3, "return value;"); 
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
         {
             classBuilder.AppendLine(2, $"public void FromJson({jsonClass.Namespace}.{jsonClass.Name} value, string jsonString)");

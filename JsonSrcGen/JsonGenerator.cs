@@ -73,6 +73,7 @@ namespace JsonSrcGen
 
             compilation = GenerateFromResource("InvalidJsonException.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonArrayAttribute.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonValueAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonDictionaryAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonIgnoreAttribute.cs", context, compilation, GenerationFolder);
@@ -185,6 +186,13 @@ namespace JsonSrcGen
             {
                 toJsonGenerator.Generate(jsonClass, classBuilder);
                 fromJsonGenerator.Generate(jsonClass, classBuilder);
+            }
+
+            var valueTypes = GetValueAttributesInfo(receiver.CandidateAttributes, compilation);
+            foreach(var valueType in valueTypes)
+            {
+                toJsonGenerator.GenerateValue(valueType, classBuilder);
+                fromJsonGenerator.GenerateValue(valueType, classBuilder); 
             }
 
             foreach(var generator in _generators)
@@ -328,6 +336,31 @@ namespace JsonSrcGen
                 return jsonType;
             }
             return null;
+        }
+
+        IReadOnlyCollection<JsonType> GetValueAttributesInfo(List<AttributeSyntax> attributeDeclarations, Compilation compilation)
+        {
+            var arrayTypes = new List<JsonType>();
+            foreach(var attribute in attributeDeclarations)
+            {
+                if(attribute.Name.ToString() == "JsonValue") 
+                {
+                    SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
+
+                    foreach (AttributeArgumentSyntax arg in attribute.ArgumentList.Arguments)
+                    {
+                        ExpressionSyntax expr = arg.Expression;
+                        if(expr is TypeOfExpressionSyntax typeofExpr)
+                        {
+                            TypeSyntax typeSyntax = typeofExpr.Type;
+                            var typeInfo = model.GetTypeInfo(typeSyntax);
+                            var jsonType = GetType(typeInfo.Type);
+                            arrayTypes.Add(jsonType);
+                        }
+                    }
+                }
+            }
+            return arrayTypes;
         }
 
         IReadOnlyCollection<JsonType> GetArrayAttributesInfo(List<AttributeSyntax> attributeDeclarations, Compilation compilation)

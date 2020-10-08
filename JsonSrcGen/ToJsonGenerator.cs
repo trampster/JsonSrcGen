@@ -92,6 +92,19 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "}"); 
         }
 
+        public void GenerateValue(JsonType type, CodeBuilder codeBuilder) 
+        {
+            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({type.Namespace}.{type.Name} value)");
+            codeBuilder.AppendLine(2, "{");
+            codeBuilder.AppendLine(0, BuilderText);
+
+            var generator = _getGeneratorForType(type);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), type, "value" );
+
+            codeBuilder.AppendLine(3, "return builder.AsSpan();");
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
         public void GenerateDictionary(JsonType keyType, JsonType valueType, CodeBuilder codeBuilder) 
         {
             codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson(Dictionary<{keyType.FullName},{valueType.FullName}> value)");

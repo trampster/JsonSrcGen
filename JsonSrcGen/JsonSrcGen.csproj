@@ -38,6 +38,7 @@
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\GenerationOutputFolderAttribute.cs" Link="GenerationOutputFolderAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\InvalidJsonException.cs" Link="InvalidJsonException.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonArrayAttribute.cs" Link="JsonArrayAttribute.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonValueAttribute.cs" Link="JsonValueAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonAttribute.cs" Link="JsonAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonDictionaryAttribute.cs" Link="JsonDictionaryAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonIgnoreAttribute.cs" Link="JsonIgnoreAttribute.cs" />

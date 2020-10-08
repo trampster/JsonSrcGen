@@ -62,7 +62,7 @@ namespace CustomConverterTests
             new JsonConverter().FromJson(customClass, "{\"DateTime\":\"UPERCASE\"}"); 
 
             //assert
-            Assert.That(customClass.Property, Is.EqualTo("upercase")); 
+            Assert.That(customClass.Property, Is.EqualTo("upercase"));
         }
     }
 }
