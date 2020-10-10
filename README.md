@@ -20,7 +20,7 @@ public class MyType
 
 var converter = new JsonConverter();
 
-ReadOnlySpan<char> span = convert.ToJson(new MyType(){MyProperty = "Some value"});
+ReadOnlySpan<char> json = convert.ToJson(new MyType(){MyProperty = "Some value"});
 
 var myType = new MyType();
 convert.FromJson("{\"MyProperty\:\"Some value\"}", myType);
