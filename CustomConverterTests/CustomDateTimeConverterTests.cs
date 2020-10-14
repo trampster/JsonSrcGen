@@ -21,7 +21,7 @@ namespace CustomConverterTests
             json = json.SkipWhitespace();
             if(json[0] != '\"')
             {
-                throw new InvalidJsonException("DateTime should start with a quote");
+                throw new InvalidJsonException("DateTime should start with a quote", json);
             }
             json = json.Slice(1);
 

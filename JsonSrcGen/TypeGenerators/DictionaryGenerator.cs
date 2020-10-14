@@ -73,7 +73,7 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel+3, "json = json.Slice(1);");
             codeBuilder.AppendLine(indentLevel+3, "break;");
             codeBuilder.AppendLine(indentLevel+2, "default:");
-            codeBuilder.AppendLine(indentLevel+3, "throw new InvalidJsonException($\"Unexpected character while parsing list Expected ',' or ']' but got '{json[0]}' at ..{new string(json)}\");");
+            codeBuilder.AppendLine(indentLevel+3, "throw new InvalidJsonException($\"Unexpected character while parsing list Expected ',' or ']' but got '{json[0]}'\", json);");
             codeBuilder.AppendLine(indentLevel+1, "}");
             codeBuilder.AppendLine(indentLevel+1, "break;");
             codeBuilder.AppendLine(indentLevel, "}");

@@ -3,7 +3,7 @@ using JsonSrcGen;
 using System.Collections.Generic;
 using System;
 
-[assembly: JsonArray(typeof(bool))] 
+[assembly: JsonArray(typeof(bool))]
 
 namespace UnitTests.ListTests
 {

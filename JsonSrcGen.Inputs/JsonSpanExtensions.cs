@@ -17,7 +17,7 @@ namespace JsonSrcGen
                     value = false;
                     return json.Slice(5);
             }
-            throw new InvalidJsonException($"Expected 'true' or 'false' but got {new string(json)}");
+            throw new InvalidJsonException("Expected 'true' or 'false'", json);
         }
 
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out bool? value)
@@ -667,7 +667,7 @@ namespace JsonSrcGen
                         return json.Slice(index+1);
                 }
             }
-            throw new InvalidJsonException("Failed to find end of string");
+            throw new InvalidJsonException("Failed to find end of string", json);
         }
 
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out char value)
@@ -675,7 +675,7 @@ namespace JsonSrcGen
             json = json.SkipWhitespace();
             if(json[0] != '\"')
             {
-                throw new InvalidJsonException($"Expected Char value to start with \" but instead got {json[0]} at {new string(json)}");
+                throw new InvalidJsonException($"Expected Char value to start with \" but instead got {json[0]}", json);
             }
             switch(json[1])
             {
@@ -717,7 +717,7 @@ namespace JsonSrcGen
                     value = FromHex(json, 1);
                     return json.Slice(5);
                 default:
-                    throw new InvalidJsonException($"Unrecognized escape sequence at {new string(json)}");
+                    throw new InvalidJsonException($"Unrecognized escape sequence at {new string(json)}", json);
             }
             return json.Slice(1);
         }
@@ -789,7 +789,7 @@ namespace JsonSrcGen
                 
             }
             //we got to the end of the span without finding the end of string character
-            throw new InvalidJsonException("Missing end of string value");
+            throw new InvalidJsonException("Missing end of string value", json);
         }
 
         static char FromHex(this ReadOnlySpan<char> json, int internalStart)
@@ -817,7 +817,7 @@ namespace JsonSrcGen
                 }
                 return json.Slice(index);
             }
-            throw new InvalidJsonException($"Unexpected end of json while skipping whitespace");
+            throw new InvalidJsonException($"Unexpected end of json while skipping whitespace", json);
         }
 
         public static ReadOnlySpan<char> SkipWhitespaceTo(this ReadOnlySpan<char> json, char to)
@@ -838,9 +838,9 @@ namespace JsonSrcGen
                     index++;
                     return json.Slice(index);
                 }
-                throw new InvalidJsonException($"Unexpected character! expected '{to}' but got '{value}' in '{new string(json)}'");
+                throw new InvalidJsonException($"Unexpected character! expected '{to}' but got '{value}'", json);
             }
-            throw new InvalidJsonException($"Unexpected end of json while looking for '{to}'");
+            throw new InvalidJsonException($"Unexpected end of json while looking for '{to}'", json);
         }
 
         public static ReadOnlySpan<char> SkipWhitespaceTo(this ReadOnlySpan<char> json, char to1, char to2, out char found)
@@ -868,9 +868,9 @@ namespace JsonSrcGen
                     found = to2;
                     return json.Slice(index);
                 }
-                throw new InvalidJsonException($"Unexpected character! expected '{to1}' or '{to2}' but got '{value}' at {new string(json)}");
+                throw new InvalidJsonException($"Unexpected character! expected '{to1}' or '{to2}' but got '{value}'", json);
             }
-            throw new InvalidJsonException($"Unexpected end of json while looking for '{to1}' or {to2}");
+            throw new InvalidJsonException($"Unexpected end of json while looking for '{to1}' or {to2}", json);
         }
 
         public static ReadOnlySpan<char> SkipProperty(this ReadOnlySpan<char> json)
@@ -906,7 +906,7 @@ namespace JsonSrcGen
                         break;
                 }
             }
-            throw new InvalidJsonException($"Failed to find end of property at {new string(json)}");
+            throw new InvalidJsonException("Failed to find end of property", json);
         }
 
         public static ReadOnlySpan<char> ReadTo(this ReadOnlySpan<char> json, char to)
@@ -919,7 +919,7 @@ namespace JsonSrcGen
                     return json.Slice(0, index);
                 }
             }
-            throw new InvalidJsonException($"Unexpected end of json while looking for '{to}'");
+            throw new InvalidJsonException($"Unexpected end of json while looking for '{to}'", json);
         }
 
         public static bool EqualsString(this ReadOnlySpan<char> json, string other)
@@ -946,7 +946,7 @@ namespace JsonSrcGen
 
             if(json[0] != '\"')
             {
-                throw new InvalidJsonException($"Expected DateTime property to start with a quote but instead got '{json[0]}'");
+                throw new InvalidJsonException($"Expected DateTime property to start with a quote but instead got '{json[0]}'", json);
             }
             json = json.Slice(1);
 
@@ -1084,7 +1084,7 @@ namespace JsonSrcGen
                 case '\"':
                     break;
                 default:
-                    throw new InvalidJsonException($"Expected DateTime property to start with a quote but instead got '{json[0]}'");
+                    throw new InvalidJsonException($"Expected DateTime property to start with a quote but instead got '{json[0]}'", json);
             }
 
             json = json.Slice(1);
@@ -1246,7 +1246,7 @@ namespace JsonSrcGen
 
             if(json[0] != '\"')
             {
-                throw new InvalidJsonException($"Expected DateTime property to start with a quote but instead got '{json[0]}'");
+                throw new InvalidJsonException($"Expected DateTime property to start with a quote but instead got '{json[0]}'", json);
             }
             json = json.Slice(1);
 
@@ -1299,7 +1299,7 @@ namespace JsonSrcGen
                 case '\"':
                     break;
                 default:
-                    throw new InvalidJsonException($"Expected Guid property to start with a quote but instead got '{json[0]}'");
+                    throw new InvalidJsonException($"Expected Guid property to start with a quote but instead got '{json[0]}'", json);
             }
             json = json.Slice(1);
 
