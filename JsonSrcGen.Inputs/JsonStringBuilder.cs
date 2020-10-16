@@ -269,6 +269,20 @@ namespace JsonSrcGen
             return _offset;
         }
 
+        IJsonBuilder AppendOffset(TimeSpan offset)
+        {
+            if (_index + 6 > _buffer.Length)
+            {
+                ResizeBuffer(6);
+            }
+            if(offset.TotalMinutes >= 0) Append('+');
+            else Append('-');
+            AppendIntTwo(Math.Abs(offset.Hours));
+            Append(':');
+            AppendIntTwo(Math.Abs(offset.Minutes));
+            return this;
+        }
+
         public IJsonBuilder AppendDate(DateTime date)
         {
             Append('\"');
@@ -300,6 +314,34 @@ namespace JsonSrcGen
                 return Append('\"');
             }
             Append(GetOffset());
+            Append('\"');
+            
+            return this;
+        }
+
+        public IJsonBuilder AppendDateTimeOffset(DateTimeOffset date)
+        {
+            Append('\"');
+            AppendIntFour(date.Year);
+            Append('-');
+            AppendIntTwo(date.Month);
+            Append('-');
+            AppendIntTwo(date.Day);
+            Append('T');
+            AppendIntTwo(date.Hour);
+            Append(':');
+            AppendIntTwo(date.Minute);
+            Append(':');
+            AppendIntTwo(date.Second);
+            var fractions = date.Ticks % TimeSpan.TicksPerSecond * TimeSpan.TicksPerMillisecond;
+            if(fractions != 0)
+            {
+                Append('.');
+                AppendDateTimeFraction(fractions);
+            }
+
+            //offset
+            AppendOffset(date.Offset);
             Append('\"');
             
             return this;

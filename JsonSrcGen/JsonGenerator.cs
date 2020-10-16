@@ -105,6 +105,7 @@ namespace JsonSrcGen
             var generators = new IJsonGenerator[]
             {
                 new DateTimeGenerator(),
+                new DateTimeOffsetGenerator(),
                 new NullableDateTimeGenerator(),
                 new GuidGenerator(),
                 new NullableGuidGenerator(),
