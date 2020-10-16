@@ -118,7 +118,7 @@ namespace UnitTests
 
             //assert
             var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
-            var sign = offset.Duration().TotalMinutes > 0 ? "+" : "-";
+            var sign = offset.Duration().TotalMinutes >= 0 ? "+" : "-";
             var hours = Math.Abs(offset.Hours).ToString("00");
             var minutes = offset.Minutes.ToString("00");
             Assert.That(json.ToString(), Is.EqualTo($"{{\"Property\":\"2016-01-02T23:59:58.555{sign}{hours}:{minutes}\"}}"));
