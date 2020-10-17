@@ -107,6 +107,7 @@ namespace JsonSrcGen
                 new DateTimeGenerator(),
                 new DateTimeOffsetGenerator(),
                 new NullableDateTimeGenerator(),
+                new NullalbeDateTimeOffsetGenerator(),
                 new GuidGenerator(),
                 new NullableGuidGenerator(),
                 new AppendReadGenerator("Int32"),
