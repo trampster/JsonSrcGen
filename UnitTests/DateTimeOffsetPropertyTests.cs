@@ -31,6 +31,22 @@ namespace UnitTests
 
                 //lazy doesn't start at beginning
                 yield return new TestCaseData(" \"2017-07-25\"", new DateTimeOffset(new DateTime(2017,7,25,0,0,0,DateTimeKind.Utc)));
+
+                //nz standard time
+                dateTime = new DateTimeOffset(new DateTime(2017,7,25,23,59,58,DateTimeKind.Unspecified).AddMilliseconds(123.45678), new TimeSpan(12,0,0));
+                yield return new TestCaseData("\"2017-07-25T23:59:58.12345678+12:00\"", dateTime);
+
+                //nz daylight savings time
+                dateTime = new DateTimeOffset(new DateTime(2017,7,25,23,59,58,DateTimeKind.Unspecified).AddMilliseconds(123.45678), new TimeSpan(13,0,0));
+                yield return new TestCaseData("\"2017-07-25T23:59:58.12345678+13:00\"", dateTime);
+
+                //Chatham Island Standard Time
+                dateTime = new DateTimeOffset(new DateTime(2017,7,25,23,59,58,DateTimeKind.Unspecified).AddMilliseconds(123.45678), new TimeSpan(12,45,0));
+                yield return new TestCaseData("\"2017-07-25T23:59:58.12345678+12:45\"", dateTime);
+
+                //Chile Summer Time
+                dateTime = new DateTimeOffset(new DateTime(2017,7,25,23,59,58,DateTimeKind.Unspecified).AddMilliseconds(123.45678), new TimeSpan(-3,0,0));
+                yield return new TestCaseData("\"2017-07-25T23:59:58.12345678-03:00\"", dateTime);
             }
         }
     }

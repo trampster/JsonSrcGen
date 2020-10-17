@@ -144,7 +144,7 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
             Assert.That(launch.Name, Is.EqualTo("NROL-108"));
             Assert.That(launch.DateUtc.ToString("o"), Is.EqualTo("2020-10-01T00:00:00.0000000Z"));
             Assert.That(launch.DateUnix, Is.EqualTo(1601510400));
-            Assert.That(launch.DateLocal.ToUniversalTime().ToString("o"), Is.EqualTo("2020-10-01T00:00:00.0000000Z"));
+            Assert.That(launch.DateLocal.ToString("o"), Is.EqualTo("2020-09-30T20:00:00.0000000-04:00"));
             Assert.That(launch.DatePrecision, Is.EqualTo("month"));
             Assert.That(launch.Upcoming, Is.True);
             Assert.That(launch.Cores.Length, Is.EqualTo(1));

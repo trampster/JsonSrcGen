@@ -70,7 +70,7 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
         public long DateUnix {get;set;}
 
         [JsonName("date_local")]
-        public DateTime DateLocal {get;set;}
+        public DateTimeOffset DateLocal {get;set;}
 
         [JsonName("date_precision")]
         public string DatePrecision {get;set;}
