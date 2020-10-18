@@ -29,18 +29,19 @@ Properties with the following types are supported:
 
 Integer Types | Others
 ------|--------
-int |  float 
-int? | float?
-uint | double
-uint? | double?
-ushort | boolean
-ushort? | boolean?
-short | string
-short? | DateTime
-byte | DateTime?
-byte? | Guid
-long | Arrays
-long? | List<T>
+int | float?
+int? | double
+uint | double?
+uint? | boolean
+ushort | boolean?
+ushort? | string 
+short | DateTime
+short? | DateTime?
+byte | DateTimeOffset
+byte? | DateTimeOffset?
+long | Guid
+long? | Arrays
+float | List<T>
     
 **Arrays**
 
