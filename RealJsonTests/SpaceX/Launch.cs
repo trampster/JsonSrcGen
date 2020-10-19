@@ -34,7 +34,7 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
         public bool? Success {get;set;}
 
         [JsonName("failures")]
-        public Failures[] Failures {get;set;}
+        public Failure[] Failures {get;set;}
 
         [JsonName("details")]
         public string Details {get;set;}
@@ -102,7 +102,7 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
     }
 
     [Json]
-    public class Failures
+    public class Failure
     {
         [JsonName("time")]
         public int Time {get;set;}
@@ -124,7 +124,7 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
         public Reddit Reddit {get;set;}
 
         [JsonName("flickr")]
-        public Flicker Flickr {get;set;}
+        public Flickr Flickr {get;set;}
 
         [JsonName("presskit")]
         public string Presskit {get;set;}
@@ -169,7 +169,7 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
     }
 
     [Json]
-    public class Flicker
+    public class Flickr
     {
         [JsonName("small")]
         public string[] Small {get;set;}

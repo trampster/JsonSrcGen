@@ -2,8 +2,10 @@ using JsonSrcGen;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
+using System;
 
 [assembly: JsonArray(typeof(JsonSrcGen.RealJsonTests.SpaceX.Launch))]
+[assembly: GenerationOutputFolder("/home/daniel/Work/JsonSrcGen/Generated")]
 
 namespace JsonSrcGen.RealJsonTests.SpaceX
 {
@@ -158,6 +160,102 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
             Assert.That(launch.Cores[0].LandingType, Is.EqualTo("RTLS"));
             Assert.That(launch.Cores[0].Landpad, Is.EqualTo("5e9e3032383ecb267a34e7c7"));
             Assert.That(launch.Id, Is.EqualTo("5f8399fb818d8b59f5740d43"));
+        }
+
+        [Test]
+        public void ToJson_CorrectJson()
+        {
+            // arrange
+            Launch launch = new Launch()
+            {
+                Fairings = new Fairings()
+                { 
+                    Reused = false,
+                    RecoveryAttempt = false,
+                    Recovered = false,
+                    Ships = new string[0]
+                },
+                Links = new Links()
+                {
+                    Patch = new Patch()
+                    {
+                        Small = "https://images2.imgbox.com/3c/0e/T8iJcSN3_o.png",
+                        Large = "https://images2.imgbox.com/40/e3/GypSkayF_o.png"
+                    },
+                    Reddit = new Reddit()
+                    {
+                        Campaign = null,
+                        Launch = null,
+                        Media = null,
+                        Recovery = null,
+                    },
+                    Flickr = new Flickr()
+                    {
+                        Small = new string[0],
+                        Original = new string[0]
+                    },
+                    Presskit = null,
+                    Webcast = "https://www.youtube.com/watch?v=0a_00nJ_Y88",
+                    YoutubeId = "0a_00nJ_Y88",
+                    Article = "https://www.space.com/2196-spacex-inaugural-falcon-1-rocket-lost-launch.html",
+                    Wikipedia = "https://en.wikipedia.org/wiki/DemoSat",
+                },
+                StaticFireDateUtc = new DateTime(2006, 03, 17, 0, 0, 0, DateTimeKind.Utc),
+                StaticFireDateUnix = 1142553600,
+                Tbd = false,
+                Net = false,
+                Window = 0,
+                Rocket = "5e9d0d95eda69955f709d1eb",
+                Success = false,
+                Details = "Engine failure at 33 seconds and loss of vehicle",
+                Crew = new string[0],
+                Ships = new string[0],
+                Capsules = new string[0],
+                Payloads = new string[]
+                {
+                    "5eb0e4b5b6c3bb0006eeb1e1"
+                },
+                Launchpad = "5e9e4502f5090995de566f86",
+                AutoUpdate = true,
+                Failures = new Failure[]
+                {
+                    new Failure()
+                    {
+                        Time = 33,
+                        Altitude = null,
+                        Reason = "merlin engine failure"
+                    }
+                },
+                FlightNumber = 1,
+                Name = "FalconSat",
+                DateUtc = new DateTime(2006, 03, 24, 22, 30, 0, DateTimeKind.Utc),
+                DateUnix = 1143239400,
+                DateLocal = new DateTimeOffset(2006, 03, 25, 10, 30, 00, new TimeSpan(12, 00, 00)),
+                DatePrecision = "hour",
+                Upcoming = false,
+                Cores = new Core[]
+                {
+                    new Core()
+                    {
+                        CoreId = "5e9e289df35918033d3b2623",
+                        Flight = 1,
+                        Gridfins = false,
+                        Legs = false,
+                        Reused = false,
+                        LandingAttempt = false,
+                        LandingSuccess = null,
+                        LandingType = null,
+                        Landpad = null,
+                    }
+                },
+                Id = "5eb87cd9ffd86e000604b32a"
+            };
+
+            // act
+            var json = _converter.ToJson(launch);
+
+            // assert
+            Assert.That(json.ToString(), Is.EqualTo(File.ReadAllText(Path.Combine("SpaceX","Launch.json"))));
         }
     }
 }

@@ -165,7 +165,7 @@ namespace JsonSrcGen.TypeGenerators
 
             codeBuilder.AppendLine(indentLevel+1, "}");
 
-            codeBuilder.AppendLine(indentLevel+1, $"if({valueGetter}.Length > 1)");
+            codeBuilder.AppendLine(indentLevel+1, $"if({valueGetter}.Length > 0)");
             codeBuilder.AppendLine(indentLevel+1, "{");
             generator.GenerateToJson(codeBuilder, indentLevel+2, appendBuilder, listElementType, $"{listName}[{valueGetter}.Length-1]");
             codeBuilder.AppendLine(indentLevel+1, "}");
