@@ -19,6 +19,9 @@
   <ItemGroup>
     <Content Include="SpaceX\*.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="OpenWeatherMap\*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>  
   </ItemGroup>
 </Project>
