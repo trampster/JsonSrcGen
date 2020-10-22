@@ -95,7 +95,7 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
         [JsonName("min")]
         public float? Min {get;set;}
 
-        [JsonName("Max")]
+        [JsonName("max")]
         public float? Max {get;set;}
 
         [JsonName("night")]
