@@ -11,24 +11,24 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
     /// </summary>
     public class WeatherTests
     {
-        string _json;
         JsonConverter _converter;
 
         [SetUp]
         public void Setup()
         {
-            _json = File.ReadAllText(Path.Combine("OpenWeatherMap","Weather.json"));
             _converter = new JsonConverter();
         }
 
-        [Test]
-        public void FromJson_CorrectTopLevel()
+        [TestCase("Weather.json")]
+        [TestCase("WeatherFormatted.json")]
+        public void FromJson_CorrectTopLevel(string jsonFile)
         {
             // arrange
             Weather weather = new Weather();
+            var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, _json);
+            _converter.FromJson(weather, json);
 
             // assert
             Assert.That(weather.Latitude, Is.EqualTo(33.44f));
@@ -37,14 +37,16 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             Assert.That(weather.TimezoneOffset, Is.EqualTo(-18000));
         }
 
-        [Test]
-        public void FromJson_CorrectCurrent()
+        [TestCase("Weather.json")]
+        [TestCase("WeatherFormatted.json")]
+        public void FromJson_CorrectCurrent(string jsonFile)
         {
             // arrange
             Weather weather = new Weather();
+            var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, _json);
+            _converter.FromJson(weather, json);
 
             // assert
             var current = weather.Current;
@@ -67,14 +69,16 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             Assert.That(current.Weather[0].Icon, Is.EqualTo("02n"));
         }
 
-        [Test]
-        public void FromJson_MinutelyCorrect()
+        [TestCase("Weather.json")]
+        [TestCase("WeatherFormatted.json")]
+        public void FromJson_MinutelyCorrect(string jsonFile)
         {
             // arrange
             Weather weather = new Weather();
+            var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, _json);
+            _converter.FromJson(weather, json);
 
             // assert
             var minutely = weather.Minutely;
@@ -93,14 +97,16 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             Assert.That(minutely[60].Precipitation, Is.EqualTo(0));
         }
 
-        [Test]
-        public void FromJson_HourlyCorrect()
+        [TestCase("Weather.json")]
+        [TestCase("WeatherFormatted.json")]
+        public void FromJson_HourlyCorrect(string jsonFile)
         {
             // arrange
             Weather weather = new Weather();
+            var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, _json);
+            _converter.FromJson(weather, json);
 
             // assert
             var hourly = weather.Hourly;
@@ -146,14 +152,16 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             Assert.That(hourly[47].Rain, Is.Null);
         }
 
-        [Test]
-        public void FromJson_DailyCorrect()
+        [TestCase("Weather.json")]
+        [TestCase("WeatherFormatted.json")]
+        public void FromJson_DailyCorrect(string jsonFile)
         {
             // arrange
             Weather weather = new Weather();
+            var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, _json);
+            _converter.FromJson(weather, json);
 
             // assert
             var daily = weather.Daily;
