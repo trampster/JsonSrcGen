@@ -196,5 +196,147 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             Assert.That(daily[1].Pop, Is.EqualTo(0));
             Assert.That(daily[1].Uvi, Is.EqualTo(4.92f));
         }
+
+        /// <summary>
+        /// This has been reduce for the orignal by removing most of the entries
+        /// in the arrays, also reordered because JsonSrcGen produces alphabetically
+        /// sorted json properties and null entries added because JsonSrcGen outputs
+        /// nulls
+        /// </summary>
+        [Test]
+        public void ToJsonReduced_CorrectJson()
+        {
+            // arrange
+            Weather weather = new Weather()
+            {
+                Latitude = 33.44f,
+                Longitude = -94.04f,
+                Timezone = "America/Chicago",
+                TimezoneOffset = -18000,
+                Current = new WeatherEntry
+                {
+                    Dt = 1603185587,
+                    Sunrise = 1603196699,
+                    Sunset = 1603236983,
+                    Temp = 294.59f,
+                    FeelsLike = 296.17f,
+                    Pressure = 1017,
+                    Humidity = 88,
+                    DewPoint = 292.52f,
+                    Uvi = 5.21f,
+                    Clouds = 20,
+                    Visibility = 10000,
+                    WindSpeed = 2.6f,
+                    WindDeg = 150,
+                    Weather = new WeatherDescription[]
+                    {
+                        new WeatherDescription()
+                        {
+                            Id = 801,
+                            Main = "Clouds",
+                            Description = "few clouds",
+                            Icon = "02n"
+                        }
+                    }
+                },
+                Minutely = new MinutelyWeather[]
+                {
+                    new MinutelyWeather()
+                    {
+                        Dt = 1603185600,
+                        Precipitation = 0
+                    },
+                    new MinutelyWeather()
+                    {
+                        Dt = 1603185660,
+                        Precipitation = 0
+                    }
+                },
+                Hourly = new WeatherEntry[]
+                {
+                    new WeatherEntry()
+                    {
+                        Dt = 1603184400,
+                        Temp = 294.59f,
+                        FeelsLike = 296.32f,
+                        Pressure = 1017,
+                        Humidity = 88,
+                        DewPoint = 292.52f,
+                        Clouds = 20,
+                        Visibility = 10000,
+                        WindSpeed = 2.39f,
+                        WindDeg = 184,
+                        Weather = new WeatherDescription[]
+                        {
+                            new WeatherDescription()
+                            {
+                                Id = 501,
+                                Main = "Rain",
+                                Description = "moderate rain",
+                                Icon = "10n"
+                            }
+                        },
+                        Pop = 0.88f,
+                        Rain = new Rain()
+                        {
+                            OneHour = 1.53f
+                        }
+                    }
+                },
+                Daily = new DailyWeatherEntry[]
+                {
+                    new DailyWeatherEntry()
+                    {
+                        Dt = 1603216800,
+                        Sunrise = 1603196699,
+                        Sunset = 1603236983,
+                        Temp = new DailyTemp()
+                        {
+                            Day = 299.61f,
+                            Min = 293.56f,
+                            Max = 301.32f,
+                            Night = 294.58f,
+                            Eve = 296.75f,
+                            Morn = 293.79f
+                        },
+                        FeelsLike = new DailyTemp()
+                        {
+                            Day = 300.68f,
+                            Night = 295.04f,
+                            Eve = 298.05f,
+                            Morn = 295.7f
+                        },
+                        Pressure = 1018,
+                        Humidity = 63,
+                        DewPoint = 292,
+                        WindSpeed = 2.99f,
+                        WindDeg = 195,
+                        Weather = new WeatherDescription[]
+                        {
+                            new WeatherDescription()
+                            {
+                                Id = 501,
+                                Main = "Rain",
+                                Description = "moderate rain",
+                                Icon = "10d"
+                            }
+                        },
+                        Clouds = 90,
+                        Pop = 0.88f,
+                        Rain = 8.15f,
+                        Uvi = 5.21f
+                    }
+                }
+            };
+
+
+            // act
+            var json = _converter.ToJson(weather);
+
+            // assert
+            var jsonExpected = File.ReadAllText(Path.Combine("OpenWeatherMap", "WeatherToJson.json"));
+
+            Assert.That(json.ToString(), Is.EqualTo(jsonExpected));
+        }
     }
 }

@@ -22,13 +22,23 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
         public WeatherEntry Current {get;set;}
 
         [JsonName("minutely")]
-        public WeatherEntry[] Minutely {get;set;}
+        public MinutelyWeather[] Minutely {get;set;}
 
         [JsonName("hourly")]
         public WeatherEntry[] Hourly {get;set;}
 
         [JsonName("daily")]
         public DailyWeatherEntry[] Daily {get;set;}
+    }
+
+    [Json]
+    public class MinutelyWeather
+    {
+        [JsonName("dt")]
+        public ulong Dt {get;set;}
+
+        [JsonName("precipitation")]
+        public ulong? Precipitation {get;set;}
     }
 
     [Json]
