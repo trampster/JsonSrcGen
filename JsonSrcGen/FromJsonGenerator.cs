@@ -18,10 +18,8 @@ namespace JsonSrcGen
 
         public void GenerateList(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public List<{type.Namespace}.{type.Name}> FromJson(List<{type.Namespace}.{type.Name}> value, string jsonString)");
+            codeBuilder.AppendLine(2, $"public List<{type.Namespace}.{type.Name}> FromJson(List<{type.Namespace}.{type.Name}> value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
-
-            codeBuilder.AppendLine(3, "var json = jsonString.AsSpan();");
             
             var arrayJsonType = new JsonType("List", "List", "System.Coolection.Generic", false, new List<JsonType>(){type});
             var generator = _getGeneratorForType(arrayJsonType);
@@ -34,10 +32,8 @@ namespace JsonSrcGen
 
         public void GenerateDictionary(JsonType keyType, JsonType valueType, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public Dictionary<{keyType.FullName}, {valueType.FullName}> FromJson(Dictionary<{keyType.FullName}, {valueType.FullName}> value, string jsonString)");
+            codeBuilder.AppendLine(2, $"public Dictionary<{keyType.FullName}, {valueType.FullName}> FromJson(Dictionary<{keyType.FullName}, {valueType.FullName}> value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
-
-            codeBuilder.AppendLine(3, "var json = jsonString.AsSpan();");
             
             var arrayJsonType = new JsonType("Dictionary", "Dictionary", "System.Coolection.Generic", false, new List<JsonType>(){keyType, valueType});
             var generator = _getGeneratorForType(arrayJsonType);
@@ -50,11 +46,9 @@ namespace JsonSrcGen
 
         public void GenerateArray(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name}[] FromJson({type.Namespace}.{type.Name}[] value, string jsonString)");
+            codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name}[] FromJson({type.Namespace}.{type.Name}[] value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
 
-            codeBuilder.AppendLine(3, "var json = jsonString.AsSpan();");
-            
             var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type});
             var generator = _getGeneratorForType(arrayJsonType);
 
@@ -66,11 +60,9 @@ namespace JsonSrcGen
 
         public void GenerateValue(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name} FromJson({type.Namespace}.{type.Name} value, string jsonString)");
+            codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name} FromJson({type.Namespace}.{type.Name} value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
 
-            codeBuilder.AppendLine(3, "var json = jsonString.AsSpan();");
-            
             var generator = _getGeneratorForType(type);
 
             generator.GenerateFromJson(codeBuilder, 3, type, value => $"value = {value};", "value");
@@ -81,10 +73,6 @@ namespace JsonSrcGen
 
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
         {
-            classBuilder.AppendLine(2, $"public void FromJson({jsonClass.Namespace}.{jsonClass.Name} value, string jsonString)");
-            classBuilder.AppendLine(2, "{");
-            classBuilder.AppendLine(3, "FromJson(value, jsonString.AsSpan());");
-            classBuilder.AppendLine(2, "}"); 
 
             classBuilder.AppendLine(2, $"public ReadOnlySpan<char> FromJson({jsonClass.Namespace}.{jsonClass.Name} value, ReadOnlySpan<char> json)");
             classBuilder.AppendLine(2, "{");
