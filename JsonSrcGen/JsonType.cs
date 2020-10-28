@@ -4,20 +4,21 @@ namespace JsonSrcGen
 {
     public class JsonType
     {
-        public JsonType(string generatorId, string name, string typeNamespace, bool isCustomType, List<JsonType> genericArguments)
+        public JsonType(string generatorId, string name, string typeNamespace, bool isCustomType, List<JsonType> genericArguments, bool canBeNull)
         {
             GeneratorId = generatorId;
             Name = name;
             Namespace = typeNamespace;
             IsCustomType = isCustomType;
             GenericArguments = genericArguments;
+            CanBeNull = canBeNull;
         }
         public string GeneratorId {get;}
         public string Name {get;}
         public string Namespace {get;}
         public string FullName => $"{Namespace}.{Name}";
         public bool IsCustomType {get;}
-
+        public bool CanBeNull {get;}
         public List<JsonType> GenericArguments {get;}
     }
 }

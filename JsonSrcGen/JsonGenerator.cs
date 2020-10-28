@@ -75,6 +75,7 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("JsonArrayAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonValueAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonAttribute.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonIgnoreNullAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonDictionaryAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonIgnoreAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonListAttribute.cs", context, compilation, GenerationFolder);
@@ -405,6 +406,8 @@ namespace JsonSrcGen
                     string jsonClassName = classSymbol.Name;
                     string jsonClassNamespace = classSymbol.ContainingNamespace.ToString();
 
+                    bool ignoreNull = HasJsonIgnoreNullAttribute(classSymbol);
+
                     var jsonProperties = new List<JsonProperty>();
 
                     foreach(var member in classSymbol.GetMembers().Where(member => member.Kind == SymbolKind.Property))
@@ -436,7 +439,7 @@ namespace JsonSrcGen
                         jsonProperties.Add(new JsonProperty(jsonPropertyType, jsonPropertyName ?? codePropertyName, codePropertyName));
                     }
 
-                    jsonClasses.Add(new JsonClass(jsonClassName, jsonClassNamespace, jsonProperties));
+                    jsonClasses.Add(new JsonClass(jsonClassName, jsonClassNamespace, jsonProperties, ignoreNull));
                 }
             }
             return jsonClasses; 
@@ -494,6 +497,11 @@ namespace JsonSrcGen
             return symbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "JsonAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSrcGen");
         }
 
+        bool HasJsonIgnoreNullAttribute(ISymbol symbol)
+        {
+            return symbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "JsonIgnoreNullAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSrcGen");
+        }
+
         bool HasCustomConverterAttribute(ISymbol symbol)
         {
             return symbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "CustomConverterAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSrcGen");
@@ -532,16 +540,17 @@ namespace JsonSrcGen
                 if(namedType != null)
                 {
                     string name = $"{namedType.TypeArguments.First().Name}?";
-                    return new JsonType(name, name, FullNamespace(namedType.TypeArguments.First()), false, GetGenericArguments(typeSymbol));
+                    return new JsonType(name, name, FullNamespace(namedType.TypeArguments.First()), false, GetGenericArguments(typeSymbol), true);
                 }
             }
             if(typeSymbol.TypeKind == TypeKind.Array)
             {
                 var arraySymbol = typeSymbol as IArrayTypeSymbol;
-                return new JsonType("Array", "", "", false, new List<JsonType>(){GetType(arraySymbol.ElementType)});
+                return new JsonType("Array", "", "", false, new List<JsonType>(){GetType(arraySymbol.ElementType)}, true);
             }
+            bool canBeNull = typeSymbol.IsReferenceType;
             bool isCustomType = HasJsonClassAttribute(typeSymbol);
-            return new JsonType(isCustomType ? "Custom" : typeSymbol.Name, typeSymbol.Name, FullNamespace(typeSymbol), isCustomType, GetGenericArguments(typeSymbol));
+            return new JsonType(isCustomType ? "Custom" : typeSymbol.Name, typeSymbol.Name, FullNamespace(typeSymbol), isCustomType, GetGenericArguments(typeSymbol), canBeNull);
         }
 
         string FullNamespace(ITypeSymbol symbol)

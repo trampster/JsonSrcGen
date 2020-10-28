@@ -15,10 +15,17 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, valueSetter(propertyValueName));
         }
 
-        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter)
+        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull)
         {
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
-            codeBuilder.AppendLine(indentLevel, $"builder.Append({valueGetter} == null ? \"null\" : {valueGetter}.Value ? \"true\" : \"false\");");
+            if(canBeNull)
+            {
+                codeBuilder.AppendLine(indentLevel, $"builder.Append({valueGetter} == null ? \"null\" : {valueGetter}.Value ? \"true\" : \"false\");");
+            }
+            else
+            {
+                codeBuilder.AppendLine(indentLevel, $"builder.Append({valueGetter}.Value ? \"true\" : \"false\");");
+            }
         }
         
         public CodeBuilder ClassLevelBuilder => null;

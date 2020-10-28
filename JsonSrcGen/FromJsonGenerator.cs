@@ -21,7 +21,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, $"public List<{type.Namespace}.{type.Name}> FromJson(List<{type.Namespace}.{type.Name}> value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
             
-            var arrayJsonType = new JsonType("List", "List", "System.Coolection.Generic", false, new List<JsonType>(){type});
+            var arrayJsonType = new JsonType("List", "List", "System.Coolection.Generic", false, new List<JsonType>(){type}, true);
             var generator = _getGeneratorForType(arrayJsonType);
 
             generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value");
@@ -35,7 +35,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, $"public Dictionary<{keyType.FullName}, {valueType.FullName}> FromJson(Dictionary<{keyType.FullName}, {valueType.FullName}> value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
             
-            var arrayJsonType = new JsonType("Dictionary", "Dictionary", "System.Coolection.Generic", false, new List<JsonType>(){keyType, valueType});
+            var arrayJsonType = new JsonType("Dictionary", "Dictionary", "System.Coolection.Generic", false, new List<JsonType>(){keyType, valueType}, true);
             var generator = _getGeneratorForType(arrayJsonType);
 
             generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value");
@@ -49,7 +49,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name}[] FromJson({type.Namespace}.{type.Name}[] value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
 
-            var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type});
+            var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true);
             var generator = _getGeneratorForType(arrayJsonType);
 
             generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value");

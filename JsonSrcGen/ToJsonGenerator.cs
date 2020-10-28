@@ -44,6 +44,16 @@ namespace JsonSrcGen
             bool isFirst = true;
             foreach(var property in jsonClass.Properties.OrderBy(p => p.JsonName))
             {
+                int indent = 3;
+
+                if(jsonClass.IgnoreNull && property.Type.CanBeNull)
+                {
+                    classBuilder.MakeAppend(indent, appendBuilder);
+                    classBuilder.AppendLine(indent, $"if(value.{property.CodeName} != null)");
+                    classBuilder.AppendLine(indent, "{");
+                    indent++;
+
+                }
                 if(!isFirst)
                 {
                     appendBuilder.Append(",");
@@ -55,7 +65,14 @@ namespace JsonSrcGen
 
 
                 var generator = GetGeneratorForType(property.Type);
-                generator.GenerateToJson(classBuilder, 3, appendBuilder, property.Type, $"value.{property.CodeName}");
+                bool canBeNull = jsonClass.IgnoreNull ? false : property.Type.CanBeNull;
+                generator.GenerateToJson(classBuilder, indent, appendBuilder, property.Type, $"value.{property.CodeName}", canBeNull);
+
+                if(jsonClass.IgnoreNull && property.Type.CanBeNull)
+                {
+                    indent--;
+                    classBuilder.AppendLine(indent, "}");
+                }
 
                 if(isFirst) isFirst = false;
             }
@@ -70,9 +87,9 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
-            var arrayJsonType = new JsonType("List", "List", "System.Collection.Generic", false, new List<JsonType>(){type});
-            var generator = _getGeneratorForType(arrayJsonType);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value" );
+            var listJsonType = new JsonType("List", "List", "System.Collection.Generic", false, new List<JsonType>(){type}, true);
+            var generator = _getGeneratorForType(listJsonType);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), listJsonType, "value", listJsonType.CanBeNull);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 
@@ -84,9 +101,9 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
-            var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type});
+            var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true);
             var generator = _getGeneratorForType(arrayJsonType);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value" );
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 
@@ -99,7 +116,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(0, BuilderText);
 
             var generator = _getGeneratorForType(type);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), type, "value" );
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), type, "value", type.CanBeNull);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 
@@ -111,9 +128,9 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
-            var arrayJsonType = new JsonType("Dictionary", "Dictionary", "NA", false, new List<JsonType>(){keyType, valueType});
+            var arrayJsonType = new JsonType("Dictionary", "Dictionary", "NA", false, new List<JsonType>(){keyType, valueType}, true);
             var generator = _getGeneratorForType(arrayJsonType);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value" );
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 

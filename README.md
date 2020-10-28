@@ -96,6 +96,18 @@ public class CustomCaseStringConverter : ICustomConverter<int>
 }
 ```
 
+**Leave out null properties**
+
+You can instruct JsonSrcGen to skip serializing null property values by adding the following attribute:
+
+```csharp
+[JsonIgnoreNull]
+public class MyJsonType
+{
+    int? MyProperty
+}
+```
+
 **Nuget Packages**
 
 JsonSrcGen is available as a nuget package:

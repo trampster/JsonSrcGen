@@ -77,7 +77,7 @@ namespace JsonSrcGen.TypeGenerators
 
         int _listNumber = 0;
 
-        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter)
+        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull)
         {
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
 
@@ -85,40 +85,49 @@ namespace JsonSrcGen.TypeGenerators
             _listNumber++;
 
             codeBuilder.AppendLine(indentLevel, $"var {listName} = {valueGetter};");
-            codeBuilder.AppendLine(indentLevel, $"if({listName} == null)");
-            codeBuilder.AppendLine(indentLevel, "{");
-            appendBuilder.Append("null");
-            codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
-            codeBuilder.AppendLine(indentLevel, "}");
-            codeBuilder.AppendLine(indentLevel, "else");
-            codeBuilder.AppendLine(indentLevel, "{");
 
+            if(canBeNull)
+            {
+                codeBuilder.AppendLine(indentLevel, $"if({listName} == null)");
+                codeBuilder.AppendLine(indentLevel, "{");
+                appendBuilder.Append("null");
+                codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
+                codeBuilder.AppendLine(indentLevel, "}");
+                codeBuilder.AppendLine(indentLevel, "else");
+                codeBuilder.AppendLine(indentLevel, "{");
+                indentLevel++;
+            }
             var listElementType = type.GenericArguments[0];
             var generator = _getGeneratorForType(listElementType);
             appendBuilder.Append("[");
-            codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
+            codeBuilder.MakeAppend(indentLevel, appendBuilder);
 
 
             
-            codeBuilder.AppendLine(indentLevel+1, $"for(int index = 0; index < {valueGetter}.Count-1; index++)");
-            codeBuilder.AppendLine(indentLevel+1, "{");
+            codeBuilder.AppendLine(indentLevel, $"for(int index = 0; index < {valueGetter}.Count-1; index++)");
+            codeBuilder.AppendLine(indentLevel, "{");
             
-            generator.GenerateToJson(codeBuilder, indentLevel+2, appendBuilder, listElementType, $"{listName}[index]");
+            generator.GenerateToJson(codeBuilder, indentLevel+1, appendBuilder, listElementType, $"{listName}[index]", listElementType.CanBeNull);
 
             appendBuilder.Append(",");
-            codeBuilder.MakeAppend(indentLevel+2, appendBuilder);
+            codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
 
 
-            codeBuilder.AppendLine(indentLevel+1, "}");
+            codeBuilder.AppendLine(indentLevel, "}");
 
-            codeBuilder.AppendLine(indentLevel+1, $"if({valueGetter}.Count > 1)");
-            codeBuilder.AppendLine(indentLevel+1, "{");
-            generator.GenerateToJson(codeBuilder, indentLevel+2, appendBuilder, listElementType, $"{listName}[{valueGetter}.Count-1]");
-            codeBuilder.AppendLine(indentLevel+1, "}");
+            codeBuilder.AppendLine(indentLevel, $"if({valueGetter}.Count > 0)");
+            codeBuilder.AppendLine(indentLevel, "{");
+            generator.GenerateToJson(codeBuilder, indentLevel+1, appendBuilder, listElementType, $"{listName}[{valueGetter}.Count-1]", listElementType.CanBeNull);
+            codeBuilder.AppendLine(indentLevel, "}");
 
             appendBuilder.Append("]");
-            codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
-            codeBuilder.AppendLine(indentLevel, "}");
+            codeBuilder.MakeAppend(indentLevel, appendBuilder);
+            
+            if(canBeNull)
+            {
+                indentLevel--;
+                codeBuilder.AppendLine(indentLevel, "}");
+            }
         }
 
         public CodeBuilder ClassLevelBuilder => null;

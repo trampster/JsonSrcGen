@@ -83,53 +83,61 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, "}");
         }
 
-        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter)
+        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull)
         {
            codeBuilder.MakeAppend(indentLevel, appendBuilder);
 
             string dictionaryName = $"list{UniqueNumberGenerator.UniqueNumber}"; 
 
             codeBuilder.AppendLine(indentLevel, $"var {dictionaryName} = {valueGetter};");
-            codeBuilder.AppendLine(indentLevel, $"if({dictionaryName} == null)");
-            codeBuilder.AppendLine(indentLevel, "{");
-            appendBuilder.Append("null");
-            codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
-            codeBuilder.AppendLine(indentLevel, "}");
-            codeBuilder.AppendLine(indentLevel, "else");
-            codeBuilder.AppendLine(indentLevel, "{");
 
+            if(canBeNull)
+            {
+                codeBuilder.AppendLine(indentLevel, $"if({dictionaryName} == null)");
+                codeBuilder.AppendLine(indentLevel, "{");
+                appendBuilder.Append("null");
+                codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
+                codeBuilder.AppendLine(indentLevel, "}");
+                codeBuilder.AppendLine(indentLevel, "else");
+                codeBuilder.AppendLine(indentLevel, "{");
+                indentLevel++;
+            }
             var dictionaryValueType = type.GenericArguments[1];
             var generator = _getGeneratorForType(dictionaryValueType);
             appendBuilder.Append("{");
-            codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
+            codeBuilder.MakeAppend(indentLevel, appendBuilder);
 
-            codeBuilder.AppendLine(indentLevel+1, "bool isFirst = true;");
+            codeBuilder.AppendLine(indentLevel, "bool isFirst = true;");
 
-            codeBuilder.AppendLine(indentLevel+1, $"foreach(var pair in {dictionaryName})");
-            codeBuilder.AppendLine(indentLevel+1, "{");
+            codeBuilder.AppendLine(indentLevel, $"foreach(var pair in {dictionaryName})");
+            codeBuilder.AppendLine(indentLevel, "{");
             
-            codeBuilder.AppendLine(indentLevel+2, "if(!isFirst)");
-            codeBuilder.AppendLine(indentLevel+2, "{");
+            codeBuilder.AppendLine(indentLevel, "if(!isFirst)");
+            codeBuilder.AppendLine(indentLevel+1, "{");
             appendBuilder.Append(",");
-            codeBuilder.MakeAppend(indentLevel+3, appendBuilder);
-            codeBuilder.AppendLine(indentLevel+2, "}");
+            codeBuilder.MakeAppend(indentLevel+2, appendBuilder);
+            codeBuilder.AppendLine(indentLevel+1, "}");
 
-            codeBuilder.AppendLine(indentLevel+2, "isFirst = false;");
+            codeBuilder.AppendLine(indentLevel+1, "isFirst = false;");
 
 
             appendBuilder.Append("\\\"");
-            codeBuilder.MakeAppend(indentLevel+2, appendBuilder);
+            codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
 
-            codeBuilder.AppendLine(indentLevel+2, $"builder.Append(pair.Key);");
+            codeBuilder.AppendLine(indentLevel+1, $"builder.Append(pair.Key);");
             appendBuilder.Append("\\\":");
 
-            generator.GenerateToJson(codeBuilder, indentLevel+2, appendBuilder, dictionaryValueType, $"pair.Value");
+            generator.GenerateToJson(codeBuilder, indentLevel+1, appendBuilder, dictionaryValueType, $"pair.Value", dictionaryValueType.CanBeNull);
 
-            codeBuilder.AppendLine(indentLevel+1, "}");
+            codeBuilder.AppendLine(indentLevel, "}");
 
             appendBuilder.Append("}");
-            codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
-            codeBuilder.AppendLine(indentLevel, "}");
+            codeBuilder.MakeAppend(indentLevel, appendBuilder);
+            if(canBeNull)
+            {
+                indentLevel--;
+                codeBuilder.AppendLine(indentLevel, "}");
+            }
         }
 
         public CodeBuilder ClassLevelBuilder => null;
