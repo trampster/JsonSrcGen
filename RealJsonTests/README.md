@@ -6,10 +6,10 @@ Tests must meet the following criteria:
 * Use nunit
 * Use local json data (no external API calls from the tests)
 
-API's are eligable for free inclusion under any of the following conditions:
+API's are eligible for free inclusion under any of the following conditions:
 * The API is available to the public free of charge.
 * The server code is available under an OSI approved opensource licence.
 
-If your API does not meet the above coditions please contacts the maintainers to discus how you can support the development in exchange for having your tests included.
+If your API does not meet the above conditions please contacts the maintainers to discus how you can support the development in exchange for having your tests included.
 
 
