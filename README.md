@@ -1,5 +1,5 @@
-# JsonSrcGen
-![alt text](https://github.com/trampster/JsonSrcGen/blob/master/JsonSrcGen/icon.png "JsonSrcGen Logo") Json library that uses .NET 5 c# Source Generators
+# ![alt text](https://github.com/trampster/JsonSrcGen/blob/master/JsonSrcGen/icon.png "JsonSrcGen Logo") JsonSrcGen
+Json library that uses .NET 5 c# Source Generators
 
 Note: Requires the .Net 5 Preview to run. Mono platforms do not have support for the .Net 5 Source Generators yet.
 
