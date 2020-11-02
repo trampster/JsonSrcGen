@@ -51,7 +51,7 @@ namespace CustomConverterTests
             var json = new JsonConverter().ToJson(new CustomClass(){DateTime=dateTime}); 
 
             //assert
-            Assert.That(json.ToString(), Is.EqualTo("{\"DateTime\":\"1/01/0001 12:00:00 AM\"}"));
+            Assert.That(json.ToString(), Is.EqualTo($"{{\"DateTime\":\"{dateTime}\"}}"));
         }
 
         [Test]
