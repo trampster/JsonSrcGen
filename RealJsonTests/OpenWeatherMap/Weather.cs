@@ -93,7 +93,7 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
         public float? Pop {get;set;}
 
         [JsonName("rain")]
-        public Rain? Rain {get;set;}
+        public Rain Rain {get;set;}
     }
 
     [Json]
