@@ -15,7 +15,7 @@ namespace UnitTests
 
     public class UIntPropertyTests
     {
-        JsonSrcGen.JsonConverter _convert;
+        JsonSrcGen.JsonConverter _convert; 
         const string ExpectedJson = "{\"Age\":42,\"Height\":176,\"Max\":4294967295,\"Min\":0}";
 
         [SetUp]

@@ -116,7 +116,7 @@ namespace JsonSrcGen
                 new AppendReadGenerator("UInt64"),
                 new AppendReadGenerator("Int64"),
                 new AppendReadGenerator("Int16"),
-                new AppendReadGenerator("UInt16"),
+                new AppendReadGenerator("UInt16"), 
                 new AppendReadGenerator("Byte"),
                 new AppendReadGenerator("Double"),
                 new AppendReadGenerator("Single") {ReadType="Double"},
