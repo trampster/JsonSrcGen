@@ -81,18 +81,34 @@ namespace JsonSrcGen
 
             classBuilder.AppendLine(3, "while(true)");
             classBuilder.AppendLine(3, "{");
+            
+            classBuilder.AppendLine(3, "json = json.SkipWhitespace();");
 
-            classBuilder.AppendLine(4, "json = json.SkipWhitespaceTo('\\\"');");
+            string valueVariable = $"value{UniqueNumberGenerator.UniqueNumber}";
+            classBuilder.AppendLine(4, $"char {valueVariable} = json[0];");
+            classBuilder.AppendLine(4, $"if({valueVariable} == '\\\"')");
+            classBuilder.AppendLine(4, "{");
+            classBuilder.AppendLine(5, "json = json.Slice(1);");
+            classBuilder.AppendLine(4, "}");
+            classBuilder.AppendLine(4, $"else if({valueVariable} == '}}')");
+            classBuilder.AppendLine(4, "{");
+            classBuilder.AppendLine(5, "return json;");
+            classBuilder.AppendLine(4, "}");
+            classBuilder.AppendLine(4, "else");
+            classBuilder.AppendLine(4, "{");
+            classBuilder.AppendLine(5, $"throw new InvalidJsonException($\"Unexpected character! expected '}}}}' or '\\\"' but got '{{{valueVariable}}}'\", json);");
+            classBuilder.AppendLine(4, "}");
+
             classBuilder.AppendLine(4, "var propertyName = json.ReadTo('\\\"');");
             classBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
             classBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(':');");
             
             GenerateProperties(jsonClass.Properties, 4, classBuilder);
 
-            classBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(',', '}', out char found);"); 
-            classBuilder.AppendLine(4, "if(found == '}')");
+            classBuilder.AppendLine(4, "json = json.SkipWhitespace();");
+            classBuilder.AppendLine(4, "if(json[0] == ',')");
             classBuilder.AppendLine(4, "{");
-            classBuilder.AppendLine(5, "return json;");
+            classBuilder.AppendLine(5, "json = json.Slice(1);");
             classBuilder.AppendLine(4, "}");
 
             classBuilder.AppendLine(3, "}");
