@@ -92,7 +92,7 @@ namespace JsonSrcGen
             classBuilder.AppendLine(4, "}");
             classBuilder.AppendLine(4, $"else if({valueVariable} == '}}')");
             classBuilder.AppendLine(4, "{");
-            classBuilder.AppendLine(5, "return json;");
+            classBuilder.AppendLine(5, "return json.Slice(1);");
             classBuilder.AppendLine(4, "}");
             classBuilder.AppendLine(4, "else");
             classBuilder.AppendLine(4, "{");
