@@ -71,48 +71,67 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "}"); 
         }
 
-        public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
+        public void Generate(JsonClass jsonClass, CodeBuilder codeBuilder)
         {
 
-            classBuilder.AppendLine(2, $"public ReadOnlySpan<char> FromJson({jsonClass.Namespace}.{jsonClass.Name} value, ReadOnlySpan<char> json)");
-            classBuilder.AppendLine(2, "{");
+            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> FromJson({jsonClass.Namespace}.{jsonClass.Name} value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, "{");
 
-            classBuilder.AppendLine(3, "json = json.SkipWhitespaceTo('{');");
+            codeBuilder.AppendLine(3, "json = json.SkipWhitespaceTo('{');");
 
-            classBuilder.AppendLine(3, "while(true)");
-            classBuilder.AppendLine(3, "{");
+            foreach(var property in jsonClass.Properties)
+            {
+                if(property.Optional)
+                {
+                    var generator = _getGeneratorForType(property.Type);
+                    generator.OnNewObject(codeBuilder, 3, propertyValue => $"value.{property.CodeName} = {propertyValue};");
+                }
+            }
+
+            codeBuilder.AppendLine(3, "while(true)");
+            codeBuilder.AppendLine(3, "{");
             
-            classBuilder.AppendLine(3, "json = json.SkipWhitespace();");
+            codeBuilder.AppendLine(3, "json = json.SkipWhitespace();");
 
             string valueVariable = $"value{UniqueNumberGenerator.UniqueNumber}";
-            classBuilder.AppendLine(4, $"char {valueVariable} = json[0];");
-            classBuilder.AppendLine(4, $"if({valueVariable} == '\\\"')");
-            classBuilder.AppendLine(4, "{");
-            classBuilder.AppendLine(5, "json = json.Slice(1);");
-            classBuilder.AppendLine(4, "}");
-            classBuilder.AppendLine(4, $"else if({valueVariable} == '}}')");
-            classBuilder.AppendLine(4, "{");
-            classBuilder.AppendLine(5, "return json.Slice(1);");
-            classBuilder.AppendLine(4, "}");
-            classBuilder.AppendLine(4, "else");
-            classBuilder.AppendLine(4, "{");
-            classBuilder.AppendLine(5, $"throw new InvalidJsonException($\"Unexpected character! expected '}}}}' or '\\\"' but got '{{{valueVariable}}}'\", json);");
-            classBuilder.AppendLine(4, "}");
+            codeBuilder.AppendLine(4, $"char {valueVariable} = json[0];");
+            codeBuilder.AppendLine(4, $"if({valueVariable} == '\\\"')");
+            codeBuilder.AppendLine(4, "{");
+            codeBuilder.AppendLine(5, "json = json.Slice(1);");
+            codeBuilder.AppendLine(4, "}");
+            codeBuilder.AppendLine(4, $"else if({valueVariable} == '}}')");
+            codeBuilder.AppendLine(4, "{");
+            codeBuilder.AppendLine(5, "return json.Slice(1);");
+            codeBuilder.AppendLine(4, "}");
+            codeBuilder.AppendLine(4, "else");
+            codeBuilder.AppendLine(4, "{");
+            codeBuilder.AppendLine(5, $"throw new InvalidJsonException($\"Unexpected character! expected '}}}}' or '\\\"' but got '{{{valueVariable}}}'\", json);");
+            codeBuilder.AppendLine(4, "}");
 
-            classBuilder.AppendLine(4, "var propertyName = json.ReadTo('\\\"');");
-            classBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
-            classBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(':');");
+            codeBuilder.AppendLine(4, "var propertyName = json.ReadTo('\\\"');");
+            codeBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
+            codeBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(':');");
             
-            GenerateProperties(jsonClass.Properties, 4, classBuilder);
+            GenerateProperties(jsonClass.Properties, 4, codeBuilder);
 
-            classBuilder.AppendLine(4, "json = json.SkipWhitespace();");
-            classBuilder.AppendLine(4, "if(json[0] == ',')");
-            classBuilder.AppendLine(4, "{");
-            classBuilder.AppendLine(5, "json = json.Slice(1);");
-            classBuilder.AppendLine(4, "}");
+            codeBuilder.AppendLine(4, "json = json.SkipWhitespace();");
+            codeBuilder.AppendLine(4, "if(json[0] == ',')");
+            codeBuilder.AppendLine(4, "{");
+            codeBuilder.AppendLine(5, "json = json.Slice(1);");
+            codeBuilder.AppendLine(4, "}");
 
-            classBuilder.AppendLine(3, "}");
-            classBuilder.AppendLine(2, "}");
+            codeBuilder.AppendLine(3, "}");
+
+            foreach(var property in jsonClass.Properties)
+            {
+                if(property.Optional)
+                {
+                    var generator = _getGeneratorForType(property.Type);
+                    generator.OnObjectFinished(codeBuilder, 3, propertyValue => $"value.{property.CodeName} = {propertyValue};");
+                }
+            }
+
+            codeBuilder.AppendLine(2, "}");
         }
 
         public void GenerateProperties(IReadOnlyCollection<JsonProperty> properties, int indentLevel, CodeBuilder classBuilder)

@@ -37,5 +37,15 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
             codeBuilder.AppendLine(indentLevel, $"{_converterName}.ToJson(builder, {valueGetter});");
         }
+
+        public void OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        {
+
+        }
+
+        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        {
+            
+        }
     }
 }

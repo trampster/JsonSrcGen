@@ -78,6 +78,7 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("JsonIgnoreNullAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonDictionaryAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonIgnoreAttribute.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonOptionalAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonListAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonNameAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonSpanExtensions.cs", context, compilation, GenerationFolder);
@@ -417,6 +418,7 @@ namespace JsonSrcGen
                         string jsonPropertyName = null;
                         var attributes = property.GetAttributes();
                         bool hasIgnoreAttribute = false;
+                        bool hasOptionalAttribute = false;
                         foreach(var attribute in attributes)
                         {
                             if(attribute.AttributeClass.Name == "JsonIgnoreAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen")
@@ -428,6 +430,10 @@ namespace JsonSrcGen
                             {
                                 jsonPropertyName = (string)attribute.ConstructorArguments.First().Value;
                             }
+                            if(attribute.AttributeClass.Name == "JsonOptionalAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen")
+                            {
+                                hasOptionalAttribute = true;
+                            }
                         }
                         if(hasIgnoreAttribute)
                         {
@@ -436,7 +442,7 @@ namespace JsonSrcGen
 
                         string codePropertyName = member.Name;
                         var jsonPropertyType = GetType(member);
-                        jsonProperties.Add(new JsonProperty(jsonPropertyType, jsonPropertyName ?? codePropertyName, codePropertyName));
+                        jsonProperties.Add(new JsonProperty(jsonPropertyType, jsonPropertyName ?? codePropertyName, codePropertyName, hasOptionalAttribute));
                     }
 
                     jsonClasses.Add(new JsonClass(jsonClassName, jsonClassNamespace, jsonProperties, ignoreNull));

@@ -36,5 +36,15 @@ namespace JsonSrcGen.TypeGenerators
         }
 
         public CodeBuilder ClassLevelBuilder => null;
+
+        public void OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        {
+
+        }
+
+        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        {
+            
+        }
     }
 }

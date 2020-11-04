@@ -43,6 +43,7 @@
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonIgnoreNullAttribute.cs" Link="JsonIgnoreNullAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonDictionaryAttribute.cs" Link="JsonDictionaryAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonIgnoreAttribute.cs" Link="JsonIgnoreAttribute.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonOptionalAttribute.cs" Link="JsonOptionalAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonListAttribute.cs" Link="JsonListAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonNameAttribute.cs" Link="JsonNameAttribute.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonSpanExtensions.cs" Link="JsonSpanExtensions.cs" />

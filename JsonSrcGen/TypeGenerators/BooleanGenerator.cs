@@ -20,5 +20,15 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, $"builder.Append({valueGetter} ? \"true\" : \"false\");");
         }
         public CodeBuilder ClassLevelBuilder => null;
+
+        public void OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        {
+            codeBuilder.AppendLine(indentLevel, valueSetter("default(bool)"));
+        }
+
+        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        {
+
+        }
     }
 }
