@@ -79,19 +79,22 @@ namespace JsonSrcGen
 
             codeBuilder.AppendLine(3, "json = json.SkipWhitespaceTo('{');");
 
+            var properties = new List<JsonPropertyInstance>();
             foreach(var property in jsonClass.Properties)
             {
+                string wasSetVariable = null;
                 if(property.Optional)
                 {
                     var generator = _getGeneratorForType(property.Type);
-                    generator.OnNewObject(codeBuilder, 3, propertyValue => $"value.{property.CodeName} = {propertyValue};");
+                    wasSetVariable = generator.OnNewObject(codeBuilder, 3, propertyValue => $"value.{property.CodeName} = {propertyValue};");
                 }
+                properties.Add(new JsonPropertyInstance(property.Type, property.JsonName, property.CodeName, property.Optional, wasSetVariable));
             }
 
             codeBuilder.AppendLine(3, "while(true)");
             codeBuilder.AppendLine(3, "{");
             
-            codeBuilder.AppendLine(3, "json = json.SkipWhitespace();");
+            codeBuilder.AppendLine(4, "json = json.SkipWhitespace();");
 
             string valueVariable = $"value{UniqueNumberGenerator.UniqueNumber}";
             codeBuilder.AppendLine(4, $"char {valueVariable} = json[0];");
@@ -101,6 +104,14 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(4, "}");
             codeBuilder.AppendLine(4, $"else if({valueVariable} == '}}')");
             codeBuilder.AppendLine(4, "{");
+            foreach(var property in properties)
+            {
+                if(property.Optional)
+                {
+                    var generator = _getGeneratorForType(property.Type);
+                    generator.OnObjectFinished(codeBuilder, 5, propertyValue => $"value.{property.CodeName} = {propertyValue};", property.WasSetVariable);
+                }
+            }
             codeBuilder.AppendLine(5, "return json.Slice(1);");
             codeBuilder.AppendLine(4, "}");
             codeBuilder.AppendLine(4, "else");
@@ -112,7 +123,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
             codeBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(':');");
             
-            GenerateProperties(jsonClass.Properties, 4, codeBuilder);
+            GenerateProperties(properties, 4, codeBuilder);
 
             codeBuilder.AppendLine(4, "json = json.SkipWhitespace();");
             codeBuilder.AppendLine(4, "if(json[0] == ',')");
@@ -122,19 +133,10 @@ namespace JsonSrcGen
 
             codeBuilder.AppendLine(3, "}");
 
-            foreach(var property in jsonClass.Properties)
-            {
-                if(property.Optional)
-                {
-                    var generator = _getGeneratorForType(property.Type);
-                    generator.OnObjectFinished(codeBuilder, 3, propertyValue => $"value.{property.CodeName} = {propertyValue};");
-                }
-            }
-
             codeBuilder.AppendLine(2, "}");
         }
 
-        public void GenerateProperties(IReadOnlyCollection<JsonProperty> properties, int indentLevel, CodeBuilder classBuilder)
+        public void GenerateProperties(IReadOnlyCollection<JsonPropertyInstance> properties, int indentLevel, CodeBuilder classBuilder)
         {
             var propertyHashFactory = new PropertyHashFactory();
             var propertyHash = propertyHashFactory.FindBestHash(properties.Select(p => p.JsonName).ToArray());
@@ -182,6 +184,10 @@ namespace JsonSrcGen
 
                 var generator = _getGeneratorForType(property.Type);
                 generator.GenerateFromJson(classBuilder, indentLevel+2, property.Type, propertyValue => $"value.{property.CodeName} = {propertyValue};", $"value.{property.CodeName}");
+                if(property.WasSetVariable != null)
+                {
+                    classBuilder.AppendLine(indentLevel+2, $"{property.WasSetVariable} = true;");
+                }
 
                 classBuilder.AppendLine(indentLevel+2, "break;"); 
             }
@@ -189,9 +195,9 @@ namespace JsonSrcGen
             classBuilder.AppendLine(indentLevel, "}"); // end of switch
         }
 
-        class SwitchGroup : List<IGrouping<int, JsonProperty>>{}
+        class SwitchGroup : List<IGrouping<int, JsonPropertyInstance>>{}
 
-        IEnumerable<SwitchGroup> FindSwitchGroups(IGrouping<int, JsonProperty>[] hashes) 
+        IEnumerable<SwitchGroup> FindSwitchGroups(IGrouping<int, JsonPropertyInstance>[] hashes) 
         {
             int last = 0;
             int gaps = 0;

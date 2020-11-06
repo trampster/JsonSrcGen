@@ -6,7 +6,7 @@ namespace JsonSrcGen.TypeGenerators
 {
     public class StringGenerator : IJsonGenerator
     {
-        public string TypeName => "String";
+        public string GeneratorId => "String";
 
         public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
         {
@@ -46,12 +46,13 @@ namespace JsonSrcGen.TypeGenerators
 
         public CodeBuilder ClassLevelBuilder => null;
 
-        public void OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        public string OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
         {
-
+            codeBuilder.AppendLine(indentLevel, valueSetter("null"));
+            return null;
         }
 
-        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter, string wasSetVariable)
         {
             
         }

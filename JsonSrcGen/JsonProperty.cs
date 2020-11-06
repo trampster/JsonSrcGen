@@ -16,4 +16,15 @@ namespace JsonSrcGen
         public string CodeName {get;}
         public bool Optional {get;}
     }
+
+    public class JsonPropertyInstance : JsonProperty
+    {
+        public JsonPropertyInstance(JsonType type, string jsonName, string codeName, bool optional, string wasSetVariable)
+            : base(type, jsonName, codeName, optional)
+        {
+            WasSetVariable = wasSetVariable;
+        }
+
+        public string WasSetVariable {get;}
+    }
 }

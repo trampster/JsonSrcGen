@@ -31,5 +31,7 @@ namespace JsonSrcGen
         {
             get;
         }
+
+        public string FullName => $"{Namespace}.{Name}";
     }
 }

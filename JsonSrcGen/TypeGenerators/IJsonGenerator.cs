@@ -6,7 +6,7 @@ namespace JsonSrcGen.TypeGenerators
 {
     public interface IJsonGenerator
     {
-        string TypeName {get; }
+        string GeneratorId {get; }
 
         void GenerateFromJson(CodeBuilder codeBuilder, int inputLevel, JsonType type, Func<string, string> valueSetter, string valueGetter);
 
@@ -14,8 +14,15 @@ namespace JsonSrcGen.TypeGenerators
 
         CodeBuilder ClassLevelBuilder {get;}
 
-        void OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="codeBuilder"></param>
+        /// <param name="indentLevel"></param>
+        /// <param name="valueSetter"></param>
+        /// <returns>wasSetVariableName which is used to track if the property was set, or null if it isn't tracked</returns>
+        string OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter);
 
-        void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter);
+        void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter, string wasSetVariableName);
     }
 }

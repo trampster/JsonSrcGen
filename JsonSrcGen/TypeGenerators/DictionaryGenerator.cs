@@ -8,7 +8,7 @@ namespace JsonSrcGen.TypeGenerators
     public class DictionaryGenerator : IJsonGenerator
     {
         readonly Func<JsonType, IJsonGenerator> _getGeneratorForType;
-        public string TypeName => "Dictionary"; 
+        public string GeneratorId => "Dictionary"; 
 
         public DictionaryGenerator(Func<JsonType, IJsonGenerator> getGeneratorForType)
         {
@@ -142,14 +142,19 @@ namespace JsonSrcGen.TypeGenerators
 
         public CodeBuilder ClassLevelBuilder => null;
 
-        public void OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        public string OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
         {
-
+            string wasSetVariable = $"wasSet{UniqueNumberGenerator.UniqueNumber}";
+            codeBuilder.AppendLine(indentLevel, $"bool {wasSetVariable} = false;");
+            return wasSetVariable;
         }
 
-        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter, string wasSetVariableName)
         {
-            
+            codeBuilder.AppendLine(indentLevel, $"if(!{wasSetVariableName})");
+            codeBuilder.AppendLine(indentLevel, "{");
+            codeBuilder.AppendLine(indentLevel+1, valueSetter($"null"));
+            codeBuilder.AppendLine(indentLevel, "}");
         }
     }
 }

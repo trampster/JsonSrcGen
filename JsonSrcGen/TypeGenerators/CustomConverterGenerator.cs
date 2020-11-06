@@ -6,14 +6,16 @@ namespace JsonSrcGen.TypeGenerators
 {
     public class CustomConverterGenerator : IJsonGenerator
     {
-        public string TypeName { get; }
+        public string GeneratorId { get; }
+        string TypeName { get; }
         readonly CodeBuilder _classLevelBuilder;
 
 
         public readonly string _converterName;
 
-        public CustomConverterGenerator(string typeName, string converterClassName, CodeBuilder classLevelBuilder)
+        public CustomConverterGenerator(string generatorId, string typeName, string converterClassName, CodeBuilder classLevelBuilder)
         {
+            GeneratorId = generatorId;
             TypeName = typeName;
             _classLevelBuilder = classLevelBuilder;
             _converterName =  $"CustomConverter{UniqueNumberGenerator.UniqueNumber}";
@@ -38,14 +40,19 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, $"{_converterName}.ToJson(builder, {valueGetter});");
         }
 
-        public void OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        public string OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
         {
-
+            string wasSetVariable = $"wasSet{UniqueNumberGenerator.UniqueNumber}";
+            codeBuilder.AppendLine(indentLevel, $"bool {wasSetVariable} = false;");
+            return wasSetVariable;
         }
 
-        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter, string wasSetVariableName)
         {
-            
+            codeBuilder.AppendLine(indentLevel, $"if(!{wasSetVariableName})");
+            codeBuilder.AppendLine(indentLevel, "{");
+            codeBuilder.AppendLine(indentLevel+1, valueSetter($"default({TypeName})"));
+            codeBuilder.AppendLine(indentLevel, "}");
         }
     }
 }

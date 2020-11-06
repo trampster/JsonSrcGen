@@ -6,8 +6,7 @@ namespace JsonSrcGen.TypeGenerators
 {
     public class GuidGenerator : IJsonGenerator
     {
-        public string TypeName => "Guid"; 
-
+        public string GeneratorId => "Guid"; 
         public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
         {
             string propertyValueName = $"property{UniqueNumberGenerator.UniqueNumber}Value";
@@ -25,12 +24,12 @@ namespace JsonSrcGen.TypeGenerators
 
         public CodeBuilder ClassLevelBuilder => null;
 
-        public void OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        public string OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
         {
-
+            return null;
         }
 
-        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter, string wasSetVariable)
         {
             
         }

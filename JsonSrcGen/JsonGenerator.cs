@@ -135,7 +135,6 @@ namespace JsonSrcGen
                 new StringGenerator(),
                 new ListGenerator(type => GetGeneratorForType(type)),
                 new ArrayGenerator(type => GetGeneratorForType(type), new CodeBuilder()),
-                new CustomTypeGenerator(),
                 new DictionaryGenerator(type => GetGeneratorForType(type)),
                 new CharGenerator()
             };
@@ -143,22 +142,28 @@ namespace JsonSrcGen
             _generators = new Dictionary<string, IJsonGenerator>();
             foreach(var generator in generators)
             {
-                _generators.Add(generator.TypeName, generator);
+                _generators.Add(generator.GeneratorId, generator);
+            }
+
+            foreach(var customClass in classes)
+            {
+                _generators.Add(customClass.FullName, new CustomTypeGenerator(customClass.FullName));
             }
 
             var customTypeConverters = GetCustomTypeConverters(receiver.CandidateClasses, compilation); 
-            foreach(var customTypeConverter in customTypeConverters)
+            foreach(var customTypeConverter in customTypeConverters) 
             {
-                LogLine($"Adding customTypeConverter TypeName: {customTypeConverter.TypeName}");
+                LogLine($"Adding customTypeConverter GeneratorId: {customTypeConverter.GeneratorId}");
 
-                if(_generators.ContainsKey(customTypeConverter.TypeName))
+                if(_generators.ContainsKey(customTypeConverter.GeneratorId))
                 {
-                    _generators[customTypeConverter.TypeName] = customTypeConverter;
+                    LogLine($"overriding existing");
+                    _generators[customTypeConverter.GeneratorId] = customTypeConverter;
                 }
                 else
                 {
-                    _generators.Add(customTypeConverter.TypeName, customTypeConverter);
-
+                    LogLine($"new generator");
+                    _generators.Add(customTypeConverter.GeneratorId, customTypeConverter);
                 }
             }
 
@@ -398,7 +403,6 @@ namespace JsonSrcGen
 
             foreach (var candidateClass in classDeclarations)
             {
-
                 SemanticModel model = compilation.GetSemanticModel(candidateClass.SyntaxTree);
                 var classSymbol = model.GetDeclaredSymbol(candidateClass);
 
@@ -466,12 +470,13 @@ namespace JsonSrcGen
                     string converterClassName = classSymbol.Name;
                     string converterNamespace = classSymbol.ContainingNamespace.ToString();
 
-                    string targetType = GetCustomConverterTargetType(classSymbol);
+                    var targetType = GetCustomConverterTargetType(classSymbol);
 
                     if(ImplementsInterface(classSymbol, "JsonSrcGen.ICustomConverter"))
                     {
                         customTypeConverters.Add(new CustomConverterGenerator(
-                            targetType, 
+                            targetType.GeneratorId, 
+                            targetType.FullName, 
                             $"{converterNamespace}.{converterClassName}", 
                             new CodeBuilder()));
                     }
@@ -513,7 +518,7 @@ namespace JsonSrcGen
             return symbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "CustomConverterAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSrcGen");
         }
 
-        string GetCustomConverterTargetType(ISymbol symbol)
+        JsonType GetCustomConverterTargetType(ISymbol symbol)
         {
             var query = 
                 from attribute in symbol.GetAttributes()
@@ -525,7 +530,7 @@ namespace JsonSrcGen
             {
                 throw new InvalidOperationException("CustomConverter parameter must be a type");
             }
-            return GetType(typeSymbol).Name;
+            return GetType(typeSymbol);
         }
 
         JsonType GetType(ISymbol symbol)
@@ -554,9 +559,9 @@ namespace JsonSrcGen
                 var arraySymbol = typeSymbol as IArrayTypeSymbol;
                 return new JsonType("Array", "", "", false, new List<JsonType>(){GetType(arraySymbol.ElementType)}, true);
             }
-            bool canBeNull = typeSymbol.IsReferenceType;
+            bool canBeNull = typeSymbol.IsReferenceType; 
             bool isCustomType = HasJsonClassAttribute(typeSymbol);
-            return new JsonType(isCustomType ? "Custom" : typeSymbol.Name, typeSymbol.Name, FullNamespace(typeSymbol), isCustomType, GetGenericArguments(typeSymbol), canBeNull);
+            return new JsonType(isCustomType ? $"{typeSymbol.ContainingNamespace}.{typeSymbol.Name}" : typeSymbol.Name, typeSymbol.Name, FullNamespace(typeSymbol), isCustomType, GetGenericArguments(typeSymbol), canBeNull);
         }
 
         string FullNamespace(ITypeSymbol symbol)

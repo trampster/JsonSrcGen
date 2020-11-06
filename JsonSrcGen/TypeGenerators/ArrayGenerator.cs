@@ -9,7 +9,7 @@ namespace JsonSrcGen.TypeGenerators
     {
         readonly Func<JsonType, IJsonGenerator> _getGeneratorForType;
         readonly CodeBuilder _classLevelBuilder;
-        public string TypeName => "Array"; 
+        public string GeneratorId => "Array"; 
 
         readonly Dictionary<string, string> _listLookup = new Dictionary<string, string>();
 
@@ -184,12 +184,13 @@ namespace JsonSrcGen.TypeGenerators
             }
         }
 
-        public void OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        public string OnNewObject(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
         {
-
+            codeBuilder.AppendLine(indentLevel, valueSetter("null"));
+            return null;
         }
 
-        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter)
+        public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter, string wasSetVariable)
         {
             
         }
