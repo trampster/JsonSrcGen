@@ -6,9 +6,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.0.1</Version>
-    <AssemblyVersion>1.0.0.1</AssemblyVersion>
-    <PackageVersion>1.0.0.1-rc1</PackageVersion>
+    <Version>1.0.1.0</Version>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <PackageVersion>1.0.1.0-rc2</PackageVersion>
     <PackageId>JsonSrcGen</PackageId>
     <Authors>Daniel Hughes</Authors>
     <Description>
