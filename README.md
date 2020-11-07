@@ -104,7 +104,20 @@ You can instruct JsonSrcGen to skip serializing null property values by adding t
 [JsonIgnoreNull]
 public class MyJsonType
 {
-    int? MyProperty
+    int? MyProperty {get;set;}
+}
+```
+
+**Set Property to default**
+
+By default JsonSrcGen doesn't set properties to there default value if they are missing in the JSON. If you alwasy give FromJson a new instance this isn't a problem. However if you reused objects (which is a big performance boost) then the property wont get set unless present in the Json. If you want JsonSrcGen to set missing properties to default then you can specify this using the JsonOptionalAttribute
+
+```csharp
+[JsonIgnoreNull]
+public class MyJsonType
+{
+    [JsonOptional]
+    string MyProperty{get;set;}
 }
 ```
 
