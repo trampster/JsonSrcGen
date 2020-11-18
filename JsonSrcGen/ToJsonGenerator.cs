@@ -89,7 +89,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
-            var listJsonType = new JsonType("List", "List", "System.Collection.Generic", false, new List<JsonType>(){type}, true);
+            var listJsonType = new JsonType("List", "List", "System.Collection.Generic", false, new List<JsonType>(){type}, true, true);
             var generator = _getGeneratorForType(listJsonType);
             generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), listJsonType, "value", listJsonType.CanBeNull);
 
@@ -103,7 +103,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
-            var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true);
+            var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true, true);
             var generator = _getGeneratorForType(arrayJsonType);
             generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull);
 
@@ -130,7 +130,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
-            var arrayJsonType = new JsonType("Dictionary", "Dictionary", "NA", false, new List<JsonType>(){keyType, valueType}, true);
+            var arrayJsonType = new JsonType("Dictionary", "Dictionary", "NA", false, new List<JsonType>(){keyType, valueType}, true, true);
             var generator = _getGeneratorForType(arrayJsonType);
             generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull);
 

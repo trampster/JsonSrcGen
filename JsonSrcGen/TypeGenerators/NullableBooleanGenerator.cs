@@ -18,9 +18,13 @@ namespace JsonSrcGen.TypeGenerators
         public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull)
         {
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
+
             if(canBeNull)
             {
-                codeBuilder.AppendLine(indentLevel, $"builder.Append({valueGetter} == null ? \"null\" : {valueGetter}.Value ? \"true\" : \"false\");");
+                string valueName = $"listValue{UniqueNumberGenerator.UniqueNumber}";
+                codeBuilder.AppendLine(indentLevel, $"var {valueName} = {valueGetter};");
+
+                codeBuilder.AppendLine(indentLevel, $"builder.Append({valueName} == null ? \"null\" : {valueName}.Value ? \"true\" : \"false\");");
             }
             else
             {
