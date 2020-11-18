@@ -17,9 +17,12 @@ namespace JsonSrcGen.TypeGenerators
         {
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
             
+            string valueName = $"listValue{UniqueNumberGenerator.UniqueNumber}";
+            codeBuilder.AppendLine(indentLevel, $"var {valueName} = {valueGetter};");
+
             if(canBeNull)
             {
-                codeBuilder.AppendLine(indentLevel, $"if({valueGetter} == null)");
+                codeBuilder.AppendLine(indentLevel, $"if({valueName} == null)");
                 codeBuilder.AppendLine(indentLevel, "{");
                 codeBuilder.AppendLine(indentLevel+1, $"builder.Append(\"null\");");
                 codeBuilder.AppendLine(indentLevel, "}");
@@ -28,7 +31,7 @@ namespace JsonSrcGen.TypeGenerators
                 indentLevel++;
             }
             
-            codeBuilder.AppendLine(indentLevel, $"builder.AppendDate({valueGetter}.Value);");
+            codeBuilder.AppendLine(indentLevel, $"builder.AppendDate({valueName}.Value);");
 
             if(canBeNull)
             {

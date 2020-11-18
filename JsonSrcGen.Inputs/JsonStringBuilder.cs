@@ -248,7 +248,7 @@ namespace JsonSrcGen
                 .Append(input.AsSpan(start, input.Length - start));
         }
 
-        string _offset;
+        string _offset = "";
         int _offsetCacheTime = 0;
 
         string GetOffset()

@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 
+#nullable enable
 namespace JsonSrcGen
 {
     internal static class JsonSpanExtensions
@@ -647,7 +648,7 @@ namespace JsonSrcGen
             return json.Slice(afterIntIndex);
         }
 
-        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out string value)
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out string? value)
         {
             json = json.SkipWhitespaceTo('\"', 'n', out char found);
             if(found == 'n')
@@ -723,15 +724,15 @@ namespace JsonSrcGen
         }
 
         [ThreadStatic]
-        static StringBuilder _builder;
+        static StringBuilder? _builder;
 
         static ReadOnlySpan<char> ReadEscapedString(this ReadOnlySpan<char> json, int firstEscapeCharacterIndex, out string value)
         {
             var builder = _builder;
-            if(_builder == null)
+            if(builder == null)
             {
-                _builder = new StringBuilder();
-                builder = _builder;
+                builder = new StringBuilder();
+                _builder = builder;
             }
             builder.Clear();
             int index = firstEscapeCharacterIndex;
@@ -741,7 +742,7 @@ namespace JsonSrcGen
 
                 if(character == '\\')
                 {
-                    _builder.Append(json.Slice(0, index)); //append
+                    builder.Append(json.Slice(0, index)); //append
                     //escape character
                     index++;
                     character = json[index];
@@ -750,26 +751,26 @@ namespace JsonSrcGen
                         case '\"':
                         case '\\':
                         case '/':
-                            _builder.Append(character);
+                            builder.Append(character);
                             break;
                         case 'b':
-                            _builder.Append('\b');
+                            builder.Append('\b');
                             break;
                         case 'f':
-                            _builder.Append('\f');
+                            builder.Append('\f');
                             break;
                         case 'n':
-                            _builder.Append('\n');
+                            builder.Append('\n');
                             break;
                         case 'r':
-                            _builder.Append('\r');
+                            builder.Append('\r');
                             break;
                         case 't':
-                            _builder.Append('\t');
+                            builder.Append('\t');
                             break;
                         case 'u':
                             index++;
-                            _builder.Append(FromHex(json, index));
+                            builder.Append(FromHex(json, index));
                             index += 3;
                             break;
                     }
@@ -781,7 +782,7 @@ namespace JsonSrcGen
                 else if(character == '\"')
                 {
                     //end of string value
-                    _builder.Append(json.Slice(0, index));
+                    builder.Append(json.Slice(0, index));
                     value = builder.ToString();
                     return json.Slice(index + 1);
                 }
@@ -1609,3 +1610,5 @@ namespace JsonSrcGen
         }
     }
 }
+
+#nullable restore

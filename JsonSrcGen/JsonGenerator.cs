@@ -94,17 +94,19 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 
+
 namespace JsonSrcGen
 {
+#nullable enable
     public class JsonConverter
     {
         [ThreadStatic]
-        JsonStringBuilder Builder;
+        JsonStringBuilder? Builder;
 ");
 
             var classes = GetJsonClassInfo(receiver.CandidateClasses, compilation);
 
-            var generators = new IJsonGenerator[]
+            var generators = new IJsonGenerator[] 
             {
                 new DateTimeGenerator(),
                 new DateTimeOffsetGenerator(),
@@ -171,7 +173,7 @@ namespace JsonSrcGen
             var fromJsonGenerator = new FromJsonGenerator(GetGeneratorForType);
 
             var listTypes = GetListAttributesInfo(receiver.CandidateAttributes, compilation);
-            foreach(var listType in listTypes)
+            foreach(var listType in listTypes) 
             {
                 toJsonGenerator.GenerateList(listType, classBuilder);
                 fromJsonGenerator.GenerateList(listType, classBuilder);
@@ -215,6 +217,8 @@ namespace JsonSrcGen
 
             classBuilder.AppendLine(1, "}");
             classBuilder.AppendLine(0, "}");
+            classBuilder.AppendLine(0, "#nullable restore");
+            
 
             if(GenerationFolder != null)
             {
@@ -284,7 +288,7 @@ namespace JsonSrcGen
                         {
                             TypeSyntax typeSyntax = typeofExpr.Type;
                             var typeInfo = model.GetTypeInfo(typeSyntax);
-                            var jsonType = GetType(typeInfo.Type);
+                            var jsonType = GetType(typeInfo.Type, model);
                             listTypes.Add(jsonType);
                         }
                     }
@@ -341,7 +345,7 @@ namespace JsonSrcGen
             {
                 TypeSyntax typeSyntax = typeofExpr.Type;
                 var typeInfo = model.GetTypeInfo(typeSyntax);
-                var jsonType = GetType(typeInfo.Type);
+                var jsonType = GetType(typeInfo.Type, model);
                 return jsonType;
             }
             return null;
@@ -363,7 +367,7 @@ namespace JsonSrcGen
                         {
                             TypeSyntax typeSyntax = typeofExpr.Type;
                             var typeInfo = model.GetTypeInfo(typeSyntax);
-                            var jsonType = GetType(typeInfo.Type);
+                            var jsonType = GetType(typeInfo.Type, model);
                             arrayTypes.Add(jsonType);
                         }
                     }
@@ -388,7 +392,7 @@ namespace JsonSrcGen
                         {
                             TypeSyntax typeSyntax = typeofExpr.Type;
                             var typeInfo = model.GetTypeInfo(typeSyntax);
-                            var jsonType = GetType(typeInfo.Type);
+                            var jsonType = GetType(typeInfo.Type, model);
                             arrayTypes.Add(jsonType);
                         }
                     }
@@ -445,7 +449,7 @@ namespace JsonSrcGen
                         }
 
                         string codePropertyName = member.Name;
-                        var jsonPropertyType = GetType(member);
+                        var jsonPropertyType = GetType(member, model);
                         jsonProperties.Add(new JsonProperty(jsonPropertyType, jsonPropertyName ?? codePropertyName, codePropertyName, hasOptionalAttribute));
                     }
 
@@ -470,7 +474,7 @@ namespace JsonSrcGen
                     string converterClassName = classSymbol.Name;
                     string converterNamespace = classSymbol.ContainingNamespace.ToString();
 
-                    var targetType = GetCustomConverterTargetType(classSymbol);
+                    var targetType = GetCustomConverterTargetType(classSymbol, model);
 
                     if(ImplementsInterface(classSymbol, "JsonSrcGen.ICustomConverter"))
                     {
@@ -518,7 +522,7 @@ namespace JsonSrcGen
             return symbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "CustomConverterAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSrcGen");
         }
 
-        JsonType GetCustomConverterTargetType(ISymbol symbol)
+        JsonType GetCustomConverterTargetType(ISymbol symbol, SemanticModel semanticModel)
         {
             var query = 
                 from attribute in symbol.GetAttributes()
@@ -530,20 +534,20 @@ namespace JsonSrcGen
             {
                 throw new InvalidOperationException("CustomConverter parameter must be a type");
             }
-            return GetType(typeSymbol);
+            return GetType(typeSymbol, semanticModel);
         }
 
-        JsonType GetType(ISymbol symbol)
+        JsonType GetType(ISymbol symbol, SemanticModel semanticModel)
         {
             var property = symbol as IPropertySymbol;
             if(property != null)
             {
-                return GetType(property.Type);
+                return GetType(property.Type, semanticModel);
             }
             throw new Exception($"unsupported member type {symbol} {symbol.GetType()}");
         }
 
-        JsonType GetType(ITypeSymbol typeSymbol)
+        JsonType GetType(ITypeSymbol typeSymbol, SemanticModel semanticModel)
         {
             if(typeSymbol.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
             {
@@ -551,17 +555,17 @@ namespace JsonSrcGen
                 if(namedType != null)
                 {
                     string name = $"{namedType.TypeArguments.First().Name}?";
-                    return new JsonType(name, name, FullNamespace(namedType.TypeArguments.First()), false, GetGenericArguments(typeSymbol), true);
+                    return new JsonType(name, name, FullNamespace(namedType.TypeArguments.First()), false, GetGenericArguments(typeSymbol, semanticModel), true, false);
                 }
             }
             if(typeSymbol.TypeKind == TypeKind.Array)
             {
                 var arraySymbol = typeSymbol as IArrayTypeSymbol;
-                return new JsonType("Array", "", "", false, new List<JsonType>(){GetType(arraySymbol.ElementType)}, true);
+                return new JsonType("Array", "", "", false, new List<JsonType>(){GetType(arraySymbol.ElementType, semanticModel)}, true, true);
             }
             bool canBeNull = typeSymbol.IsReferenceType; 
             bool isCustomType = HasJsonClassAttribute(typeSymbol);
-            return new JsonType(isCustomType ? $"{typeSymbol.ContainingNamespace}.{typeSymbol.Name}" : typeSymbol.Name, typeSymbol.Name, FullNamespace(typeSymbol), isCustomType, GetGenericArguments(typeSymbol), canBeNull);
+            return new JsonType(isCustomType ? $"{typeSymbol.ContainingNamespace}.{typeSymbol.Name}" : typeSymbol.Name, typeSymbol.Name, FullNamespace(typeSymbol), isCustomType, GetGenericArguments(typeSymbol, semanticModel), canBeNull, typeSymbol.IsReferenceType);
         }
 
         string FullNamespace(ITypeSymbol symbol)
@@ -587,7 +591,7 @@ namespace JsonSrcGen
             return fullNamespace;
         }
 
-        List<JsonType> GetGenericArguments(ITypeSymbol typeSymbol)
+        List<JsonType> GetGenericArguments(ITypeSymbol typeSymbol, SemanticModel model)
         {
             var list = new List<JsonType>();
             var namedType = typeSymbol as INamedTypeSymbol;
@@ -595,7 +599,7 @@ namespace JsonSrcGen
             {
                 foreach(var typeArgument in namedType.TypeArguments)
                 {
-                    list.Add(GetType(typeArgument));
+                    list.Add(GetType(typeArgument, model));
                 }
             }
             return list;

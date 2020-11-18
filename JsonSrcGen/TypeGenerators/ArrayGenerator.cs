@@ -31,7 +31,7 @@ namespace JsonSrcGen.TypeGenerators
             listFieldName = $"_listBuilder{UniqueNumberGenerator.UniqueNumber}";
 
             _classLevelBuilder.AppendLine(2, "[ThreadStatic]");
-            _classLevelBuilder.AppendLine(2, $"List<{type.FullName}> {listFieldName};");
+            _classLevelBuilder.AppendLine(2, $"List<{type.FullNameWithNullableAnnotation}>? {listFieldName};");
             
             _listLookup.Add(type.FullName, listFieldName);
             return listFieldName;
@@ -49,7 +49,7 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, $"var {builderFieldName} = {staticBuilderField};");
             codeBuilder.AppendLine(indentLevel, $"if({builderFieldName} == null)");
             codeBuilder.AppendLine(indentLevel, "{");
-            codeBuilder.AppendLine(indentLevel+1, $"{builderFieldName} = new List<{type.GenericArguments[0].FullName}>();");
+            codeBuilder.AppendLine(indentLevel+1, $"{builderFieldName} = new List<{type.GenericArguments[0].FullNameWithNullableAnnotation}>();");
             codeBuilder.AppendLine(indentLevel+1, $"{staticBuilderField} = {builderFieldName};");
             codeBuilder.AppendLine(indentLevel, "}");
             codeBuilder.AppendLine(indentLevel, $"{builderFieldName}.Clear();");
@@ -109,7 +109,7 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, "{");
             
 
-            codeBuilder.AppendLine(indentLevel+1, $"{type.GenericArguments[0].FullName}[] {arrayName};");
+            codeBuilder.AppendLine(indentLevel+1, $"{type.GenericArguments[0].FullNameWithNullableAnnotation}[] {arrayName};");
 
             codeBuilder.AppendLine(indentLevel+1, $"if({builderFieldName}.Count == {valueGetter}?.Length)");
             codeBuilder.AppendLine(indentLevel+1, "{");
@@ -193,6 +193,6 @@ namespace JsonSrcGen.TypeGenerators
         public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter, string wasSetVariable)
         {
             
-        }
+        } 
     }
 }

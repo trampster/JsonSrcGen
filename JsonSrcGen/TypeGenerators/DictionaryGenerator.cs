@@ -56,7 +56,12 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel+1, "}");
 
             //key
-            codeBuilder.AppendLine(indentLevel+1, "json = json.Read(out string key);");
+            codeBuilder.AppendLine(indentLevel+1, "json = json.Read(out string? key);");
+            codeBuilder.AppendLine(indentLevel+1, "if(key == null)");
+            codeBuilder.AppendLine(indentLevel+1, "{");
+            codeBuilder.AppendLine(indentLevel+2, "throw new InvalidJsonException(\"Dictionary key cannot be null\", json);");
+            codeBuilder.AppendLine(indentLevel+1, "}");
+
             codeBuilder.AppendLine(indentLevel+1, "json = json.SkipWhitespaceTo(':');");
 
             //value
