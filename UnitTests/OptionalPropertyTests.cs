@@ -122,7 +122,7 @@ namespace UnitTests
             };
 
             //act
-            _convert.FromJson(jsonClass, json); 
+           JsonConverter.FromJson(jsonClass, json); 
 
             //assert
             Assert.That(jsonClass.OptionalBool, Is.EqualTo(default(bool)));

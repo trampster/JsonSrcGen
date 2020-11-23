@@ -49,7 +49,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json =JsonConverter.ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo($"{{\"Property\":{expectedPropertyValue}}}"));
@@ -63,7 +63,7 @@ namespace UnitTests
             var jsonClass = new JsonCharClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+           JsonConverter.FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Property, Is.EqualTo(expectedCharacter));
@@ -77,7 +77,7 @@ namespace UnitTests
             var jsonClass = new JsonCharClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+           JsonConverter.FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Property, Is.EqualTo('\u1F4A'));

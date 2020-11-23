@@ -36,7 +36,7 @@ namespace UnitTests
             var jsonClass = new CollisionJsonClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+           JsonConverter.FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Aaa, Is.EqualTo("one"));

@@ -1,9 +1,8 @@
-using System.Text;
-using System.Linq;
+using JsonSrcGen.TypeGenerators;
 using System;
 using System.Collections.Generic;
-using JsonSrcGen.TypeGenerators;
-using JsonSrcGen;
+using System.Linq;
+using System.Text;
 
 namespace JsonSrcGen
 {
@@ -11,11 +10,6 @@ namespace JsonSrcGen
     {
         const string BuilderText = @"
             var builder = Builder;
-            if(builder == null)
-            {
-                builder = new JsonStringBuilder();
-                Builder = builder;
-            }
             builder.Clear();";
 
         readonly Func<JsonType, IJsonGenerator> _getGeneratorForType;
@@ -25,17 +19,26 @@ namespace JsonSrcGen
             _getGeneratorForType = getGeneratorForType;
         }
 
+    
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
         {
-            classBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({jsonClass.Namespace}.{jsonClass.Name} value)");
+            if (jsonClass.StructRef)
+            {
+                classBuilder.AppendLine(2, $"public static ReadOnlySpan<char> ToJson(ref {jsonClass.Namespace}.{jsonClass.Name} value)");
+            }
+            else
+            {
+                classBuilder.AppendLine(2, $"public static ReadOnlySpan<char> ToJson({jsonClass.Namespace}.{jsonClass.Name} value)");
+            }
+
             classBuilder.AppendLine(2, "{");
             classBuilder.AppendLine(0, BuilderText);
             classBuilder.AppendLine(3, "ToJson(value, builder);");
             classBuilder.AppendLine(3, "return builder.AsSpan();");
-            classBuilder.AppendLine(2, "}"); 
+            classBuilder.AppendLine(2, "}");
 
-
-            classBuilder.AppendLine(2, $"public void ToJson({jsonClass.Namespace}.{jsonClass.Name} value, JsonStringBuilder builder)");
+            classBuilder.AppendLine(2, $"[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
+            classBuilder.AppendLine(2, $"public static void ToJson({jsonClass.Namespace}.{jsonClass.Name} value, JsonStringBuilder builder)");
             classBuilder.AppendLine(2, "{");
 
             var appendBuilder = new StringBuilder();
@@ -63,7 +66,6 @@ namespace JsonSrcGen
                 appendBuilder.AppendDoubleEscaped(property.JsonName);
                 appendBuilder.Append($"\\\":");
 
-
                 var generator = GetGeneratorForType(property.Type);
                 bool canBeNull = jsonClass.IgnoreNull ? false : property.Type.CanBeNull;
                 generator.GenerateToJson(classBuilder, indent, appendBuilder, property.Type, $"value.{property.CodeName}", canBeNull);
@@ -83,7 +85,7 @@ namespace JsonSrcGen
 
         public void GenerateList(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson(List<{type.Namespace}.{type.Name}> value)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> ToJson(List<{type.Namespace}.{type.Name}> value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
@@ -97,7 +99,7 @@ namespace JsonSrcGen
 
         public void GenerateArray(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({type.Namespace}.{type.Name}[] value)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> ToJson(ref {type.Namespace}.{type.Name}[] value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
@@ -111,7 +113,7 @@ namespace JsonSrcGen
 
         public void GenerateValue(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({type.Namespace}.{type.Name} value)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> ToJson({type.Namespace}.{type.Name} value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
@@ -124,7 +126,7 @@ namespace JsonSrcGen
 
         public void GenerateDictionary(JsonType keyType, JsonType valueType, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson(Dictionary<{keyType.FullName},{valueType.FullName}> value)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> ToJson(Dictionary<{keyType.FullName},{valueType.FullName}> value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 

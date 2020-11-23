@@ -8,12 +8,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ListTests\**" />
+    <Compile Remove="ValueTests\**" />
+    <EmbeddedResource Remove="ListTests\**" />
+    <EmbeddedResource Remove="ValueTests\**" />
+    <None Remove="ListTests\**" />
+    <None Remove="ValueTests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ArrayPropertyTests.cs" />
+    <Compile Remove="ArrayTests\BooleanArrayTests.cs" />
+    <Compile Remove="ArrayTests\CustomClassArrayTests.cs" />
+    <Compile Remove="ArrayTests\DateTimeArrayTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0"/>
-    <ProjectReference Include="../JsonSrcGen/JsonSrcGen.csproj" 
-                        OutputItemType="Analyzer"
-                        ReferenceOutputAssembly="false" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <ProjectReference Include="../JsonSrcGen/JsonSrcGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

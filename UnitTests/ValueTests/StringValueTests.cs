@@ -22,7 +22,7 @@ namespace UnitTests
         {
             //arrange
             //act
-            var json = _convert.ToJson(value);
+            var json = JsonConverter.ToJson(value);
 
             //asserts
             Assert.That(json.ToString(), Is.EqualTo(expectedJson));
@@ -35,7 +35,7 @@ namespace UnitTests
         {
             //arrange
             //act
-            string value = _convert.FromJson((string)null, json); 
+            string value = JsonConverter.FromJson((string)null, json); 
 
             //assert
             Assert.That(value, Is.EqualTo(expectedValue));

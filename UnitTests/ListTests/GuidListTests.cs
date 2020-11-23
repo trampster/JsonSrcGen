@@ -26,7 +26,7 @@ namespace UnitTests.ListTests
             var list = new List<Guid>(){new Guid(1,2,3,4,5,6,7,8,9,10,11), new Guid(2,2,3,4,5,6,7,8,9,10,11)};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = JsonConverter.ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -37,7 +37,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<Guid>)null);
+            var json = JsonConverter.ToJson((List<Guid>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));
@@ -50,7 +50,7 @@ namespace UnitTests.ListTests
             var list = new List<Guid>();
 
             //act
-            _convert.FromJson(list, ExpectedJson);
+            JsonConverter.FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(2));
@@ -65,7 +65,7 @@ namespace UnitTests.ListTests
             var list = new List<Guid>(){new Guid(), new Guid(), new Guid()};
 
             //act
-            list =_convert.FromJson(list, ExpectedJson);
+            list =JsonConverter.FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(2));
@@ -80,7 +80,7 @@ namespace UnitTests.ListTests
             var list = new List<Guid>(){new Guid()};
 
             //act
-            list = _convert.FromJson(list, "null");
+            list = JsonConverter.FromJson(list, "null");
 
             //assert
             Assert.That(list, Is.Null);
@@ -91,7 +91,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var list = _convert.FromJson((List<Guid>)null, ExpectedJson);
+            var list = JsonConverter.FromJson((List<Guid>)null, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(2));

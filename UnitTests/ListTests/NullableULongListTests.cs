@@ -26,7 +26,7 @@ namespace UnitTests.ListTests
             var list = new List<ulong?>(){0, 1, 42, null, ulong.MaxValue};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = JsonConverter.ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -37,7 +37,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<ulong?>)null);
+            var json = JsonConverter.ToJson((List<ulong?>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));
@@ -50,7 +50,7 @@ namespace UnitTests.ListTests
             var list = new List<ulong?>();
 
             //act
-            _convert.FromJson(list, ExpectedJson);
+            JsonConverter.FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(5));
@@ -68,7 +68,7 @@ namespace UnitTests.ListTests
             var list = new List<ulong?>(){1, 2, 3};
 
             //act
-            list =_convert.FromJson(list, ExpectedJson);
+            list =JsonConverter.FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(5));
@@ -86,7 +86,7 @@ namespace UnitTests.ListTests
             var list = new List<ulong?>(){1, 2, 3};
 
             //act
-            list = _convert.FromJson(list, "null");
+            list = JsonConverter.FromJson(list, "null");
 
             //assert
             Assert.That(list, Is.Null);
@@ -97,7 +97,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var list = _convert.FromJson((List<ulong?>)null, ExpectedJson);
+            var list = JsonConverter.FromJson((List<ulong?>)null, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(5));

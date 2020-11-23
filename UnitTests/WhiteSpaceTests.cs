@@ -31,7 +31,7 @@ namespace UnitTests
             var jsonClass = new JsonClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+           JsonConverter.FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.FirstName, Is.EqualTo("Bob"));

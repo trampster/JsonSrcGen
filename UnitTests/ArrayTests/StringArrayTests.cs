@@ -9,14 +9,12 @@ namespace UnitTests.ArrayTests
 {
     public class StringArrayTests
     { 
-        JsonSrcGen.JsonConverter _convert;
-
         string ExpectedJson = "[\"one\",null,\"two\"]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonConverter();
+           
         }
 
         [Test] 
@@ -26,7 +24,7 @@ namespace UnitTests.ArrayTests
             var array = new string[]{"one", null, "two"};
 
             //act
-            var json = _convert.ToJson(array);
+            var json = JsonConverter.ToJson(ref array);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson.ToString()));
@@ -35,9 +33,10 @@ namespace UnitTests.ArrayTests
         [Test]
         public void ToJson_Null_CorrectString()
         {
+            var array = (string[])null;
             //arrange
             //act
-            var json = _convert.ToJson((string[])null);
+            var json = JsonConverter.ToJson(ref array);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));
@@ -50,7 +49,7 @@ namespace UnitTests.ArrayTests
             var array = new string[]{};
 
             //act
-            array = _convert.FromJson(array, ExpectedJson.ToString());
+            JsonConverter.FromJson(ref array, ExpectedJson.ToString());
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));
@@ -66,7 +65,7 @@ namespace UnitTests.ArrayTests
             var array = new string[]{"asfd", "gggg"};
 
             //act
-            array =_convert.FromJson(array, ExpectedJson.ToString());
+            JsonConverter.FromJson(ref array, ExpectedJson.ToString());
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));
@@ -82,7 +81,7 @@ namespace UnitTests.ArrayTests
             var array = new string[]{"asfd", "gggg"};
 
             //act
-            array = _convert.FromJson(array, "null");
+            JsonConverter.FromJson(ref array, "null");
 
             //assert
             Assert.That(array, Is.Null);
@@ -91,9 +90,10 @@ namespace UnitTests.ArrayTests
         [Test]
         public void FromJson_ArrayNull_MakesArray()
         {
+            var array = (string[])null;
             //arrange
             //act
-            var array = _convert.FromJson((string[])null, ExpectedJson.ToString());
+            JsonConverter.FromJson(ref array, ExpectedJson.ToString());
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));

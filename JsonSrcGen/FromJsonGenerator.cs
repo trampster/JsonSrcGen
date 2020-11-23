@@ -18,7 +18,7 @@ namespace JsonSrcGen
 
         public void GenerateList(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public List<{type.Namespace}.{type.Name}> FromJson(List<{type.Namespace}.{type.Name}> value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(List<{type.Namespace}.{type.Name}> value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
             
             var arrayJsonType = new JsonType("List", "List", "System.Coolection.Generic", false, new List<JsonType>(){type}, true);
@@ -26,13 +26,13 @@ namespace JsonSrcGen
 
             generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value");
 
-            codeBuilder.AppendLine(3, "return value;"); 
+            codeBuilder.AppendLine(3, "return json;"); 
             codeBuilder.AppendLine(2, "}"); 
         }
 
         public void GenerateDictionary(JsonType keyType, JsonType valueType, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public Dictionary<{keyType.FullName}, {valueType.FullName}> FromJson(Dictionary<{keyType.FullName}, {valueType.FullName}> value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref Dictionary<{keyType.FullName}, {valueType.FullName}> value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
             
             var arrayJsonType = new JsonType("Dictionary", "Dictionary", "System.Coolection.Generic", false, new List<JsonType>(){keyType, valueType}, true);
@@ -40,13 +40,13 @@ namespace JsonSrcGen
 
             generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value");
 
-            codeBuilder.AppendLine(3, "return value;"); 
+            codeBuilder.AppendLine(3, "return json;"); 
             codeBuilder.AppendLine(2, "}"); 
         }
 
         public void GenerateArray(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name}[] FromJson({type.Namespace}.{type.Name}[] value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref {type.Namespace}.{type.Name}[] value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
 
             var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true);
@@ -54,27 +54,41 @@ namespace JsonSrcGen
 
             generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value");
 
-            codeBuilder.AppendLine(3, "return value;"); 
+            codeBuilder.AppendLine(3, "return json;"); 
             codeBuilder.AppendLine(2, "}"); 
         }
 
         public void GenerateValue(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name} FromJson({type.Namespace}.{type.Name} value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson({type.Namespace}.{type.Name} value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
 
             var generator = _getGeneratorForType(type);
 
             generator.GenerateFromJson(codeBuilder, 3, type, value => $"value = {value};", "value");
 
-            codeBuilder.AppendLine(3, "return value;"); 
+            codeBuilder.AppendLine(3, "return json;"); 
             codeBuilder.AppendLine(2, "}"); 
         }
 
         public void Generate(JsonClass jsonClass, CodeBuilder codeBuilder)
         {
+            if (jsonClass.ReadOnly)
+            {
+                return;
+            }
 
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> FromJson({jsonClass.Namespace}.{jsonClass.Name} value, ReadOnlySpan<char> json)");
+            //codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> FromJson({jsonClass.Namespace}.{jsonClass.Name} value, ReadOnlySpan<char> json)");
+            if (jsonClass.StructRef)
+            {
+                codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref {jsonClass.Namespace}.{jsonClass.Name} value, ReadOnlySpan<char> json)");
+            }
+            else
+            {
+                codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson({jsonClass.Namespace}.{jsonClass.Name} value, ReadOnlySpan<char> json)");
+              //  codeBuilder.AppendLine(2, $"public {jsonClass.Namespace}.{jsonClass.Name} FromJson(ReadOnlySpan<char> json)");
+            }
+
             codeBuilder.AppendLine(2, "{");
 
             codeBuilder.AppendLine(3, "json = json.SkipWhitespaceTo('{');");
@@ -104,6 +118,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(4, "}");
             codeBuilder.AppendLine(4, $"else if({valueVariable} == '}}')");
             codeBuilder.AppendLine(4, "{");
+
             foreach(var property in properties)
             {
                 if(property.Optional)
@@ -112,7 +127,12 @@ namespace JsonSrcGen
                     generator.OnObjectFinished(codeBuilder, 5, propertyValue => $"value.{property.CodeName} = {propertyValue};", property.WasSetVariable);
                 }
             }
-            codeBuilder.AppendLine(5, "return json.Slice(1);");
+
+         
+            codeBuilder.AppendLine(5, "json.Slice(1);");
+            //RETURN
+            codeBuilder.AppendLine(5, "return json;");
+
             codeBuilder.AppendLine(4, "}");
             codeBuilder.AppendLine(4, "else");
             codeBuilder.AppendLine(4, "{");

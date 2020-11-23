@@ -37,7 +37,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json =JsonConverter.ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -51,7 +51,7 @@ namespace UnitTests
             var jsonClass = new JsonUShortClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+           JsonConverter.FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Age, Is.EqualTo(42));

@@ -3,12 +3,12 @@ using JsonSrcGen;
 using System.Collections.Generic;
 using System;
 
-[assembly: JsonDictionary(typeof(string), typeof(int))] 
+[assembly: JsonDictionary(typeof(string), typeof(int))]
 
 namespace UnitTests.ListTests
 {
-    public class IntDictionaryArrayTests 
-    { 
+    public class IntDictionaryArrayTests
+    {
         JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "{\"First\":1,\"Second\":2,\"Third\":3}";
@@ -19,7 +19,7 @@ namespace UnitTests.ListTests
             _convert = new JsonConverter();
         }
 
-        [Test] 
+        [Test]
         public void ToJson_CorrectString()
         {
             //arrange
@@ -31,31 +31,31 @@ namespace UnitTests.ListTests
             };
 
             //act
-            var json = _convert.ToJson(dictionary);
+            var json = JsonConverter.ToJson(dictionary);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
-        } 
+        }
 
         [Test]
         public void ToJson_Null_CorrectString()
         {
             //arrange
             //act
-            var json = _convert.ToJson((Dictionary<string, int>)null);
+            var json = JsonConverter.ToJson((Dictionary<string, int>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));
         }
 
         [Test]
-        public void FromJson_EmptyDictionary_CorrectList() 
+        public void FromJson_EmptyDictionary_CorrectList()
         {
             //arrange
             var dictionary = new Dictionary<string, int>();
 
             //act
-            dictionary = _convert.FromJson(dictionary, ExpectedJson);
+            JsonConverter.FromJson(ref dictionary, ExpectedJson);
 
             //assert
             Assert.That(dictionary.Count, Is.EqualTo(3));
@@ -64,7 +64,7 @@ namespace UnitTests.ListTests
             Assert.That(dictionary["Third"], Is.EqualTo(3));
         }
 
-        [Test] 
+        [Test]
         public void FromJson_PopulatedDictionary_CorrectDictionary()
         {
             //arrange
@@ -78,7 +78,7 @@ namespace UnitTests.ListTests
             };
 
             //act
-            dictionary =_convert.FromJson(dictionary, ExpectedJson);
+            JsonConverter.FromJson(ref dictionary, ExpectedJson);
 
             //assert
             Assert.That(dictionary.Count, Is.EqualTo(3));
@@ -87,7 +87,7 @@ namespace UnitTests.ListTests
             Assert.That(dictionary["Third"], Is.EqualTo(3));
         }
 
-        [Test] 
+        [Test]
         public void FromJson_EmptyJson_EmptyDictionary()
         {
             //arrange
@@ -101,14 +101,14 @@ namespace UnitTests.ListTests
             };
 
             //act
-            dictionary =_convert.FromJson(dictionary, "{}");
+            JsonConverter.FromJson(ref dictionary, "{}");
 
             //assert
             Assert.That(dictionary.Count, Is.EqualTo(0));
         }
 
-        [Test] 
-        public void FromJson_JsonNull_ReturnsNull() 
+        [Test]
+        public void FromJson_JsonNull_ReturnsNull()
         {
             //arrange
             var dictionary = new Dictionary<string, int>()
@@ -121,18 +121,19 @@ namespace UnitTests.ListTests
             };
 
             //act
-            dictionary = _convert.FromJson(dictionary, "null");
+            JsonConverter.FromJson(ref dictionary, "null");
 
             //assert
-            Assert.That(dictionary, Is.Null); 
+            Assert.That(dictionary, Is.Null);
         }
 
         [Test]
         public void FromJson_DictionaryNull_MakesDictionary()
         {
+            Dictionary<string, int> dictionary = null;
             //arrange
             //act
-            var dictionary = _convert.FromJson((Dictionary<string,int>)null, ExpectedJson);
+            JsonConverter.FromJson(ref dictionary, ExpectedJson);
 
             //assert
             Assert.That(dictionary.Count, Is.EqualTo(3));

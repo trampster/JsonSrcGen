@@ -37,7 +37,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json =JsonConverter.ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -53,7 +53,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json =JsonConverter.ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"Dictionary\":null}"));
@@ -69,7 +69,7 @@ namespace UnitTests
             };
 
             //act
-            _convert.FromJson(jsonClass, ExpectedJson);
+           JsonConverter.FromJson(jsonClass, ExpectedJson);
 
             //assert
             Assert.That(jsonClass.Dictionary.Count, Is.EqualTo(2));
@@ -87,7 +87,7 @@ namespace UnitTests
             };
 
             //act
-            _convert.FromJson(jsonClass, ExpectedJson);
+           JsonConverter.FromJson(jsonClass, ExpectedJson);
 
             //assert
             Assert.That(jsonClass.Dictionary.Count, Is.EqualTo(2));
@@ -110,7 +110,7 @@ namespace UnitTests
             };
 
             //act
-            _convert.FromJson(jsonClass, ExpectedJson);
+           JsonConverter.FromJson(jsonClass, ExpectedJson);
 
             //assert
             Assert.That(jsonClass.Dictionary.Count, Is.EqualTo(2));

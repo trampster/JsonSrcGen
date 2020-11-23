@@ -8,7 +8,7 @@ namespace JsonSrcGen
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out bool value)
         {
             json = json.SkipWhitespace();
-            switch(json[0])
+            switch (json[0])
             {
                 case 't':
                     value = true;
@@ -23,7 +23,7 @@ namespace JsonSrcGen
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out bool? value)
         {
             json = json.SkipWhitespace();
-            switch(json[0])
+            switch (json[0])
             {
                 case 't':
                     value = true;
@@ -41,7 +41,7 @@ namespace JsonSrcGen
             json = json.SkipWhitespace();
             int sign = 1;
             int startIndex = 0;
-            if(json[0] == '-')
+            if (json[0] == '-')
             {
                 sign = -1;
                 startIndex = 1;
@@ -49,10 +49,10 @@ namespace JsonSrcGen
             int afterIntIndex = 0;
             int soFar = 0;
 
-            for(int index = startIndex; index < json.Length; index++)
+            for (int index = startIndex; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '0':
                     case '1':
@@ -66,7 +66,7 @@ namespace JsonSrcGen
                     case '9':
                         int digit = ((int)character) - 48;
                         soFar *= 10;
-                        soFar += digit; 
+                        soFar += digit;
                         continue;
                     default:
                         afterIntIndex = index;
@@ -74,7 +74,7 @@ namespace JsonSrcGen
                 }
                 break;
             }
-            
+
             value = (short)(sign * soFar);
 
             return json.Slice(afterIntIndex);
@@ -85,7 +85,7 @@ namespace JsonSrcGen
             json = json.SkipWhitespace();
             int sign = 1;
             int startIndex = 0;
-            switch(json[0])
+            switch (json[0])
             {
                 case '-':
                     sign = -1;
@@ -97,10 +97,10 @@ namespace JsonSrcGen
             }
             int afterIntIndex = 0;
             value = 0;
-            for(int index = startIndex; index < json.Length; index++)
+            for (int index = startIndex; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '0':
                     case '1':
@@ -114,7 +114,7 @@ namespace JsonSrcGen
                     case '9':
                         long digit = ((long)character) - 48;
                         value *= 10;
-                        value += digit; 
+                        value += digit;
                         continue;
                     default:
                         afterIntIndex = index;
@@ -122,7 +122,7 @@ namespace JsonSrcGen
                 }
                 break;
             }
-            
+
             value = sign * value;
 
             return json.Slice(afterIntIndex);
@@ -133,17 +133,17 @@ namespace JsonSrcGen
             json = json.SkipWhitespace();
             int sign = 1;
             int startIndex = 0;
-            if(json[0] == '-')
+            if (json[0] == '-')
             {
                 sign = -1;
                 startIndex = 1;
             }
             int afterIntIndex = 0;
             value = 0;
-            for(int index = startIndex; index < json.Length; index++)
+            for (int index = startIndex; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '0':
                     case '1':
@@ -157,7 +157,7 @@ namespace JsonSrcGen
                     case '9':
                         long digit = ((long)character) - 48;
                         value *= 10;
-                        value += digit; 
+                        value += digit;
                         continue;
                     default:
                         afterIntIndex = index;
@@ -165,7 +165,7 @@ namespace JsonSrcGen
                 }
                 break;
             }
-            
+
             value = sign * value;
 
             return json.Slice(afterIntIndex);
@@ -178,7 +178,7 @@ namespace JsonSrcGen
             int sign = 1;
             int startIndex = 0;
 
-            switch(json[0])
+            switch (json[0])
             {
                 case '-':
                     sign = -1;
@@ -192,10 +192,10 @@ namespace JsonSrcGen
             int afterIntIndex = 0;
             int soFar = 0;
 
-            for(int index = startIndex; index < json.Length; index++)
+            for (int index = startIndex; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '0':
                     case '1':
@@ -209,7 +209,7 @@ namespace JsonSrcGen
                     case '9':
                         int digit = ((int)character) - 48;
                         soFar *= 10;
-                        soFar += digit; 
+                        soFar += digit;
                         continue;
                     default:
                         afterIntIndex = index;
@@ -217,7 +217,7 @@ namespace JsonSrcGen
                 }
                 break;
             }
-            
+
             value = sign * soFar;
 
             return json.Slice(afterIntIndex);
@@ -228,7 +228,7 @@ namespace JsonSrcGen
             json = json.SkipWhitespace();
             int sign = 1;
             int startIndex = 0;
-            if(json[0] == '-')
+            if (json[0] == '-')
             {
                 sign = -1;
                 startIndex = 1;
@@ -236,10 +236,10 @@ namespace JsonSrcGen
             int afterIntIndex = 0;
             int soFar = 0;
 
-            for(int index = startIndex; index < json.Length; index++)
+            for (int index = startIndex; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '0':
                     case '1':
@@ -253,7 +253,7 @@ namespace JsonSrcGen
                     case '9':
                         int digit = ((int)character) - 48;
                         soFar *= 10;
-                        soFar += digit; 
+                        soFar += digit;
                         continue;
                     default:
                         afterIntIndex = index;
@@ -261,7 +261,7 @@ namespace JsonSrcGen
                 }
                 break;
             }
-            
+
             value = sign * soFar;
 
             return json.Slice(afterIntIndex);
@@ -272,6 +272,71 @@ namespace JsonSrcGen
             return character >= '0' && character <= '9';
         }
 
+
+        private static readonly StringBuilder _sb = new StringBuilder();
+
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out decimal? value)
+        {
+            json = json.SkipWhitespace();
+
+            if (json[0] == 'n')
+            {
+                value = null;
+                return json.Slice(4);
+            }
+
+            var result = json.Read(out decimal newValue);
+            value = newValue;
+            return result;
+        }
+
+        public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out decimal value)
+        {
+            _sb.Clear();
+            int index = 0;
+            int sign = 1;
+            char character = ' ';
+            value = 0;
+
+            if (json[index] == '-')
+            {
+                sign = -1;
+                index++;
+            }
+
+            for (; index < json.Length; index++)
+            {
+                character = json[index];
+
+                if (!CheckNumber(json, index, character))
+                    break;
+
+                _sb.Append(character);
+            }
+
+            if (decimal.TryParse(_sb.ToString(), out value))
+            {
+                value *= sign;
+                return json.Slice(index);
+            }
+
+            throw new Exception("Error parse decimal");
+        }
+
+        private static bool CheckNumber(ReadOnlySpan<char> json, int index, char character)
+        {
+            int nextIndex = (index + 1);
+            nextIndex = nextIndex < json.Length ? nextIndex : 0;
+            char nextChar = json[nextIndex];
+
+            if (!IsNumber(character) && (nextIndex == 0 || !IsNumber(nextChar)))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out double? value)
         {
             json = json.SkipWhitespace();
@@ -280,7 +345,7 @@ namespace JsonSrcGen
             int sign = 1;
             char character = ' ';
 
-            switch(json[0])
+            switch (json[0])
             {
                 case '-':
                     sign = -1;
@@ -292,60 +357,60 @@ namespace JsonSrcGen
             }
 
             double wholePart = 0;
-            for(; index < json.Length; index++)
+            for (; index < json.Length; index++)
             {
                 character = json[index];
-                if(!IsNumber(character)) break;
-                wholePart = (wholePart*10) + character - '0';
+                if (!IsNumber(character)) break;
+                wholePart = (wholePart * 10) + character - '0';
             }
 
             double fractionalPart = 0;
-            if(character == '.')
+            if (character == '.')
             {
                 long fractionalValue = 0;
                 int factionalLength = 0;
-                for(index = index+1; index < json.Length; index++)
+                for (index = index + 1; index < json.Length; index++)
                 {
                     character = json[index];
-                    if(!IsNumber(character)) break;
-                    fractionalValue = (fractionalValue*10) + character - '0';
+                    if (!IsNumber(character)) break;
+                    fractionalValue = (fractionalValue * 10) + character - '0';
                     factionalLength++;
                 }
                 double divisor = Math.Pow(10, factionalLength);
-                fractionalPart = fractionalValue/divisor;
+                fractionalPart = fractionalValue / divisor;
             }
 
             int exponentPart = 0;
-            if(character == 'E' || character == 'e')
+            if (character == 'E' || character == 'e')
             {
                 index++;
                 character = json[index];
                 int exponentSign = 1;
-                if(character == '-')
+                if (character == '-')
                 {
                     index++;
                     exponentSign = -1;
                 }
-                else if(character == '+')
+                else if (character == '+')
                 {
                     index++;
                 }
 
-                for(; index < json.Length; index++)
+                for (; index < json.Length; index++)
                 {
                     character = json[index];
-                    if(!IsNumber(character)) break;
-                    exponentPart = (exponentPart*10) + character - '0';
+                    if (!IsNumber(character)) break;
+                    exponentPart = (exponentPart * 10) + character - '0';
                 }
 
                 exponentPart *= exponentSign;
             }
             else
             {
-                value =  sign*(wholePart + fractionalPart);
+                value = sign * (wholePart + fractionalPart);
                 return json.Slice(index);
             }
-            value = sign*(wholePart + fractionalPart) * Math.Pow(10, exponentPart);
+            value = sign * (wholePart + fractionalPart) * Math.Pow(10, exponentPart);
             return json.Slice(index);
         }
 
@@ -357,67 +422,67 @@ namespace JsonSrcGen
             int sign = 1;
             char character = ' ';
 
-            if(json[index] == '-')
+            if (json[index] == '-')
             {
                 sign = -1;
                 index++;
             }
 
             double wholePart = 0;
-            for(; index < json.Length; index++)
+            for (; index < json.Length; index++)
             {
                 character = json[index];
-                if(!IsNumber(character)) break;
-                wholePart = (wholePart*10) + character - '0';
+                if (!IsNumber(character)) break;
+                wholePart = (wholePart * 10) + character - '0';
             }
 
             double fractionalPart = 0;
-            if(character == '.')
+            if (character == '.')
             {
                 long fractionalValue = 0;
                 int factionalLength = 0;
-                for(index = index+1; index < json.Length; index++)
+                for (index = index + 1; index < json.Length; index++)
                 {
                     character = json[index];
-                    if(!IsNumber(character)) break;
-                    fractionalValue = (fractionalValue*10) + character - '0';
+                    if (!IsNumber(character)) break;
+                    fractionalValue = (fractionalValue * 10) + character - '0';
                     factionalLength++;
                 }
                 double divisor = Math.Pow(10, factionalLength);
-                fractionalPart = fractionalValue/divisor;
+                fractionalPart = fractionalValue / divisor;
             }
 
             int exponentPart = 0;
-            if(character == 'E' || character == 'e')
+            if (character == 'E' || character == 'e')
             {
                 index++;
                 character = json[index];
                 int exponentSign = 1;
-                if(character == '-')
+                if (character == '-')
                 {
                     index++;
                     exponentSign = -1;
                 }
-                else if(character == '+')
+                else if (character == '+')
                 {
                     index++;
                 }
 
-                for(; index < json.Length; index++)
+                for (; index < json.Length; index++)
                 {
                     character = json[index];
-                    if(!IsNumber(character)) break;
-                    exponentPart = (exponentPart*10) + character - '0';
+                    if (!IsNumber(character)) break;
+                    exponentPart = (exponentPart * 10) + character - '0';
                 }
 
                 exponentPart *= exponentSign;
             }
             else
             {
-                value =  sign*(wholePart + fractionalPart);
+                value = sign * (wholePart + fractionalPart);
                 return json.Slice(index);
             }
-            value = sign*(wholePart + fractionalPart) * Math.Pow(10, exponentPart);
+            value = sign * (wholePart + fractionalPart) * Math.Pow(10, exponentPart);
             return json.Slice(index);
         }
 
@@ -426,10 +491,10 @@ namespace JsonSrcGen
             json = json.SkipWhitespace();
             int afterIntIndex = 0;
             value = 0;
-            for(int index = 0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '0':
                     case '1':
@@ -443,7 +508,7 @@ namespace JsonSrcGen
                     case '9':
                         byte digit = (byte)(((byte)character) - 48);
                         value *= 10;
-                        value += digit; 
+                        value += digit;
                         continue;
 
                     default:
@@ -452,7 +517,7 @@ namespace JsonSrcGen
                 }
                 break;
             }
-            
+
             return json.Slice(afterIntIndex);
         }
 
@@ -461,10 +526,10 @@ namespace JsonSrcGen
             json = json.SkipWhitespace();
             int afterIntIndex = 0;
             int soFar = 0;
-            for(int index =0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '0':
                     case '1':
@@ -478,7 +543,7 @@ namespace JsonSrcGen
                     case '9':
                         int digit = ((int)character) - 48;
                         soFar *= 10;
-                        soFar += digit; 
+                        soFar += digit;
                         continue;
 
                     default:
@@ -487,7 +552,7 @@ namespace JsonSrcGen
                 }
                 break;
             }
-            
+
             value = (ushort)soFar;
 
             return json.Slice(afterIntIndex);
@@ -496,17 +561,17 @@ namespace JsonSrcGen
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out ulong? value)
         {
             json = json.SkipWhitespace();
-            if(json[0] == 'n')
+            if (json[0] == 'n')
             {
                 value = null;
                 return json.Slice(4);
             }
             int afterIntIndex = 0;
             value = 0;
-            for(int index =0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '0':
                     case '1':
@@ -520,7 +585,7 @@ namespace JsonSrcGen
                     case '9':
                         ulong digit = ((ulong)character) - 48;
                         value *= 10;
-                        value += digit; 
+                        value += digit;
                         continue;
 
                     default:
@@ -529,7 +594,7 @@ namespace JsonSrcGen
                 }
                 break;
             }
-            
+
             return json.Slice(afterIntIndex);
         }
 
@@ -538,10 +603,10 @@ namespace JsonSrcGen
             json = json.SkipWhitespace();
             int afterIntIndex = 0;
             value = 0;
-            for(int index =0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '0':
                     case '1':
@@ -555,7 +620,7 @@ namespace JsonSrcGen
                     case '9':
                         ulong digit = ((ulong)character) - 48;
                         value *= 10;
-                        value += digit; 
+                        value += digit;
                         continue;
 
                     default:
@@ -564,24 +629,24 @@ namespace JsonSrcGen
                 }
                 break;
             }
-            
+
             return json.Slice(afterIntIndex);
         }
 
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out uint? value)
         {
             json = json.SkipWhitespace();
-            if(json[0] == 'n')
+            if (json[0] == 'n')
             {
                 value = null;
                 return json.Slice(4);
             }
             int afterIntIndex = 0;
             int soFar = 0;
-            for(int index =0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '0':
                     case '1':
@@ -595,7 +660,7 @@ namespace JsonSrcGen
                     case '9':
                         int digit = ((int)character) - 48;
                         soFar *= 10;
-                        soFar += digit; 
+                        soFar += digit;
                         continue;
 
                     default:
@@ -604,7 +669,7 @@ namespace JsonSrcGen
                 }
                 break;
             }
-            
+
             value = (uint)soFar;
 
             return json.Slice(afterIntIndex);
@@ -615,10 +680,10 @@ namespace JsonSrcGen
             json = json.SkipWhitespace();
             int afterIntIndex = 0;
             int soFar = 0;
-            for(int index =0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '0':
                     case '1':
@@ -632,7 +697,7 @@ namespace JsonSrcGen
                     case '9':
                         int digit = ((int)character) - 48;
                         soFar *= 10;
-                        soFar += digit; 
+                        soFar += digit;
                         continue;
 
                     default:
@@ -641,7 +706,7 @@ namespace JsonSrcGen
                 }
                 break;
             }
-            
+
             value = (uint)soFar;
 
             return json.Slice(afterIntIndex);
@@ -650,21 +715,21 @@ namespace JsonSrcGen
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out string value)
         {
             json = json.SkipWhitespaceTo('\"', 'n', out char found);
-            if(found == 'n')
+            if (found == 'n')
             {
                 value = null;
                 return json.Slice(3);
             }
-            for(int index = 0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
-                switch(json[index])
+                switch (json[index])
                 {
                     case '\\':
                         json = ReadEscapedString(json, index, out value);
                         return json;
                     case '\"':
                         value = new string(json.Slice(0, index));
-                        return json.Slice(index+1);
+                        return json.Slice(index + 1);
                 }
             }
             throw new InvalidJsonException("Failed to find end of string", json);
@@ -673,11 +738,11 @@ namespace JsonSrcGen
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out char value)
         {
             json = json.SkipWhitespace();
-            if(json[0] != '\"')
+            if (json[0] != '\"')
             {
                 throw new InvalidJsonException($"Expected Char value to start with \" but instead got {json[0]}", json);
             }
-            switch(json[1])
+            switch (json[1])
             {
                 case '\\':
                     json = ReadEscapedChar(json.Slice(2), out value);
@@ -691,7 +756,7 @@ namespace JsonSrcGen
         static ReadOnlySpan<char> ReadEscapedChar(this ReadOnlySpan<char> json, out char value)
         {
             char character = json[0];
-            switch(character)
+            switch (character)
             {
                 case '\"':
                 case '\\':
@@ -728,24 +793,24 @@ namespace JsonSrcGen
         static ReadOnlySpan<char> ReadEscapedString(this ReadOnlySpan<char> json, int firstEscapeCharacterIndex, out string value)
         {
             var builder = _builder;
-            if(_builder == null)
+            if (_builder == null)
             {
                 _builder = new StringBuilder();
                 builder = _builder;
             }
             builder.Clear();
             int index = firstEscapeCharacterIndex;
-            while(true)
+            while (true)
             {
                 char character = json[index];
 
-                if(character == '\\')
+                if (character == '\\')
                 {
                     _builder.Append(json.Slice(0, index)); //append
                     //escape character
                     index++;
                     character = json[index];
-                    switch(character)
+                    switch (character)
                     {
                         case '\"':
                         case '\\':
@@ -778,7 +843,7 @@ namespace JsonSrcGen
                     index = 0;
                     continue;
                 }
-                else if(character == '\"')
+                else if (character == '\"')
                 {
                     //end of string value
                     _builder.Append(json.Slice(0, index));
@@ -786,7 +851,7 @@ namespace JsonSrcGen
                     return json.Slice(index + 1);
                 }
                 index++;
-                
+
             }
             //we got to the end of the span without finding the end of string character
             throw new InvalidJsonException("Missing end of string value", json);
@@ -804,10 +869,10 @@ namespace JsonSrcGen
 
         public static ReadOnlySpan<char> SkipWhitespace(this ReadOnlySpan<char> json)
         {
-            for(int index = 0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                switch(value)
+                switch (value)
                 {
                     case ' ':
                     case '\t':
@@ -822,10 +887,10 @@ namespace JsonSrcGen
 
         public static ReadOnlySpan<char> SkipWhitespaceTo(this ReadOnlySpan<char> json, char to)
         {
-            for(int index = 0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                switch(value)
+                switch (value)
                 {
                     case ' ':
                     case '\t':
@@ -833,7 +898,7 @@ namespace JsonSrcGen
                     case '\r':
                         continue;
                 }
-                if(value == to)
+                if (value == to)
                 {
                     index++;
                     return json.Slice(index);
@@ -845,10 +910,10 @@ namespace JsonSrcGen
 
         public static ReadOnlySpan<char> SkipWhitespaceTo(this ReadOnlySpan<char> json, char to1, char to2, out char found)
         {
-            for(int index = 0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                switch(value)
+                switch (value)
                 {
                     case ' ':
                     case '\t':
@@ -856,13 +921,13 @@ namespace JsonSrcGen
                     case '\r':
                         continue;
                 }
-                if(value == to1)
+                if (value == to1)
                 {
                     index++;
                     found = to1;
                     return json.Slice(index);
                 }
-                if(value == to2)
+                if (value == to2)
                 {
                     index++;
                     found = to2;
@@ -879,16 +944,16 @@ namespace JsonSrcGen
 
             bool inString = false;
 
-            for(int index = 0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                switch(character)
+                switch (character)
                 {
                     case '{':
                         numberOfOpenBrackets++;
                         break;
                     case '}':
-                        if(numberOfOpenBrackets == 0)
+                        if (numberOfOpenBrackets == 0)
                         {
                             //end of class that the property is in
                             return json.Slice(index);
@@ -899,7 +964,7 @@ namespace JsonSrcGen
                         inString = !inString;
                         break;
                     case ',':
-                        if(numberOfOpenBrackets == 0 && !inString)
+                        if (numberOfOpenBrackets == 0 && !inString)
                         {
                             return json.Slice(index);
                         }
@@ -911,10 +976,10 @@ namespace JsonSrcGen
 
         public static ReadOnlySpan<char> ReadTo(this ReadOnlySpan<char> json, char to)
         {
-            for(int index = 0; index < json.Length; index++)
+            for (int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                if(value == to)
+                if (value == to)
                 {
                     return json.Slice(0, index);
                 }
@@ -924,13 +989,13 @@ namespace JsonSrcGen
 
         public static bool EqualsString(this ReadOnlySpan<char> json, string other)
         {
-            if(json.Length != other.Length)
+            if (json.Length != other.Length)
             {
                 return false;
             }
-            for(int index = 0; index < 0; index++)
+            for (int index = 0; index < 0; index++)
             {
-                if(json[0] != other[0])
+                if (json[0] != other[0])
                 {
                     return false;
                 }
@@ -944,63 +1009,63 @@ namespace JsonSrcGen
 
             json = json.SkipWhitespace();
 
-            if(json[0] != '\"')
+            if (json[0] != '\"')
             {
                 throw new InvalidJsonException($"Expected DateTimeOffset property to start with a quote but instead got '{json[0]}'", json);
             }
             json = json.Slice(1);
 
-            int year = 
-                (json[0] - 48)*1000 + 
-                (json[1] - 48)*100 +
-                (json[2] - 48)*10 +
+            int year =
+                (json[0] - 48) * 1000 +
+                (json[1] - 48) * 100 +
+                (json[2] - 48) * 10 +
                 (json[3] - 48);
             int month =
-                (json[5] - 48)*10 +
+                (json[5] - 48) * 10 +
                 (json[6] - 48);
             int day =
-                (json[8] - 48)*10 +
+                (json[8] - 48) * 10 +
                 (json[9] - 48);
 
-            if(json[index + 10] == '\"')
+            if (json[index + 10] == '\"')
             {
                 value = new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.Zero);
                 return json.Slice(11);
             }
 
             int hour =
-                (json[11] - 48)*10 +
+                (json[11] - 48) * 10 +
                 (json[12] - 48);
 
             int minute =
-                (json[14] - 48)*10 +
+                (json[14] - 48) * 10 +
                 (json[15] - 48);
 
             int second =
-                (json[17] - 48)*10 +
+                (json[17] - 48) * 10 +
                 (json[18] - 48);
 
-            
+
             index += 19;
             var character = json[index];
-            if(character == '\"')
+            if (character == '\"')
             {
                 value = new DateTimeOffset(year, month, day, hour, minute, second, TimeSpan.Zero);
                 return json.Slice(20);
             }
 
             double milliseonds = 0;
-            if(character == '.')
+            if (character == '.')
             {
                 index++;
                 //milliseconds
                 int subSeconds = 0;
                 int millisecondsStart = index;
-                
-                while(true)
+
+                while (true)
                 {
                     character = json[index];
-                    if(character >= '0' && character <= '9')
+                    if (character >= '0' && character <= '9')
                     {
                         subSeconds = (subSeconds * 10) + (character - 48);
                         index++;
@@ -1009,9 +1074,9 @@ namespace JsonSrcGen
                     {
                         int millisecondsLength = index - millisecondsStart;
                         double multiplier = 1;
-                        switch(millisecondsLength)
+                        switch (millisecondsLength)
                         {
-                            case 1: 
+                            case 1:
                                 multiplier = 100;
                                 break;
                             case 2:
@@ -1036,30 +1101,30 @@ namespace JsonSrcGen
                                 multiplier = 0.00001d;
                                 break;
                         }
-                        milliseonds = subSeconds*multiplier;
+                        milliseonds = subSeconds * multiplier;
                         break;
                     }
                 }
             }
             TimeSpan offset = TimeSpan.Zero;
-            if(character == '\"')
+            if (character == '\"')
             {
 
             }
-            else if(character == 'Z')
+            else if (character == 'Z')
             {
                 index++;
             }
             else
             {
                 int offsetSign = character == '-' ? -1 : 1;
-                int offsetHours = 
-                    (json[index + 1] - 48)*10 +
+                int offsetHours =
+                    (json[index + 1] - 48) * 10 +
                     (json[index + 2] - 48);
-                int offsetMinutes = 
-                    (json[index + 4] - 48)*10 +
+                int offsetMinutes =
+                    (json[index + 4] - 48) * 10 +
                     (json[index + 5] - 48);
-                offset = new TimeSpan(offsetSign*offsetHours, offsetMinutes, 0);
+                offset = new TimeSpan(offsetSign * offsetHours, offsetMinutes, 0);
                 var localDateTime = new DateTimeOffset(year, month, day, hour, minute, second, offset).AddMilliseconds(milliseonds);
                 value = localDateTime;
                 return json.Slice(index + 7);
@@ -1075,11 +1140,11 @@ namespace JsonSrcGen
 
             json = json.SkipWhitespace();
 
-            switch(json[0])
+            switch (json[0])
             {
                 case 'n':
-                     value = null;
-                     return json.Slice(4);
+                    value = null;
+                    return json.Slice(4);
                 case '\"':
                     break;
                 default:
@@ -1087,57 +1152,57 @@ namespace JsonSrcGen
             }
             json = json.Slice(1);
 
-            int year = 
-                (json[0] - 48)*1000 + 
-                (json[1] - 48)*100 +
-                (json[2] - 48)*10 +
+            int year =
+                (json[0] - 48) * 1000 +
+                (json[1] - 48) * 100 +
+                (json[2] - 48) * 10 +
                 (json[3] - 48);
             int month =
-                (json[5] - 48)*10 +
+                (json[5] - 48) * 10 +
                 (json[6] - 48);
             int day =
-                (json[8] - 48)*10 +
+                (json[8] - 48) * 10 +
                 (json[9] - 48);
 
-            if(json[index + 10] == '\"')
+            if (json[index + 10] == '\"')
             {
                 value = new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.Zero);
                 return json.Slice(11);
             }
 
             int hour =
-                (json[11] - 48)*10 +
+                (json[11] - 48) * 10 +
                 (json[12] - 48);
 
             int minute =
-                (json[14] - 48)*10 +
+                (json[14] - 48) * 10 +
                 (json[15] - 48);
 
             int second =
-                (json[17] - 48)*10 +
+                (json[17] - 48) * 10 +
                 (json[18] - 48);
 
-            
+
             index += 19;
             var character = json[index];
-            if(character == '\"')
+            if (character == '\"')
             {
                 value = new DateTimeOffset(year, month, day, hour, minute, second, TimeSpan.Zero);
                 return json.Slice(20);
             }
 
             double milliseonds = 0;
-            if(character == '.')
+            if (character == '.')
             {
                 index++;
                 //milliseconds
                 int subSeconds = 0;
                 int millisecondsStart = index;
-                
-                while(true)
+
+                while (true)
                 {
                     character = json[index];
-                    if(character >= '0' && character <= '9')
+                    if (character >= '0' && character <= '9')
                     {
                         subSeconds = (subSeconds * 10) + (character - 48);
                         index++;
@@ -1146,9 +1211,9 @@ namespace JsonSrcGen
                     {
                         int millisecondsLength = index - millisecondsStart;
                         double multiplier = 1;
-                        switch(millisecondsLength)
+                        switch (millisecondsLength)
                         {
-                            case 1: 
+                            case 1:
                                 multiplier = 100;
                                 break;
                             case 2:
@@ -1173,30 +1238,30 @@ namespace JsonSrcGen
                                 multiplier = 0.00001d;
                                 break;
                         }
-                        milliseonds = subSeconds*multiplier;
+                        milliseonds = subSeconds * multiplier;
                         break;
                     }
                 }
             }
             TimeSpan offset = TimeSpan.Zero;
-            if(character == '\"')
+            if (character == '\"')
             {
 
             }
-            else if(character == 'Z')
+            else if (character == 'Z')
             {
                 index++;
             }
             else
             {
                 int offsetSign = character == '-' ? -1 : 1;
-                int offsetHours = 
-                    (json[index + 1] - 48)*10 +
+                int offsetHours =
+                    (json[index + 1] - 48) * 10 +
                     (json[index + 2] - 48);
-                int offsetMinutes = 
-                    (json[index + 4] - 48)*10 +
+                int offsetMinutes =
+                    (json[index + 4] - 48) * 10 +
                     (json[index + 5] - 48);
-                offset = new TimeSpan(offsetSign*offsetHours, offsetMinutes, 0);
+                offset = new TimeSpan(offsetSign * offsetHours, offsetMinutes, 0);
                 var localDateTime = new DateTimeOffset(year, month, day, hour, minute, second, offset).AddMilliseconds(milliseonds);
                 value = localDateTime;
                 return json.Slice(index + 7);
@@ -1212,63 +1277,63 @@ namespace JsonSrcGen
 
             json = json.SkipWhitespace();
 
-            if(json[0] != '\"')
+            if (json[0] != '\"')
             {
                 throw new InvalidJsonException($"Expected DateTime property to start with a quote but instead got '{json[0]}'", json);
             }
             json = json.Slice(1);
 
-            int year = 
-                (json[0] - 48)*1000 + 
-                (json[1] - 48)*100 +
-                (json[2] - 48)*10 +
+            int year =
+                (json[0] - 48) * 1000 +
+                (json[1] - 48) * 100 +
+                (json[2] - 48) * 10 +
                 (json[3] - 48);
             int month =
-                (json[5] - 48)*10 +
+                (json[5] - 48) * 10 +
                 (json[6] - 48);
             int day =
-                (json[8] - 48)*10 +
+                (json[8] - 48) * 10 +
                 (json[9] - 48);
 
-            if(json[index + 10] == '\"')
+            if (json[index + 10] == '\"')
             {
                 value = new DateTime(year, month, day);
                 return json.Slice(11);
             }
 
             int hour =
-                (json[11] - 48)*10 +
+                (json[11] - 48) * 10 +
                 (json[12] - 48);
 
             int minute =
-                (json[14] - 48)*10 +
+                (json[14] - 48) * 10 +
                 (json[15] - 48);
 
             int second =
-                (json[17] - 48)*10 +
+                (json[17] - 48) * 10 +
                 (json[18] - 48);
 
-            
+
             index += 19;
             var character = json[index];
-            if(character == '\"')
+            if (character == '\"')
             {
                 value = new DateTime(year, month, day, hour, minute, second);
                 return json.Slice(20);
             }
 
             double milliseonds = 0;
-            if(character == '.')
+            if (character == '.')
             {
                 index++;
                 //milliseconds
                 int subSeconds = 0;
                 int millisecondsStart = index;
-                
-                while(true)
+
+                while (true)
                 {
                     character = json[index];
-                    if(character >= '0' && character <= '9')
+                    if (character >= '0' && character <= '9')
                     {
                         subSeconds = (subSeconds * 10) + (character - 48);
                         index++;
@@ -1277,9 +1342,9 @@ namespace JsonSrcGen
                     {
                         int millisecondsLength = index - millisecondsStart;
                         double multiplier = 1;
-                        switch(millisecondsLength)
+                        switch (millisecondsLength)
                         {
-                            case 1: 
+                            case 1:
                                 multiplier = 100;
                                 break;
                             case 2:
@@ -1304,17 +1369,17 @@ namespace JsonSrcGen
                                 multiplier = 0.00001d;
                                 break;
                         }
-                        milliseonds = subSeconds*multiplier;
+                        milliseonds = subSeconds * multiplier;
                         break;
                     }
                 }
             }
             DateTimeKind kind = DateTimeKind.Unspecified;
-            if(character == '\"')
+            if (character == '\"')
             {
 
             }
-            else if(character == 'Z')
+            else if (character == 'Z')
             {
                 kind = DateTimeKind.Utc;
                 index++;
@@ -1322,13 +1387,13 @@ namespace JsonSrcGen
             else
             {
                 int offsetSign = character == '-' ? -1 : 1;
-                int offsetHours = 
-                    (json[index + 1] - 48)*10 +
+                int offsetHours =
+                    (json[index + 1] - 48) * 10 +
                     (json[index + 2] - 48);
-                int offsetMinutes = 
-                    (json[index + 4] - 48)*10 +
+                int offsetMinutes =
+                    (json[index + 4] - 48) * 10 +
                     (json[index + 5] - 48);
-                var offset = new TimeSpan(offsetSign*offsetHours, offsetMinutes, 0);
+                var offset = new TimeSpan(offsetSign * offsetHours, offsetMinutes, 0);
                 var localDateTime = new DateTimeOffset(year, month, day, hour, minute, second, offset).AddMilliseconds(milliseonds).LocalDateTime;
                 value = localDateTime;
                 return json.Slice(index + 7);
@@ -1344,11 +1409,11 @@ namespace JsonSrcGen
 
             json = json.SkipWhitespace();
 
-            switch(json[0])
+            switch (json[0])
             {
                 case 'n':
-                     value = null;
-                     return json.Slice(4);
+                    value = null;
+                    return json.Slice(4);
                 case '\"':
                     break;
                 default:
@@ -1357,57 +1422,57 @@ namespace JsonSrcGen
 
             json = json.Slice(1);
 
-            int year = 
-                (json[0] - 48)*1000 + 
-                (json[1] - 48)*100 +
-                (json[2] - 48)*10 +
+            int year =
+                (json[0] - 48) * 1000 +
+                (json[1] - 48) * 100 +
+                (json[2] - 48) * 10 +
                 (json[3] - 48);
             int month =
-                (json[5] - 48)*10 +
+                (json[5] - 48) * 10 +
                 (json[6] - 48);
             int day =
-                (json[8] - 48)*10 +
+                (json[8] - 48) * 10 +
                 (json[9] - 48);
 
-            if(json[index + 10] == '\"')
+            if (json[index + 10] == '\"')
             {
                 value = new DateTime(year, month, day);
                 return json.Slice(11);
             }
 
             int hour =
-                (json[11] - 48)*10 +
+                (json[11] - 48) * 10 +
                 (json[12] - 48);
 
             int minute =
-                (json[14] - 48)*10 +
+                (json[14] - 48) * 10 +
                 (json[15] - 48);
 
             int second =
-                (json[17] - 48)*10 +
+                (json[17] - 48) * 10 +
                 (json[18] - 48);
 
-            
+
             index += 19;
             var character = json[index];
-            if(character == '\"')
+            if (character == '\"')
             {
                 value = new DateTime(year, month, day, hour, minute, second);
                 return json.Slice(20);
             }
 
             double milliseonds = 0;
-            if(character == '.')
+            if (character == '.')
             {
                 index++;
                 //milliseconds
                 int subSeconds = 0;
                 int millisecondsStart = index;
-                
-                while(true)
+
+                while (true)
                 {
                     character = json[index];
-                    if(character >= '0' && character <= '9')
+                    if (character >= '0' && character <= '9')
                     {
                         subSeconds = (subSeconds * 10) + (character - 48);
                         index++;
@@ -1416,9 +1481,9 @@ namespace JsonSrcGen
                     {
                         int millisecondsLength = index - millisecondsStart;
                         double multiplier = 1;
-                        switch(millisecondsLength)
+                        switch (millisecondsLength)
                         {
-                            case 1: 
+                            case 1:
                                 multiplier = 100;
                                 break;
                             case 2:
@@ -1443,17 +1508,17 @@ namespace JsonSrcGen
                                 multiplier = 0.00001d;
                                 break;
                         }
-                        milliseonds = subSeconds*multiplier;
+                        milliseonds = subSeconds * multiplier;
                         break;
                     }
                 }
             }
             DateTimeKind kind = DateTimeKind.Unspecified;
-            if(character == '\"')
+            if (character == '\"')
             {
 
             }
-            else if(character == 'Z')
+            else if (character == 'Z')
             {
                 kind = DateTimeKind.Utc;
                 index++;
@@ -1461,13 +1526,13 @@ namespace JsonSrcGen
             else
             {
                 int offsetSign = character == '-' ? -1 : 1;
-                int offsetHours = 
-                    (json[index + 1] - 48)*10 +
+                int offsetHours =
+                    (json[index + 1] - 48) * 10 +
                     (json[index + 2] - 48);
-                int offsetMinutes = 
-                    (json[index + 4] - 48)*10 +
+                int offsetMinutes =
+                    (json[index + 4] - 48) * 10 +
                     (json[index + 5] - 48);
-                var offset = new TimeSpan(offsetSign*offsetHours, offsetMinutes, 0);
+                var offset = new TimeSpan(offsetSign * offsetHours, offsetMinutes, 0);
                 var localDateTime = new DateTimeOffset(year, month, day, hour, minute, second, offset).AddMilliseconds(milliseonds).LocalDateTime;
                 value = localDateTime;
                 return json.Slice(index + 7);
@@ -1479,7 +1544,7 @@ namespace JsonSrcGen
 
         public static byte FromHexChar(char character)
         {
-            switch(character)
+            switch (character)
             {
                 case '0': return 0;
                 case '1': return 1;
@@ -1503,7 +1568,7 @@ namespace JsonSrcGen
                 case 'E': return 14;
                 case 'f': return 15;
                 case 'F': return 15;
-                default: 
+                default:
                     throw new InvalidJsonException("character must be a hex value");
             }
         }
@@ -1512,22 +1577,22 @@ namespace JsonSrcGen
         {
             json.SkipWhitespace();
 
-            if(json[0] != '\"')
+            if (json[0] != '\"')
             {
                 throw new InvalidJsonException($"Expected DateTime property to start with a quote but instead got '{json[0]}'", json);
             }
             json = json.Slice(1);
 
             uint a =
-                ((uint)FromHexChar(json[0]) << 28) + 
-                ((uint)FromHexChar(json[1]) << 24) + 
+                ((uint)FromHexChar(json[0]) << 28) +
+                ((uint)FromHexChar(json[1]) << 24) +
                 (uint)(FromHexChar(json[2]) << 20) +
                 (uint)(FromHexChar(json[3]) << 16) +
                 (uint)(FromHexChar(json[4]) << 12) +
                 (uint)(FromHexChar(json[5]) << 8) +
                 (uint)(FromHexChar(json[6]) << 4) +
                 (uint)FromHexChar(json[7]);
-            
+
             ushort b = (ushort)
                 ((FromHexChar(json[9]) << 12) +
                 (FromHexChar(json[10]) << 8) +
@@ -1559,11 +1624,11 @@ namespace JsonSrcGen
         {
             json.SkipWhitespace();
 
-            switch(json[0])
+            switch (json[0])
             {
                 case 'n':
-                     value = null;
-                     return json.Slice(4);
+                    value = null;
+                    return json.Slice(4);
                 case '\"':
                     break;
                 default:
@@ -1572,15 +1637,15 @@ namespace JsonSrcGen
             json = json.Slice(1);
 
             uint a =
-                ((uint)FromHexChar(json[0]) << 28) + 
-                ((uint)FromHexChar(json[1]) << 24) + 
+                ((uint)FromHexChar(json[0]) << 28) +
+                ((uint)FromHexChar(json[1]) << 24) +
                 (uint)(FromHexChar(json[2]) << 20) +
                 (uint)(FromHexChar(json[3]) << 16) +
                 (uint)(FromHexChar(json[4]) << 12) +
                 (uint)(FromHexChar(json[5]) << 8) +
                 (uint)(FromHexChar(json[6]) << 4) +
                 (uint)FromHexChar(json[7]);
-            
+
             ushort b = (ushort)
                 ((FromHexChar(json[9]) << 12) +
                 (FromHexChar(json[10]) << 8) +
@@ -1607,5 +1672,7 @@ namespace JsonSrcGen
 
             return json.Slice(37);
         }
+
+
     }
 }

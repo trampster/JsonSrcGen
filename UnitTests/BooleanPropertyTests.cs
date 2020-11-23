@@ -32,7 +32,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json =JsonConverter.ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"IsFalse\":false,\"IsTrue\":true}"));
@@ -47,7 +47,7 @@ namespace UnitTests
             var jsonClass = new JsonBooleanClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+           JsonConverter.FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.IsTrue, Is.True);

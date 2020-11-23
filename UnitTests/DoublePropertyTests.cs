@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
-
+using System.Threading;
 
 namespace UnitTests
 {
@@ -28,6 +28,9 @@ namespace UnitTests
         [Test]
         public void ToJson_CorrectString()
         {
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-us");
+            Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture;
+
             //arrange
             var jsonClass = new JsonDoubleClass()
             {
@@ -39,7 +42,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json =JsonConverter.ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -48,12 +51,15 @@ namespace UnitTests
         [Test]
         public void FromJson_CorrectJsonClass()
         {
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-us");
+            Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture;
+
             //arrange
             var json = ExpectedJson;
             var jsonClass = new JsonDoubleClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+           JsonConverter.FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Age, Is.EqualTo(42.21d));

@@ -2,6 +2,7 @@ using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
 using System;
+using System.Threading;
 
 [assembly: JsonArray(typeof(double?))] 
 
@@ -9,24 +10,27 @@ namespace UnitTests.ArrayTests
 {
     public class NullableDoubleListTests
     { 
-        JsonSrcGen.JsonConverter _convert;
+        //JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[42.21,176.568,1.7976931348623157E+308,-1.7976931348623157E+308,null,0]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonConverter();
+          //  _convert = new JsonConverter();
         }
 
         [Test] 
         public void ToJson_CorrectString()
         {
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
+            Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture;
+
             //arrange
             var array = new double?[]{42.21d, 176.568d, double.MaxValue, double.MinValue, null, 0};
 
             //act
-            var json = _convert.ToJson(array);
+            var json = JsonConverter.ToJson(ref array);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -35,9 +39,10 @@ namespace UnitTests.ArrayTests
         [Test]
         public void ToJson_Null_CorrectString()
         {
+            var array = (double?[])null;
             //arrange
             //act
-            var json = _convert.ToJson((double?[])null);
+            var json = JsonConverter.ToJson(ref array);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));
@@ -50,7 +55,7 @@ namespace UnitTests.ArrayTests
             var array = new double?[]{};
 
             //act
-            array = _convert.FromJson(array, ExpectedJson);
+            JsonConverter.FromJson(ref array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(6));
@@ -69,7 +74,7 @@ namespace UnitTests.ArrayTests
             var array = new double?[]{1, 2, 3};
 
             //act
-            array =_convert.FromJson(array, ExpectedJson);
+            JsonConverter.FromJson(ref array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(6));
@@ -88,7 +93,7 @@ namespace UnitTests.ArrayTests
             var array = new double?[]{1, 2, 3};
 
             //act
-            array = _convert.FromJson(array, "null");
+            JsonConverter.FromJson(ref array, "null");
 
             //assert
             Assert.That(array, Is.Null);
@@ -97,9 +102,11 @@ namespace UnitTests.ArrayTests
         [Test]
         public void FromJson_ListNull_MakesList()
         {
+            var array = (double?[])null;
+
             //arrange
             //act
-            var array = _convert.FromJson((double?[])null, ExpectedJson);
+            JsonConverter.FromJson(ref array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(6));

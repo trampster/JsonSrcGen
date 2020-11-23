@@ -31,8 +31,8 @@ namespace JsonSrcGen.TypeGenerators
             listFieldName = $"_listBuilder{UniqueNumberGenerator.UniqueNumber}";
 
             _classLevelBuilder.AppendLine(2, "[ThreadStatic]");
-            _classLevelBuilder.AppendLine(2, $"List<{type.FullName}> {listFieldName};");
-            
+            _classLevelBuilder.AppendLine(2, $"List<{type.FullNameWithNullableAnnotation}>? {listFieldName};");
+
             _listLookup.Add(type.FullName, listFieldName);
             return listFieldName;
         }
@@ -100,7 +100,6 @@ namespace JsonSrcGen.TypeGenerators
 
             string arrayName = $"array{UniqueNumberGenerator.UniqueNumber}";
 
-            
             codeBuilder.AppendLine(indentLevel, $"if({builderFieldName} == null)");
             codeBuilder.AppendLine(indentLevel, "{");
             codeBuilder.AppendLine(indentLevel+1, valueSetter("null"));
@@ -129,14 +128,13 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, "}");
         }
 
-        int _listNumber = 0;
+       // int _listNumber = 0;
 
         public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull)
         {
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
-
-            string listName = $"list{_listNumber}"; 
-            _listNumber++;
+   
+            string listName = $"list{UniqueNumberGenerator.UniqueNumber}"; 
 
             codeBuilder.AppendLine(indentLevel, $"var {listName} = {valueGetter};");
 
@@ -156,8 +154,6 @@ namespace JsonSrcGen.TypeGenerators
             var generator = _getGeneratorForType(listElementType);
             appendBuilder.Append("[");
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
-
-
             
             codeBuilder.AppendLine(indentLevel, $"for(int index = 0; index < {valueGetter}.Length-1; index++)");
             codeBuilder.AppendLine(indentLevel, "{");

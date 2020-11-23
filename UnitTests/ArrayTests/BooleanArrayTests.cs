@@ -26,7 +26,7 @@ namespace UnitTests.ListTests
             var list = new bool[]{true, false};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = JsonConverter.ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -37,7 +37,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<bool>)null);
+            var json = JsonConverter.ToJson((List<bool>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));
@@ -50,7 +50,7 @@ namespace UnitTests.ListTests
             var array = new bool[0];
 
             //act
-            array = _convert.FromJson(array, ExpectedJson);
+            array = JsonConverter.FromJson(array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(2));
@@ -65,7 +65,7 @@ namespace UnitTests.ListTests
             var array = new bool[]{false, false, false};
 
             //act
-            array =_convert.FromJson(array, ExpectedJson);
+            array =JsonConverter.FromJson(array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(2));
@@ -80,7 +80,7 @@ namespace UnitTests.ListTests
             var array = new bool[]{false, false, false};
 
             //act
-            array = _convert.FromJson(array, "null");
+            array = JsonConverter.FromJson(array, "null");
 
             //assert
             Assert.That(array, Is.Null); 
@@ -91,7 +91,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var array = _convert.FromJson((bool[])null, ExpectedJson);
+            var array = JsonConverter.FromJson((bool[])null, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(2));

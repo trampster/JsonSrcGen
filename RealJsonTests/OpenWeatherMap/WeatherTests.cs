@@ -11,12 +11,12 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
     /// </summary>
     public class WeatherTests
     {
-        JsonConverter _converter;
+       // JsonConverter _converter;
 
         [SetUp]
         public void Setup()
         {
-            _converter = new JsonConverter();
+           // _converter = new JsonConverter();
         }
 
         [TestCase("Weather.json")]
@@ -28,7 +28,7 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, json);
+            JsonConverter.FromJson(weather, json);
 
             // assert
             Assert.That(weather.Latitude, Is.EqualTo(33.44f));
@@ -46,7 +46,7 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, json);
+            JsonConverter.FromJson(weather, json);
 
             // assert
             var current = weather.Current;
@@ -78,7 +78,7 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, json);
+            JsonConverter.FromJson(weather, json);
 
             // assert
             var minutely = weather.Minutely;
@@ -106,7 +106,7 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, json);
+            JsonConverter.FromJson(weather, json);
 
             // assert
             var hourly = weather.Hourly;
@@ -161,7 +161,7 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, json);
+            JsonConverter.FromJson(weather, json);
 
             // assert
             var daily = weather.Daily;
@@ -331,7 +331,7 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
 
 
             // act
-            var json = _converter.ToJson(weather);
+            var json = JsonConverter.ToJson(weather);
 
             // assert
             var jsonExpected = File.ReadAllText(Path.Combine("OpenWeatherMap", "WeatherToJson.json"));

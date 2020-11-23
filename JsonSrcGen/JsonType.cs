@@ -20,5 +20,9 @@ namespace JsonSrcGen
         public bool IsCustomType {get;}
         public bool CanBeNull {get;}
         public List<JsonType> GenericArguments {get;}
+
+        public bool IsReferenceType { get; }
+        public string NullibleReferenceTypeAnnotation => IsReferenceType ? "?" : "";
+        public string FullNameWithNullableAnnotation => $"{FullName}{NullibleReferenceTypeAnnotation}";
     }
 }

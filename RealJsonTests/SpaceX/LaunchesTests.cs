@@ -27,9 +27,10 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
         [Test]
         public void FromJson_CorrectCount()
         {
+            var launches = (Launch[])null;
             // arrange
             // act
-            var launches = _converter.FromJson((Launch[])null, _json);
+            JsonConverter.FromJson(ref launches, _json);
 
             // assert
             Assert.That(launches.Length, Is.EqualTo(113));
@@ -38,9 +39,10 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
         [Test]
         public void FromJson_CorrectFirstItem()
         {
+            var launches = (Launch[])null;
             // arrange
             // act
-            var launches = _converter.FromJson((Launch[])null, _json);
+             JsonConverter.FromJson(ref launches, _json);
 
             // assert
             Launch launch = launches[0];
@@ -103,9 +105,10 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
          [Test]
         public void FromJson_CorrectLastItem()
         {
+            var launches = (Launch[])null;
             // arrange
             // act
-            var launches = _converter.FromJson((Launch[])null, _json);
+             JsonConverter.FromJson(ref launches, _json);
 
             // assert
             Launch launch = launches.Last();
@@ -252,7 +255,7 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
             };
 
             // act
-            var json = _converter.ToJson(launch);
+            var json = JsonConverter.ToJson(launch);
 
             // assert
             Assert.That(json.ToString(), Is.EqualTo(File.ReadAllText(Path.Combine("SpaceX","Launch.json"))));

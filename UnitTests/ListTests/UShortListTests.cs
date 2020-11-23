@@ -9,14 +9,14 @@ namespace UnitTests.ListTests
 {
     public class UShortListTests
     { 
-        JsonSrcGen.JsonConverter _convert;
+        //JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[0,1,42,65535]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonConverter();
+          //  _convert = new JsonConverter();
         }
 
         [Test] 
@@ -26,7 +26,7 @@ namespace UnitTests.ListTests
             var list = new List<ushort>(){0, 1, 42, ushort.MaxValue};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = JsonConverter.ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson.ToString()));
@@ -37,7 +37,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<ushort>)null);
+            var json = JsonConverter.ToJson((List<ushort>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));
@@ -50,7 +50,7 @@ namespace UnitTests.ListTests
             var list = new List<ushort>();
 
             //act
-            _convert.FromJson(list, ExpectedJson);
+            JsonConverter.FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(4));
@@ -67,7 +67,7 @@ namespace UnitTests.ListTests
             var list = new List<ushort>(){1, 2, 3};
 
             //act
-            list =_convert.FromJson(list, ExpectedJson);
+            JsonConverter.FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(4));
@@ -84,7 +84,7 @@ namespace UnitTests.ListTests
             var list = new List<ushort>(){1, 2, 3};
 
             //act
-            list = _convert.FromJson(list, "null");
+            JsonConverter.FromJson(list, "null");
 
             //assert
             Assert.That(list, Is.Null);
@@ -93,9 +93,10 @@ namespace UnitTests.ListTests
         [Test]
         public void FromJson_ListNull_MakesList()
         {
-            //arrange
-            //act
-            var list = _convert.FromJson((List<ushort>)null, ExpectedJson);
+            var list = (List<ushort>)null;
+              //arrange
+              //act
+            JsonConverter.FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(4));

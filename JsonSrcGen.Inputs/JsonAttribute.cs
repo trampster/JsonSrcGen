@@ -2,8 +2,8 @@ using System;
 
 namespace JsonSrcGen
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    internal class JsonAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+    public class JsonAttribute : Attribute
     {
     }
 }

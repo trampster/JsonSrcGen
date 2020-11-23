@@ -45,6 +45,7 @@ namespace JsonSrcGen.TypeGenerators
             }
 
             codeBuilder.AppendLine(indentLevel, $"json = FromJson({valueGetter}, json);");
+
             indentLevel--;
             codeBuilder.AppendLine(indentLevel, "}");
         }

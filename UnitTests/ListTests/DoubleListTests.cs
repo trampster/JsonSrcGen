@@ -26,7 +26,7 @@ namespace UnitTests.ListTests
             var list = new List<double>(){42.21d, 176.568d, double.MaxValue, double.MinValue, 0};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = JsonConverter.ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -37,7 +37,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<double>)null);
+            var json = JsonConverter.ToJson((List<double>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));
@@ -50,7 +50,7 @@ namespace UnitTests.ListTests
             var list = new List<double>();
 
             //act
-            _convert.FromJson(list, ExpectedJson);
+            JsonConverter.FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(5));
@@ -68,7 +68,7 @@ namespace UnitTests.ListTests
             var list = new List<double>(){1, 2, 3};
 
             //act
-            list =_convert.FromJson(list, ExpectedJson);
+            list =JsonConverter.FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(5));
@@ -86,7 +86,7 @@ namespace UnitTests.ListTests
             var list = new List<double>(){1, 2, 3};
 
             //act
-            list = _convert.FromJson(list, "null");
+            list = JsonConverter.FromJson(list, "null");
 
             //assert
             Assert.That(list, Is.Null);
@@ -97,7 +97,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var list = _convert.FromJson((List<double>)null, ExpectedJson);
+            var list = JsonConverter.FromJson((List<double>)null, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(5));
