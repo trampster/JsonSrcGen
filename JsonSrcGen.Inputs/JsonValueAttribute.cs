@@ -9,6 +9,6 @@ namespace JsonSrcGen
         {
         }
 
-        public Type ListType {get;} = typeof(int);
+        public Type ListType {get;} = default;
     }
 }

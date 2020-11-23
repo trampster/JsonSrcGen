@@ -7,12 +7,12 @@ namespace UnitTests
 {
     public class IntValueTests
     {
-        JsonSrcGen.JsonConverter _convert;
+        //JsonSrcGen.JsonConverter _convert;
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonConverter();
+         //   _convert = new JsonConverter();
         }
 
         [TestCase(1, "1")]
@@ -35,8 +35,9 @@ namespace UnitTests
         {
             //arrange
             int value = 0;
+
             //act
-            value = JsonConverter.FromJson(value, json); 
+            JsonConverter.FromJson(ref value, json); 
 
             //assert
             Assert.That(value, Is.EqualTo(expectedValue));

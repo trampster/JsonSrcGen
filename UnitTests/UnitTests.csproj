@@ -9,17 +9,12 @@
 
   <ItemGroup>
     <Compile Remove="ListTests\**" />
-    <Compile Remove="ValueTests\**" />
     <EmbeddedResource Remove="ListTests\**" />
-    <EmbeddedResource Remove="ValueTests\**" />
     <None Remove="ListTests\**" />
-    <None Remove="ValueTests\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="ArrayPropertyTests.cs" />
     <Compile Remove="ArrayTests\BooleanArrayTests.cs" />
-    <Compile Remove="ArrayTests\CustomClassArrayTests.cs" />
     <Compile Remove="ArrayTests\DateTimeArrayTests.cs" />
   </ItemGroup>
 

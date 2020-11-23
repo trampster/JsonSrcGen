@@ -28,7 +28,6 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, "{");
             codeBuilder.AppendLine(indentLevel+1, "json = json.Slice(3);");
             codeBuilder.AppendLine(indentLevel+1, valueSetter("null"));
-           // codeBuilder.AppendLine(indentLevel+1, "value.Clear();");
             codeBuilder.AppendLine(indentLevel, "}");
             codeBuilder.AppendLine(indentLevel, "else");
             codeBuilder.AppendLine(indentLevel, "{");

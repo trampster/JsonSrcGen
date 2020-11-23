@@ -100,7 +100,6 @@ namespace JsonSrcGen.TypeGenerators
 
             string arrayName = $"array{UniqueNumberGenerator.UniqueNumber}";
 
-            
             codeBuilder.AppendLine(indentLevel, $"if({builderFieldName} == null)");
             codeBuilder.AppendLine(indentLevel, "{");
             codeBuilder.AppendLine(indentLevel+1, valueSetter("null"));
@@ -155,8 +154,6 @@ namespace JsonSrcGen.TypeGenerators
             var generator = _getGeneratorForType(listElementType);
             appendBuilder.Append("[");
             codeBuilder.MakeAppend(indentLevel, appendBuilder);
-
-
             
             codeBuilder.AppendLine(indentLevel, $"for(int index = 0; index < {valueGetter}.Length-1; index++)");
             codeBuilder.AppendLine(indentLevel, "{");

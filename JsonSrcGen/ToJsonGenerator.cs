@@ -19,7 +19,6 @@ namespace JsonSrcGen
             _getGeneratorForType = getGeneratorForType;
         }
 
-    
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
         {
             if (jsonClass.StructRef)
@@ -99,6 +98,7 @@ namespace JsonSrcGen
 
         public void GenerateArray(JsonType type, CodeBuilder codeBuilder) 
         {
+
             codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> ToJson(ref {type.Namespace}.{type.Name}[] value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);

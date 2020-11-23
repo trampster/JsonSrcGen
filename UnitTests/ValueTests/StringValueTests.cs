@@ -33,9 +33,10 @@ namespace UnitTests
         [TestCase("\"name\"", "\"\\\"name\\\"\"")]
         public void FromJson_CorrectJsonClass(string expectedValue, string json)
         {
+            string? value = (string)null;
             //arrange
             //act
-            string value = JsonConverter.FromJson((string)null, json); 
+            JsonConverter.FromJson(ref value, json); 
 
             //assert
             Assert.That(value, Is.EqualTo(expectedValue));

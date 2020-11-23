@@ -60,7 +60,7 @@ namespace JsonSrcGen
 
         public void GenerateValue(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref {type.Namespace}.{type.Name}{type.NullibleReferenceTypeAnnotation} value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson({type.Namespace}.{type.NullibleReferenceTypeAnnotation} value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
 
             var generator = _getGeneratorForType(type);

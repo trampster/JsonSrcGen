@@ -14,6 +14,7 @@ namespace JsonSrcGen
             CanBeNull = canBeNull;
             IsReferenceType = isReferenceType;
         }
+
         public string GeneratorId {get;}
         public string Name {get;}
         public string Namespace {get;}

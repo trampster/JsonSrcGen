@@ -59,7 +59,7 @@ namespace JsonSrcGen
                         "An exception was thrown by the JsonSrcGen generator: '{0}'",
                         "JsonSrcGen",
                         DiagnosticSeverity.Error,
-                        isEnabledByDefault: true),
+                        isEnabledByDefault: true), 
                     Location.None,
                     e.ToString() + e.StackTrace));
             }
@@ -69,7 +69,7 @@ namespace JsonSrcGen
 
         IJsonGenerator GetGeneratorForType(JsonType type)
         {
-            if (_generators.TryGetValue(type.GeneratorId, out var generator))
+            if(_generators.TryGetValue(type.GeneratorId, out var generator))
             {
                 return generator;
             }
@@ -88,14 +88,13 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("GenerationOutputFolderAttribute.cs", context, compilation, null);
 
             GenerationFolder = GetGenerationOutputFolder(receiver.CandidateAttributes, compilation);
-            if (!Directory.Exists(GenerationFolder))
+            if(!Directory.Exists(GenerationFolder))
             {
                 GenerationFolder = null;
             }
-
-            if (!string.IsNullOrEmpty(GenerationFolder))
+            if(!string.IsNullOrEmpty(GenerationFolder))
             {
-                if (File.Exists(Path.Combine(GenerationFolder, "output.log")))
+                if(File.Exists(Path.Combine(GenerationFolder, "output.log")))
                 {
                     File.Delete(Path.Combine(GenerationFolder, "output.log"));
                 }
@@ -116,7 +115,7 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("CustomConverterAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("IJsonBuilder.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonStringBuilder.cs", context, compilation, GenerationFolder);
-
+        
             var classBuilder = new CodeBuilder();
 
             classBuilder.Append(@"
@@ -124,18 +123,20 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 
+
 namespace JsonSrcGen
 {
+#nullable enable
     public class JsonConverter
     {
         [ThreadStatic]
-        private readonly static JsonStringBuilder Builder = new ();
+        private readonly static JsonStringBuilder? Builder = new ();
 ");
 
             //var classes = GetJsonClassInfo(receiver.CandidateClasses, compilation);
             var classes = GetJsonClassInfo(receiver.Targets, compilation);
 
-            var generators = new IJsonGenerator[]
+            var generators = new IJsonGenerator[] 
             {
                 new DateTimeGenerator(),
                 new DateTimeOffsetGenerator(),
@@ -148,7 +149,7 @@ namespace JsonSrcGen
                 new AppendReadGenerator("UInt64"),
                 new AppendReadGenerator("Int64"),
                 new AppendReadGenerator("Int16"),
-                new AppendReadGenerator("UInt16"),
+                new AppendReadGenerator("UInt16"), 
                 new AppendReadGenerator("Byte"),
                 new AppendReadGenerator("Double"),
                 new AppendReadGenerator("Decimal"),
@@ -173,12 +174,12 @@ namespace JsonSrcGen
             };
 
             _generators = new Dictionary<string, IJsonGenerator>();
-            foreach (var generator in generators)
+            foreach(var generator in generators)
             {
                 _generators.Add(generator.GeneratorId, generator);
             }
 
-            foreach (var customClass in classes)
+            foreach(var customClass in classes)
             {
                 _generators.Add(customClass.FullName, new CustomTypeGenerator(customClass.FullName));
             }
@@ -248,6 +249,8 @@ namespace JsonSrcGen
 
             classBuilder.AppendLine(1, "}");
             classBuilder.AppendLine(0, "}");
+            classBuilder.AppendLine(0, "#nullable restore");
+            
 
             if (GenerationFolder != null)
             {
@@ -261,7 +264,6 @@ namespace JsonSrcGen
                 }
             }
 
-          //  System.Diagnostics.Debugger.Launch();
             context.AddSource("JsonConverter", SourceText.From(classBuilder.ToString(), Encoding.UTF8));
         }
 
@@ -277,8 +279,8 @@ namespace JsonSrcGen
         Compilation GenerateFromResource(string name, GeneratorExecutionContext context, Compilation compilation, string GenerationFolder)
         {
             var assembly = typeof(JsonGenerator).Assembly;
-            using (Stream resource = assembly.GetManifestResourceStream($"JsonSrcGen.{name}"))
-            using (StreamReader reader = new StreamReader(resource))
+            using(Stream resource = assembly.GetManifestResourceStream($"JsonSrcGen.{name}"))
+            using(StreamReader reader = new StreamReader(resource))
             {
                 string content = reader.ReadToEnd();
                 context.AddSource(name, SourceText.From(content, Encoding.UTF8));
@@ -286,13 +288,13 @@ namespace JsonSrcGen
                 CSharpParseOptions options = (context.Compilation as CSharpCompilation).SyntaxTrees[0].Options as CSharpParseOptions;
                 compilation = compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(SourceText.From(content, Encoding.UTF8), options));
 
-                if (GenerationFolder != null)
+                if(GenerationFolder != null)
                 {
                     try
                     {
                         File.WriteAllText(Path.Combine(GenerationFolder, name), content);
                     }
-                    catch (DirectoryNotFoundException)
+                    catch(DirectoryNotFoundException)
                     {
                         //Don't fail the generation as this makes the CI Unit Tests fail
                     }
@@ -305,20 +307,20 @@ namespace JsonSrcGen
         IReadOnlyCollection<JsonType> GetListAttributesInfo(List<AttributeSyntax> attributeDeclarations, Compilation compilation)
         {
             var listTypes = new List<JsonType>();
-            foreach (var attribute in attributeDeclarations)
+            foreach(var attribute in attributeDeclarations)
             {
-                if (attribute.Name.ToString().Contains("JsonList"))
+                if(attribute.Name.ToString() == "JsonList") 
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 
                     foreach (AttributeArgumentSyntax arg in attribute.ArgumentList.Arguments)
                     {
                         ExpressionSyntax expr = arg.Expression;
-                        if (expr is TypeOfExpressionSyntax typeofExpr)
+                        if(expr is TypeOfExpressionSyntax typeofExpr)
                         {
                             TypeSyntax typeSyntax = typeofExpr.Type;
                             var typeInfo = model.GetTypeInfo(typeSyntax);
-                            var jsonType = GetType(typeInfo.Type);
+                            var jsonType = GetType(typeInfo.Type, model);
                             listTypes.Add(jsonType);
                         }
                     }
@@ -329,9 +331,9 @@ namespace JsonSrcGen
 
         string GetGenerationOutputFolder(List<AttributeSyntax> attributeDeclarations, Compilation compilation)
         {
-            foreach (AttributeSyntax attribute in attributeDeclarations)
+            foreach(AttributeSyntax attribute in attributeDeclarations)
             {
-                if (attribute.Name.ToString().Contains("GenerationOutputFolder"))
+                if(attribute.Name.ToString() == "GenerationOutputFolder") 
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
                     foreach (AttributeArgumentSyntax arg in attribute.ArgumentList.Arguments)
@@ -351,13 +353,13 @@ namespace JsonSrcGen
         IReadOnlyCollection<(JsonType, JsonType)> GetDictionaryAttributesInfo(List<AttributeSyntax> attributeDeclarations, Compilation compilation)
         {
             var listTypes = new List<(JsonType, JsonType)>();
-            foreach (var attribute in attributeDeclarations)
+            foreach(var attribute in attributeDeclarations)
             {
-                if (attribute.Name.ToString().Contains("JsonDictionary"))
+                if(attribute.Name.ToString() == "JsonDictionary") 
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
                     var keyType = GetJsonType(attribute.ArgumentList.Arguments[0], model);
-                    if (keyType.FullName != "System.String")
+                    if(keyType.FullName != "System.String")
                     {
                         throw new NotSupportedException("JsonSrcGen only supports Dictionary with String keys.");
                     }
@@ -371,11 +373,11 @@ namespace JsonSrcGen
         JsonType GetJsonType(AttributeArgumentSyntax attributeArgumentSyntax, SemanticModel model)
         {
             ExpressionSyntax expr = attributeArgumentSyntax.Expression;
-            if (expr is TypeOfExpressionSyntax typeofExpr)
+            if(expr is TypeOfExpressionSyntax typeofExpr)
             {
                 TypeSyntax typeSyntax = typeofExpr.Type;
                 var typeInfo = model.GetTypeInfo(typeSyntax);
-                var jsonType = GetType(typeInfo.Type);
+                var jsonType = GetType(typeInfo.Type, model);
                 return jsonType;
             }
             return null;
@@ -384,20 +386,20 @@ namespace JsonSrcGen
         IReadOnlyCollection<JsonType> GetValueAttributesInfo(List<AttributeSyntax> attributeDeclarations, Compilation compilation)
         {
             var arrayTypes = new List<JsonType>();
-            foreach (var attribute in attributeDeclarations)
+            foreach(var attribute in attributeDeclarations)
             {
-                if (attribute.Name.ToString().Contains("JsonValue"))
+                if(attribute.Name.ToString() == "JsonValue") 
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 
                     foreach (AttributeArgumentSyntax arg in attribute.ArgumentList.Arguments)
                     {
                         ExpressionSyntax expr = arg.Expression;
-                        if (expr is TypeOfExpressionSyntax typeofExpr)
+                        if(expr is TypeOfExpressionSyntax typeofExpr)
                         {
                             TypeSyntax typeSyntax = typeofExpr.Type;
                             var typeInfo = model.GetTypeInfo(typeSyntax);
-                            var jsonType = GetType(typeInfo.Type);
+                            var jsonType = GetType(typeInfo.Type, model);
                             arrayTypes.Add(jsonType);
                         }
                     }
@@ -409,20 +411,20 @@ namespace JsonSrcGen
         IReadOnlyCollection<JsonType> GetArrayAttributesInfo(List<AttributeSyntax> attributeDeclarations, Compilation compilation)
         {
             var arrayTypes = new List<JsonType>();
-            foreach (var attribute in attributeDeclarations)
+            foreach(var attribute in attributeDeclarations)
             {
-                if (attribute.Name.ToString().Contains("JsonArray"))
+                if(attribute.Name.ToString() == "JsonArray") 
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 
                     foreach (AttributeArgumentSyntax arg in attribute.ArgumentList.Arguments)
                     {
                         ExpressionSyntax expr = arg.Expression;
-                        if (expr is TypeOfExpressionSyntax typeofExpr)
+                        if(expr is TypeOfExpressionSyntax typeofExpr)
                         {
                             TypeSyntax typeSyntax = typeofExpr.Type;
                             var typeInfo = model.GetTypeInfo(typeSyntax);
-                            var jsonType = GetType(typeInfo.Type);
+                            var jsonType = GetType(typeInfo.Type, model);
                             arrayTypes.Add(jsonType);
                         }
                     }
@@ -484,7 +486,7 @@ namespace JsonSrcGen
                         }
 
                         string codePropertyName = member.Name;
-                        var jsonPropertyType = GetType(member);
+                        var jsonPropertyType = GetType(member, model);
                         jsonProperties.Add(new JsonProperty(jsonPropertyType, jsonPropertyName ?? codePropertyName, codePropertyName, hasOptionalAttribute));
                     }
 
@@ -500,6 +502,7 @@ namespace JsonSrcGen
 
             foreach (var candidateClass in classDeclarations)
             {
+
                 SemanticModel model = compilation.GetSemanticModel(candidateClass.SyntaxTree);
                 var classSymbol = model.GetDeclaredSymbol(candidateClass);
 
@@ -508,32 +511,32 @@ namespace JsonSrcGen
                     string converterClassName = classSymbol.Name;
                     string converterNamespace = classSymbol.ContainingNamespace.ToString();
 
-                    var targetType = GetCustomConverterTargetType(classSymbol);
+                    var targetType = GetCustomConverterTargetType(classSymbol, model);
 
-                    if (ImplementsInterface(classSymbol, "JsonSrcGen.ICustomConverter"))
+                    if(ImplementsInterface(classSymbol, "JsonSrcGen.ICustomConverter"))
                     {
                         customTypeConverters.Add(new CustomConverterGenerator(
-                            targetType.GeneratorId,
-                            targetType.FullName,
-                            $"{converterNamespace}.{converterClassName}",
+                            targetType.GeneratorId, 
+                            targetType.FullName, 
+                            $"{converterNamespace}.{converterClassName}", 
                             new CodeBuilder()));
                     }
                 }
             }
-            return customTypeConverters;
+            return customTypeConverters; 
         }
 
         bool ImplementsInterface(INamedTypeSymbol symbol, string interfaceFullName)
         {
-            foreach (var interfaceSymbol in symbol.Interfaces)
+            foreach(var interfaceSymbol in symbol.Interfaces)
             {
                 string actualInterfaceFullName = $"{interfaceSymbol.ContainingNamespace}.{interfaceSymbol.Name}";
-
-                if (actualInterfaceFullName == interfaceFullName)
+                
+                if(actualInterfaceFullName == interfaceFullName)
                 {
                     return true;
                 }
-                if (ImplementsInterface(interfaceSymbol, interfaceFullName))
+                if(ImplementsInterface(interfaceSymbol, interfaceFullName))
                 {
                     return true;
                 }
@@ -556,63 +559,63 @@ namespace JsonSrcGen
             return symbol.GetAttributes().Any(ad => ad.AttributeClass.Name == "CustomConverterAttribute" && ad.AttributeClass.ContainingNamespace.Name == "JsonSrcGen");
         }
 
-        JsonType GetCustomConverterTargetType(ISymbol symbol)
+        JsonType GetCustomConverterTargetType(ISymbol symbol, SemanticModel semanticModel)
         {
-            var query =
+            var query = 
                 from attribute in symbol.GetAttributes()
                 where attribute.AttributeClass.Name == "CustomConverterAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen"
                 select attribute.ConstructorArguments.First().Value;
             var type = query.First();
             var typeSymbol = type as ITypeSymbol;
-            if (typeSymbol == null)
+            if(typeSymbol == null)
             {
                 throw new InvalidOperationException("CustomConverter parameter must be a type");
             }
-            return GetType(typeSymbol);
+            return GetType(typeSymbol, semanticModel);
         }
 
-        JsonType GetType(ISymbol symbol)
+        JsonType GetType(ISymbol symbol, SemanticModel semanticModel)
         {
             var property = symbol as IPropertySymbol;
-            if (property != null)
+            if(property != null)
             {
-                return GetType(property.Type);
+                return GetType(property.Type, semanticModel);
             }
             throw new Exception($"unsupported member type {symbol} {symbol.GetType()}");
         }
 
-        JsonType GetType(ITypeSymbol typeSymbol)
+        JsonType GetType(ITypeSymbol typeSymbol, SemanticModel semanticModel)
         {
-            if (typeSymbol.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
+            if(typeSymbol.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
             {
                 var namedType = typeSymbol as INamedTypeSymbol;
-                if (namedType != null)
+                if(namedType != null)
                 {
                     string name = $"{namedType.TypeArguments.First().Name}?";
-                    return new JsonType(name, name, FullNamespace(namedType.TypeArguments.First()), false, GetGenericArguments(typeSymbol), true);
+                    return new JsonType(name, name, FullNamespace(namedType.TypeArguments.First()), false, GetGenericArguments(typeSymbol, semanticModel), true, false);
                 }
             }
-            if (typeSymbol.TypeKind == TypeKind.Array)
+            if(typeSymbol.TypeKind == TypeKind.Array)
             {
                 var arraySymbol = typeSymbol as IArrayTypeSymbol;
-                return new JsonType("Array", "", "", false, new List<JsonType>() { GetType(arraySymbol.ElementType) }, true);
+                return new JsonType("Array", "", "", false, new List<JsonType>(){GetType(arraySymbol.ElementType, semanticModel)}, true, true);
             }
-            bool canBeNull = typeSymbol.IsReferenceType;
+            bool canBeNull = typeSymbol.IsReferenceType; 
             bool isCustomType = HasJsonClassAttribute(typeSymbol);
-            return new JsonType(isCustomType ? $"{typeSymbol.ContainingNamespace}.{typeSymbol.Name}" : typeSymbol.Name, typeSymbol.Name, FullNamespace(typeSymbol), isCustomType, GetGenericArguments(typeSymbol), canBeNull);
+            return new JsonType(isCustomType ? $"{typeSymbol.ContainingNamespace}.{typeSymbol.Name}" : typeSymbol.Name, typeSymbol.Name, FullNamespace(typeSymbol), isCustomType, GetGenericArguments(typeSymbol, semanticModel), canBeNull, typeSymbol.IsReferenceType);
         }
 
         string FullNamespace(ITypeSymbol symbol)
         {
             var namespaceBuilder = new List<string>();
-            var containingNamespace = symbol.ContainingNamespace;
-            while (true)
+            var containingNamespace  = symbol.ContainingNamespace;
+            while(true)
             {
-                if (containingNamespace.Name != "")
+                if(containingNamespace.Name != "")
                 {
                     namespaceBuilder.Add(containingNamespace.Name);
                 }
-                if (containingNamespace.ContainingNamespace != null)
+                if(containingNamespace.ContainingNamespace != null)
                 {
                     containingNamespace = containingNamespace.ContainingNamespace;
                     continue;
@@ -625,15 +628,15 @@ namespace JsonSrcGen
             return fullNamespace;
         }
 
-        List<JsonType> GetGenericArguments(ITypeSymbol typeSymbol)
+        List<JsonType> GetGenericArguments(ITypeSymbol typeSymbol, SemanticModel model)
         {
             var list = new List<JsonType>();
             var namedType = typeSymbol as INamedTypeSymbol;
-            if (namedType != null)
+            if(namedType != null)
             {
-                foreach (var typeArgument in namedType.TypeArguments)
+                foreach(var typeArgument in namedType.TypeArguments)
                 {
-                    list.Add(GetType(typeArgument));
+                    list.Add(GetType(typeArgument, model));
                 }
             }
             return list;

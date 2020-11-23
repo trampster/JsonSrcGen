@@ -48,7 +48,7 @@ namespace CustomConverterTests
             var dateTime = DateTime.MinValue;
 
             //act
-            var json = new JsonConverter().ToJson(new CustomClass(){DateTime=dateTime}); 
+            var json = JsonConverter.ToJson(new CustomClass(){DateTime=dateTime}); 
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo($"{{\"DateTime\":\"{dateTime}\"}}"));
@@ -61,7 +61,7 @@ namespace CustomConverterTests
             var customClass = new CustomClass();
 
             //act
-            new JsonConverter().FromJson(customClass, "{\"DateTime\":\"1/01/0001 12:00:00 AM\"}"); 
+            JsonConverter.FromJson(customClass, "{\"DateTime\":\"1/01/0001 12:00:00 AM\"}"); 
 
             //assert
             Assert.That(customClass.DateTime, Is.EqualTo(DateTime.MinValue));

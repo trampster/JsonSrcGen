@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Linq;
 using System;
+using System.Threading;
 
 namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
 {
@@ -206,6 +207,9 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
         [Test]
         public void ToJsonReduced_CorrectJson()
         {
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
+            Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture;
+
             // arrange
             Weather weather = new Weather()
             {

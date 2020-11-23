@@ -46,7 +46,7 @@ namespace CustomConverterTests
             var dateTime = DateTime.MinValue;
 
             //act
-            var json = new JsonConverter().ToJson(new CustomStringClass(){Property="upercase"}); 
+            var json = JsonConverter.ToJson(new CustomStringClass(){Property="upercase"}); 
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"Property\":\"UPERCASE\"}"));
@@ -59,7 +59,7 @@ namespace CustomConverterTests
             var customClass = new CustomStringClass();
 
             //act
-            new JsonConverter().FromJson(customClass, "{\"DateTime\":\"UPERCASE\"}"); 
+            JsonConverter.FromJson(customClass, "{\"DateTime\":\"UPERCASE\"}"); 
 
             //assert
             Assert.That(customClass.Property, Is.EqualTo("upercase"));

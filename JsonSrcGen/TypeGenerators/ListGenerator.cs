@@ -41,6 +41,9 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel+1, $"{valueGetter}.Clear();");
             codeBuilder.AppendLine(indentLevel, "}");
 
+            
+
+            
             Func<string, string> listAdder = value => $"{valueGetter}.Add({value});";
 
             codeBuilder.AppendLine(indentLevel, "while(true)");
@@ -80,12 +83,12 @@ namespace JsonSrcGen.TypeGenerators
 
             _listNumber++;
             string listName = $"list{_listNumber}"; 
-
+   
             codeBuilder.AppendLine(indentLevel, $"var {listName} = {valueGetter};");
 
             if(canBeNull)
             {
-                codeBuilder.AppendLine(indentLevel, $"if({valueGetter} == null)");
+                codeBuilder.AppendLine(indentLevel, $"if({listName} == null)");
                 codeBuilder.AppendLine(indentLevel, "{");
                 appendBuilder.Append("null");
                 codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
