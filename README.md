@@ -110,7 +110,7 @@ public class MyJsonType
 
 **Set Property to default if missing**
 
-By default JsonSrcGen doesn't set properties to there default value if they are missing in the JSON. If you alwasy give FromJson a new instance this isn't a problem. However if you reused objects (which is a big performance boost) then the property wont get set unless present in the Json. If you want JsonSrcGen to set missing properties to default then you can specify this using the JsonOptionalAttribute
+By default JsonSrcGen doesn't set properties to there default value if they are missing in the JSON. If you always give FromJson a new instance this isn't a problem. However if you reused objects (which is a big performance boost) then the property wont get set unless present in the Json. If you want JsonSrcGen to set missing properties to default then you can specify this using the JsonOptionalAttribute
 
 ```csharp
 public class MyJsonType
