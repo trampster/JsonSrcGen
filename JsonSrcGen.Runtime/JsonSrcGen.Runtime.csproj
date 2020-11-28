@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.1.0.0-alpha.1</Version>
-    <AssemblyVersion>1.1.0.0-alpha.1</AssemblyVersion>
+    <Version>1.1.0.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <PackageVersion>1.1.0.0-alpha.1</PackageVersion>
     <PackageId>JsonSrcGen.Runtime</PackageId>
     <Authors>Daniel Hughes</Authors>
