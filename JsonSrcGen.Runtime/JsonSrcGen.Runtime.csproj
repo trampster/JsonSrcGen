@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>1.1.0.0-alpha.1</Version>
+    <AssemblyVersion>1.1.0.0-alpha.1</AssemblyVersion>
+    <PackageVersion>1.1.0.0-alpha.1</PackageVersion>
+    <PackageId>JsonSrcGen.Runtime</PackageId>
+    <Authors>Daniel Hughes</Authors>
+    <Description>
+        Runtime dependency of JsonSrcGen. Provides fixed functionality and
+        helper methods are can't be part of the generated code.
+    </Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright © Daniel Hughes 2020</Copyright>
+    <PackageProjectUrl>https://github.com/trampster/JsonSrcGen</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/trampster/JsonSrcGen</RepositoryUrl>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+</Project>
