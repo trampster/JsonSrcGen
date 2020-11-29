@@ -18,7 +18,7 @@ namespace JsonSrcGen
 
         public void GenerateList(JsonType type, CodeBuilder codeBuilder)
         {
-            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(List<{type.Namespace}.{type.FullNameWithNullableAnnotation}>? value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref List<{type.FullName}> value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
             
             var arrayJsonType = new JsonType("List", "List", "System.Coolection.Generic", false, new List<JsonType>(){type}, true, true);
@@ -32,7 +32,7 @@ namespace JsonSrcGen
 
         public void GenerateDictionary(JsonType keyType, JsonType valueType, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref Dictionary<{keyType.FullName}, {valueType.FullName}>? value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref Dictionary<{keyType.FullName}, {valueType.FullName}> value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
             
             var arrayJsonType = new JsonType("Dictionary", "Dictionary", "System.Coolection.Generic", false, new List<JsonType>(){keyType, valueType}, true, true);
@@ -46,7 +46,7 @@ namespace JsonSrcGen
 
         public void GenerateArray(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref {type.Namespace}.{type.Name}{type.NullibleReferenceTypeAnnotation}[]? value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref {type.FullName}[] value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
 
             var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true, true);
@@ -60,7 +60,7 @@ namespace JsonSrcGen
 
         public void GenerateValue(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref {type.Namespace}.{type.Name}{type.NullibleReferenceTypeAnnotation} value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref {type.FullName} value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
 
             var generator = _getGeneratorForType(type);
@@ -80,11 +80,11 @@ namespace JsonSrcGen
 
             if (jsonClass.StructRef)
             {
-                codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref {jsonClass.Namespace}.{jsonClass.Name} value, ReadOnlySpan<char> json)");
+                codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson(ref {jsonClass.FullName} value, ReadOnlySpan<char> json)");
             }
             else
             {
-                codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson({jsonClass.Namespace}.{jsonClass.Name} value, ReadOnlySpan<char> json)");
+                codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> FromJson({jsonClass.FullName} value, ReadOnlySpan<char> json)");
             }
 
             codeBuilder.AppendLine(2, "{");

@@ -8,14 +8,30 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="ListTests\**" />
-    <EmbeddedResource Remove="ListTests\**" />
-    <None Remove="ListTests\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="ArrayTests\BooleanArrayTests.cs" />
+    <Compile Remove="ArrayTests\ByteArrayTests.cs" />
     <Compile Remove="ArrayTests\DateTimeArrayTests.cs" />
+    <Compile Remove="ListTests\ByteListTests.cs" />
+    <Compile Remove="ListTests\CustomClassListTests.cs" />
+    <Compile Remove="ListTests\DateTimeListTests.cs" />
+    <Compile Remove="ListTests\DoubleListTests.cs" />
+    <Compile Remove="ListTests\FloatListTests.cs" />
+    <Compile Remove="ListTests\GuidListTests.cs" />
+    <Compile Remove="ListTests\LongListTests.cs" />
+    <Compile Remove="ListTests\NulalbleDoubleListTests.cs" />
+    <Compile Remove="ListTests\NullableBooleanListTests.cs" />
+    <Compile Remove="ListTests\NullableByteListTests.cs" />
+    <Compile Remove="ListTests\NullableDateTimeListTests.cs" />
+    <Compile Remove="ListTests\NullableFloatListTests.cs" />
+    <Compile Remove="ListTests\NullableGuidListTests.cs" />
+    <Compile Remove="ListTests\NullableLongListTests.cs" />
+    <Compile Remove="ListTests\NullableShortListTests.cs" />
+    <Compile Remove="ListTests\NullableUIntListTests.cs" />
+    <Compile Remove="ListTests\NullableUShortListTests.cs" />
+    <Compile Remove="ListTests\ShortListTests.cs" />
+    <Compile Remove="ListTests\StringListTests.cs" />
+    <Compile Remove="ListTests\UIntListTests.cs" />
+    <Compile Remove="ListTests\ULongListTests.cs" />
+    <Compile Remove="ListTests\UShortListTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -84,7 +84,7 @@ namespace JsonSrcGen
 
         public void GenerateList(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> ToJson(List<{type.Namespace}.{type.Name}> value)");
+            codeBuilder.AppendLine(2, $"public static ReadOnlySpan<char> ToJson(List<{type.FullName}> value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 

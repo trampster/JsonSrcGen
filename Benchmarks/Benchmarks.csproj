@@ -37,10 +37,4 @@
 	  <ProjectReference Include="..\..\..\..\Fontes\JsonSrcGen\JsonSrcGen\JsonSrcGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Reference Include="Jil5">
-			<HintPath>..\..\..\Jil-master\Jil-master\Jil\bin\Release\net5\Jil5.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-
 </Project>

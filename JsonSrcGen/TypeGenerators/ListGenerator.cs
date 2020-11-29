@@ -34,7 +34,7 @@ namespace JsonSrcGen.TypeGenerators
 
             codeBuilder.AppendLine(indentLevel, $"if({valueGetter} == null)");
             codeBuilder.AppendLine(indentLevel, "{");
-            codeBuilder.AppendLine(indentLevel+1, valueSetter($"new List<{listElementType.FullName}{listElementType.NullibleReferenceTypeAnnotation}>()"));
+            codeBuilder.AppendLine(indentLevel+1, valueSetter($"new List<{listElementType.FullName}>()"));
             codeBuilder.AppendLine(indentLevel, "}");
             codeBuilder.AppendLine(indentLevel, "else");
             codeBuilder.AppendLine(indentLevel, "{");

@@ -3,8 +3,6 @@ using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using SST = ServiceStack.Text;
 
-[assembly: JsonSrcGen.JsonArray(typeof(int))]
-
 namespace Benchmarks
 {
     [RankColumn]

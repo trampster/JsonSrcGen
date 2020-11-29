@@ -6,6 +6,8 @@ namespace JsonSrcGen
     {
         public JsonType(string generatorId, string name, string typeNamespace, bool isCustomType, List<JsonType> genericArguments, bool canBeNull, bool isReferenceType)
         {
+           
+
             GeneratorId = generatorId;
             Name = name;
             Namespace = typeNamespace;

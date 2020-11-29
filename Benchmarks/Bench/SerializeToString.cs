@@ -84,7 +84,7 @@ namespace Benchmarks
         public string SourceGENStruct2()
         {
             JsonStruct2 instance2 = new();
-            return JsonSrcGen.JsonConverter.ToJson(instance2).ToString();
+            return JsonSrcGen.JsonConverter.ToJson(ref instance2).ToString();
         }
 
         [Benchmark]

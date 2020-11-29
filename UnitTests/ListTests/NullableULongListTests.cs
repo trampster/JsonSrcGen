@@ -9,14 +9,14 @@ namespace UnitTests.ListTests
 {
     public class NullableULongListTests
     { 
-        JsonSrcGen.JsonConverter _convert;
+       // JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[0,1,42,null,18446744073709551615]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonConverter();
+           // _convert = new JsonConverter();
         }
 
         [Test] 
@@ -35,9 +35,10 @@ namespace UnitTests.ListTests
         [Test]
         public void ToJson_Null_CorrectString()
         {
+            var list = (List<ulong?>)null;
             //arrange
             //act
-            var json = JsonConverter.ToJson((List<ulong?>)null);
+            var json = JsonConverter.ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));
@@ -50,7 +51,7 @@ namespace UnitTests.ListTests
             var list = new List<ulong?>();
 
             //act
-            JsonConverter.FromJson(list, ExpectedJson);
+            JsonConverter.FromJson(ref list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(5));
@@ -68,7 +69,7 @@ namespace UnitTests.ListTests
             var list = new List<ulong?>(){1, 2, 3};
 
             //act
-            list =JsonConverter.FromJson(list, ExpectedJson);
+            JsonConverter.FromJson(ref list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(5));
@@ -86,7 +87,7 @@ namespace UnitTests.ListTests
             var list = new List<ulong?>(){1, 2, 3};
 
             //act
-            list = JsonConverter.FromJson(list, "null");
+            JsonConverter.FromJson(ref list, "null");
 
             //assert
             Assert.That(list, Is.Null);
@@ -95,9 +96,10 @@ namespace UnitTests.ListTests
         [Test]
         public void FromJson_ListNull_MakesList()
         {
+            var list = (List<ulong?>)null;
             //arrange
             //act
-            var list = JsonConverter.FromJson((List<ulong?>)null, ExpectedJson);
+            JsonConverter.FromJson(ref list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(5));

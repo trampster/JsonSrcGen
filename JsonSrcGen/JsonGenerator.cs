@@ -132,8 +132,6 @@ namespace JsonSrcGen
         [ThreadStatic]
         private readonly static JsonStringBuilder? Builder = new ();
 ");
-
-            //var classes = GetJsonClassInfo(receiver.CandidateClasses, compilation);
             var classes = GetJsonClassInfo(receiver.Targets, compilation);
 
             var generators = new IJsonGenerator[] 
@@ -309,7 +307,7 @@ namespace JsonSrcGen
             var listTypes = new List<JsonType>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonList") 
+                if(attribute.Name.ToString().Contains("JsonList")) 
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 
@@ -355,7 +353,7 @@ namespace JsonSrcGen
             var listTypes = new List<(JsonType, JsonType)>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonDictionary") 
+                if(attribute.Name.ToString().Contains("JsonDictionary"))
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
                     var keyType = GetJsonType(attribute.ArgumentList.Arguments[0], model);
@@ -388,7 +386,7 @@ namespace JsonSrcGen
             var arrayTypes = new List<JsonType>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonValue") 
+                if(attribute.Name.ToString().Contains("JsonValue"))
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 
@@ -413,7 +411,7 @@ namespace JsonSrcGen
             var arrayTypes = new List<JsonType>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonArray") 
+                if(attribute.Name.ToString().Contains("JsonArray"))
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 

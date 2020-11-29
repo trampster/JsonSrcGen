@@ -3,45 +3,46 @@ using JsonSrcGen;
 using System.Collections.Generic;
 using System;
 
-[assembly: JsonArray(typeof(bool))]
+[assembly: JsonSrcGen.JsonArray(typeof(bool))]
 
 namespace UnitTests.ListTests
 {
     public class BooleanArrayTests
     { 
-        JsonSrcGen.JsonConverter _convert;
+       // JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[true,false]";
 
         [SetUp]
         public void Setup()
         {
-            _convert = new JsonConverter();
+          //  _convert = new JsonConverter();
         }
 
         [Test] 
         public void ToJson_CorrectString()
         {
             //arrange
-            var list = new bool[]{true, false};
+            var array = new bool[]{true, false};
 
             //act
-            var json = JsonConverter.ToJson(list);
+            var json = JsonConverter.ToJson(ref array);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
         } 
 
-        [Test]
-        public void ToJson_Null_CorrectString()
-        {
-            //arrange
-            //act
-            var json = JsonConverter.ToJson((List<bool>)null);
+        //[Test]
+        //public void ToJson_Null_CorrectString()
+        //{
+        //    var array = (List<bool>)null;
+        //    //arrange
+        //    //act
+        //    var json = JsonConverter.ToJson(ref );
 
-            //assert
-            Assert.That(json.ToString(), Is.EqualTo("null"));
-        }
+        //    //assert
+        //    Assert.That(json.ToString(), Is.EqualTo("null"));
+        //}
 
         [Test]
         public void FromJson_EmptyList_CorrectList()
@@ -50,7 +51,7 @@ namespace UnitTests.ListTests
             var array = new bool[0];
 
             //act
-            array = JsonConverter.FromJson(array, ExpectedJson);
+            JsonConverter.FromJson(ref array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(2));
@@ -65,7 +66,7 @@ namespace UnitTests.ListTests
             var array = new bool[]{false, false, false};
 
             //act
-            array =JsonConverter.FromJson(array, ExpectedJson);
+            JsonConverter.FromJson(ref array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(2));
@@ -80,7 +81,7 @@ namespace UnitTests.ListTests
             var array = new bool[]{false, false, false};
 
             //act
-            array = JsonConverter.FromJson(array, "null");
+            JsonConverter.FromJson(ref array, "null");
 
             //assert
             Assert.That(array, Is.Null); 
@@ -89,9 +90,11 @@ namespace UnitTests.ListTests
         [Test]
         public void FromJson_ListNull_MakesList()
         {
+            var array = (bool[])null;
+
             //arrange
             //act
-            var array = JsonConverter.FromJson((bool[])null, ExpectedJson);
+            JsonConverter.FromJson(ref array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(2));

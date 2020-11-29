@@ -2,6 +2,8 @@
 using System;
 using System.Threading.Tasks;
 
+[assembly: JsonSrcGen.JsonArray(typeof(int))]
+
 namespace Benchmarks
 {
     class Program
