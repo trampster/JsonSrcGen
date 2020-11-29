@@ -1,24 +1,46 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
-    <LangVersion>9.0</LangVersion>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net5.0</TargetFramework>
+		<Authors>Hugo de Brito V. R. Alves</Authors>
+		<Company>Hugo de Brito V. R. Alves</Company>
+	</PropertyGroup>
 
-  </PropertyGroup>
+	<ItemGroup>
+		<None Remove="C:\Users\hugo.alves\.nuget\packages\microsoft.diagnostics.tracing.traceevent\2.0.49\build\..\lib\native\amd64\KernelTraceControl.dll" />
+		<None Remove="C:\Users\hugo.alves\.nuget\packages\microsoft.diagnostics.tracing.traceevent\2.0.49\build\..\lib\native\amd64\msdia140.dll" />
+		<None Remove="C:\Users\hugo.alves\.nuget\packages\microsoft.diagnostics.tracing.traceevent\2.0.49\build\..\lib\native\x86\KernelTraceControl.dll" />
+		<None Remove="C:\Users\hugo.alves\.nuget\packages\microsoft.diagnostics.tracing.traceevent\2.0.49\build\..\lib\native\x86\KernelTraceControl.Win61.dll" />
+		<None Remove="C:\Users\hugo.alves\.nuget\packages\microsoft.diagnostics.tracing.traceevent\2.0.49\build\..\lib\native\x86\msdia140.dll" />
+		<None Remove="C:\Users\hugo.alves\.nuget\packages\microsoft.diagnostics.tracing.traceevent\2.0.49\build\..\lib\netstandard1.6\Dia2Lib.dll" />
+		<None Remove="C:\Users\hugo.alves\.nuget\packages\microsoft.diagnostics.tracing.traceevent\2.0.49\build\..\lib\netstandard1.6\OSExtensions.dll" />
+		<None Remove="C:\Users\hugo.alves\.nuget\packages\microsoft.diagnostics.tracing.traceevent\2.0.49\build\..\lib\netstandard1.6\TraceReloggerLib.dll" />
+	</ItemGroup>
 
-  <PropertyGroup>
-    <RestoreAdditionalProjectSources>https://ci.appveyor.com/nuget/benchmarkdotnet;$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
+		<PackageReference Include="Jil" Version="2.17.0" />
+		
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+		<PackageReference Include="ServiceStack.Text" Version="5.10.2" />
+		<PackageReference Include="Sigil" Version="5.0.0" />
 
-  <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.12.1.1420" />
-    <PackageReference Include="JsonSrcGen" Version="0.1.0.7-alpha">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Utf8Json" Version="1.3.7" />
-  </ItemGroup>
+		<PackageReference Include="Utf8Json" Version="1.3.7" />
+		<PackageReference Include="Utf8Json.AspNetCoreMvcFormatter" Version="1.3.7" />
+		<PackageReference Include="Utf8Json.ImmutableCollection" Version="1.3.7" />
+		<PackageReference Include="Utf8Json.UnityShims" Version="1.3.7" />
+	</ItemGroup>
+
+	<ItemGroup>
+	 
+	  <ProjectReference Include="..\..\..\..\Fontes\JsonSrcGen\JsonSrcGen\JsonSrcGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Jil5">
+			<HintPath>..\..\..\Jil-master\Jil-master\Jil\bin\Release\net5\Jil5.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
 </Project>
