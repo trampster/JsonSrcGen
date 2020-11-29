@@ -5,3 +5,4 @@ Generated/Generated.cs
 Generated
 *.log
 BenchmarkDotNet.Artifacts
+*.testlog
