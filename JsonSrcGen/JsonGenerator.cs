@@ -122,6 +122,7 @@ namespace JsonSrcGen
                 new AppendReadGenerator("UInt16"), 
                 new AppendReadGenerator("Byte"),
                 new AppendReadGenerator("Double"),
+                new AppendReadGenerator("Decimal"),
                 new AppendReadGenerator("Single") {ReadType="Double"},
                 new NullableAppendReadGenerator("UInt64?"),
                 new NullableAppendReadGenerator("UInt32?"),
@@ -131,6 +132,7 @@ namespace JsonSrcGen
                 new NullableAppendReadGenerator("Int16?") {ReadType="Int32?"},
                 new NullableAppendReadGenerator("Int64?"),
                 new NullableAppendReadGenerator("Double?"),
+                new NullableAppendReadGenerator("Decimal?"),
                 new NullableAppendReadGenerator("Single?") {ReadType="Double?"},
                 new BoolGenerator(),
                 new NullableBoolGenerator(),
@@ -277,7 +279,7 @@ namespace JsonSrcGen
             var listTypes = new List<JsonType>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonList") 
+                if(attribute.Name.ToString().Contains("JsonList"))
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 
@@ -323,7 +325,7 @@ namespace JsonSrcGen
             var listTypes = new List<(JsonType, JsonType)>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonDictionary") 
+                if(attribute.Name.ToString().Contains("JsonDictionary"))
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
                     var keyType = GetJsonType(attribute.ArgumentList.Arguments[0], model);
@@ -356,7 +358,7 @@ namespace JsonSrcGen
             var arrayTypes = new List<JsonType>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonValue") 
+                if(attribute.Name.ToString().Contains("JsonValue")) 
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 
@@ -381,7 +383,7 @@ namespace JsonSrcGen
             var arrayTypes = new List<JsonType>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonArray") 
+                if(attribute.Name.ToString().Contains("JsonArray")) 
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 

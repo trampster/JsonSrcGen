@@ -5,3 +5,10 @@ Generated/Generated.cs
 Generated
 *.log
 BenchmarkDotNet.Artifacts
+/.vs/JsonSrcGen/DesignTimeBuild
+/.vs/JsonSrcGen/v16/TestStore/0
+*.suo
+*.json
+*.sqlite
+*.user
+*.sqlite-journal

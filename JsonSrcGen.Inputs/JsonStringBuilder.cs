@@ -150,6 +150,17 @@ namespace JsonSrcGen
             return this;
         }
 
+        public IJsonBuilder Append(decimal value)
+        {
+            if (_index + 30 > _buffer.Length)
+            {
+                ResizeBuffer(30);
+            }
+            value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
+            _index += charsWriten;
+            return this;
+        }
+
         public IJsonBuilder Append(double value)
         {
             if (_index + 19 > _buffer.Length)
