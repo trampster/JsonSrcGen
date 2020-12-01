@@ -65,7 +65,7 @@ namespace JsonSrcGen
                     case '7':
                     case '8':
                     case '9':
-                        int digit = ((int)character) - 48;
+                        int digit = character - '0';
                         soFar *= 10;
                         soFar += digit; 
                         continue;
