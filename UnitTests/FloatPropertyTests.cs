@@ -23,6 +23,9 @@ namespace UnitTests
         public void Setup()
         {
             _convert = new JsonConverter();
+            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-us");
+            System.Threading.Thread.CurrentThread.CurrentCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
+
         }
 
         [Test]

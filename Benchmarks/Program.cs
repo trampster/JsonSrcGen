@@ -1,6 +1,8 @@
-﻿using System;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
+using System;
+using System.Threading.Tasks;
+
+[assembly: JsonSrcGen.JsonArray(typeof(int))]
 
 namespace Benchmarks
 {
@@ -8,8 +10,14 @@ namespace Benchmarks
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<SimpleClassFromJsonBenchmark>();
-            summary = BenchmarkRunner.Run<SimpleClassToJsonBenchmark>();
+            BenchmarkRunner.Run<SerializeToString>();
+            //BenchmarkRunner.Run<SerializeToArray>();
+
+            //BenchmarkRunner.Run<DeserializeToClass>();
+            //BenchmarkRunner.Run<DeserializeToArray>();
         }
     }
+
+  
 }
+

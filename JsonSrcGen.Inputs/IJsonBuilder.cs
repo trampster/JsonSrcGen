@@ -13,6 +13,8 @@ namespace JsonSrcGen
         IJsonBuilder Append(long value);
         IJsonBuilder Append(ulong value);
         IJsonBuilder Append(double value);
+  
+        IJsonBuilder Append(decimal value);
         IJsonBuilder Append(Guid value);
         IJsonBuilder AppendDate(DateTime date);
         IJsonBuilder AppendEscaped(char input);
