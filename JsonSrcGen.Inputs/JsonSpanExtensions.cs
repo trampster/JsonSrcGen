@@ -53,7 +53,7 @@ namespace JsonSrcGen
             for (int index = startIndex; index < json.Length; index++)
             {
                 var character = json[index];
-                if (IsNumber(character))
+                if (character >= '0' && character <= '9')
                 {
                     int digit = ((int)character) - 48;
                     soFar *= 10;
@@ -91,7 +91,7 @@ namespace JsonSrcGen
             for (int index = startIndex; index < json.Length; index++)
             {
                 var character = json[index];
-                if (IsNumber(character))
+                if (character >= '0' && character <= '9')
                 {
                     long digit = ((long)character) - 48;
                     value *= 10;
@@ -214,7 +214,7 @@ namespace JsonSrcGen
             nextIndex = nextIndex < json.Length ? nextIndex : 0;
             char nextChar = json[nextIndex];
 
-            if (!IsNumber(character) && (nextIndex == 0 || !IsNumber(nextChar)))
+            if (!(character >= '0' && character <= '9') && (nextIndex == 0 || !(nextChar >= '0' && nextChar <= '9')))
             {
                 return false;
             }
@@ -237,7 +237,7 @@ namespace JsonSrcGen
             for (int index = startIndex; index < json.Length; index++)
             {
                 var character = json[index];
-                if (IsNumber(character))
+                if (character >= '0' && character <= '9')
                 {
                     long digit = ((long)character) - 48;
                     value *= 10;
@@ -279,7 +279,7 @@ namespace JsonSrcGen
             for (int index = startIndex; index < json.Length; index++)
             {
                 var character = json[index];
-                if (IsNumber(character))
+                if (character >= '0' && character <= '9')
                 {
                     int digit = ((int)character) - 48;
                     soFar *= 10;
@@ -314,7 +314,7 @@ namespace JsonSrcGen
             {
                 var character = json[index];
 
-                if (IsNumber(character))
+                if (character >= '0' && character <= '9')
                 {
                     int digit = ((int)character) - 48;
                     soFar *= 10;
@@ -330,12 +330,6 @@ namespace JsonSrcGen
             value = sign * soFar;
 
             return json.Slice(afterIntIndex);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static bool IsNumber(char character)
-        {
-            return character >= '0' && character <= '9';
         }
 
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out double? value)
@@ -361,7 +355,7 @@ namespace JsonSrcGen
             for (; index < json.Length; index++)
             {
                 character = json[index];
-                if (!IsNumber(character)) break;
+                if (!(character >= '0' && character <= '9')) break;
                 wholePart = (wholePart * 10) + character - '0';
             }
 
@@ -373,7 +367,7 @@ namespace JsonSrcGen
                 for (index = index + 1; index < json.Length; index++)
                 {
                     character = json[index];
-                    if (!IsNumber(character)) break;
+                    if (!(character >= '0' && character <= '9')) break;
                     fractionalValue = (fractionalValue * 10) + character - '0';
                     factionalLength++;
                 }
@@ -400,7 +394,7 @@ namespace JsonSrcGen
                 for (; index < json.Length; index++)
                 {
                     character = json[index];
-                    if (!IsNumber(character)) break;
+                    if (!(character >= '0' && character <= '9')) break;
                     exponentPart = (exponentPart * 10) + character - '0';
                 }
 
@@ -433,7 +427,7 @@ namespace JsonSrcGen
             for (; index < json.Length; index++)
             {
                 character = json[index];
-                if (!IsNumber(character)) break;
+                if (!(character >= '0' && character <= '9')) break;
                 wholePart = (wholePart * 10) + character - '0';
             }
 
@@ -445,7 +439,7 @@ namespace JsonSrcGen
                 for (index = index + 1; index < json.Length; index++)
                 {
                     character = json[index];
-                    if (!IsNumber(character)) break;
+                    if (!(character >= '0' && character <= '9')) break;
                     fractionalValue = (fractionalValue * 10) + character - '0';
                     factionalLength++;
                 }
@@ -472,7 +466,7 @@ namespace JsonSrcGen
                 for (; index < json.Length; index++)
                 {
                     character = json[index];
-                    if (!IsNumber(character)) break;
+                    if (!(character >= '0' && character <= '9')) break;
                     exponentPart = (exponentPart * 10) + character - '0';
                 }
 
@@ -495,7 +489,7 @@ namespace JsonSrcGen
             for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                if (IsNumber(character))
+                if (character >= '0' && character <= '9')
                 {
                     byte digit = (byte)(((byte)character) - 48);
                     value *= 10;
@@ -519,7 +513,7 @@ namespace JsonSrcGen
             for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                if (IsNumber(character))
+                if (character >= '0' && character <= '9')
                 {
                     int digit = ((int)character) - 48;
                     soFar *= 10;
@@ -550,7 +544,7 @@ namespace JsonSrcGen
             for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                if (IsNumber(character))
+                if (character >= '0' && character <= '9')
                 {
                     ulong digit = ((ulong)character) - 48;
                     value *= 10;
@@ -574,7 +568,7 @@ namespace JsonSrcGen
             for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                if (IsNumber(character))
+                if (character >= '0' && character <= '9')
                 {
                     ulong digit = ((ulong)character) - 48;
                     value *= 10;
@@ -603,7 +597,7 @@ namespace JsonSrcGen
             for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                if (IsNumber(character))
+                if (character >= '0' && character <= '9')
                 {
                     int digit = ((int)character) - 48;
                     soFar *= 10;
@@ -629,7 +623,7 @@ namespace JsonSrcGen
             for (int index = 0; index < json.Length; index++)
             {
                 var character = json[index];
-                if (IsNumber(character))
+                if (character >= '0' && character <= '9')
                 {
                     int digit = ((int)character) - 48;
                     soFar *= 10;
