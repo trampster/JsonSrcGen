@@ -81,6 +81,62 @@ namespace JsonSrcGen
             classBuilder.AppendLine(2, "}");
         }
 
+        public void GenerateUtf8(JsonClass jsonClass, CodeBuilder classBuilder)
+        {
+            classBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJson({jsonClass.Namespace}.{jsonClass.Name} value)");
+            classBuilder.AppendLine(2, "{");
+            classBuilder.AppendLine(0, BuilderText);
+            classBuilder.AppendLine(3, "ToJson(value, builder);");
+            classBuilder.AppendLine(3, "return builder.AsSpan();");
+            classBuilder.AppendLine(2, "}"); 
+
+
+            classBuilder.AppendLine(2, $"public void ToJson({jsonClass.Namespace}.{jsonClass.Name} value, JsonUtf8Builder builder)");
+            classBuilder.AppendLine(2, "{");
+
+            var appendBuilder = new StringBuilder();
+            appendBuilder.Append("{");
+
+            bool isFirst = true;
+            foreach(var property in jsonClass.Properties.OrderBy(p => p.JsonName))
+            {
+                int indent = 3;
+
+                if(jsonClass.IgnoreNull && property.Type.CanBeNull)
+                {
+                    classBuilder.MakeAppend(indent, appendBuilder);
+                    classBuilder.AppendLine(indent, $"if(value.{property.CodeName} != null)");
+                    classBuilder.AppendLine(indent, "{");
+                    indent++;
+
+                }
+                if(!isFirst)
+                {
+                    appendBuilder.Append(",");
+                }
+
+                appendBuilder.Append($"\\\"");
+                appendBuilder.AppendDoubleEscaped(property.JsonName);
+                appendBuilder.Append($"\\\":");
+
+
+                var generator = GetGeneratorForType(property.Type);
+                bool canBeNull = jsonClass.IgnoreNull ? false : property.Type.CanBeNull;
+                generator.GenerateToJson(classBuilder, indent, appendBuilder, property.Type, $"value.{property.CodeName}", canBeNull);
+
+                if(jsonClass.IgnoreNull && property.Type.CanBeNull)
+                {
+                    indent--;
+                    classBuilder.AppendLine(indent, "}");
+                }
+
+                if(isFirst) isFirst = false;
+            }
+            appendBuilder.Append("}"); 
+            classBuilder.MakeAppend(3, appendBuilder);
+            classBuilder.AppendLine(2, "}");
+        }
+
         public void GenerateList(JsonType type, CodeBuilder codeBuilder) 
         {
             codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson(List<{type.Namespace}.{type.Name}> value)");

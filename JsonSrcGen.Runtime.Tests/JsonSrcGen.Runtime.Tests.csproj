@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <LangVersion>9.0</LangVersion>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -12,17 +11,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0"/>
     <ProjectReference Include="../JsonSrcGen.Runtime/JsonSrcGen.Runtime.csproj" />
-    <ProjectReference Include="../JsonSrcGen/JsonSrcGen.csproj" 
-                        OutputItemType="Analyzer"
-                        ReferenceOutputAssembly="false" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="SpaceX\*.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="OpenWeatherMap\*.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>  
-  </ItemGroup>
 </Project>

@@ -5,9 +5,8 @@ namespace JsonSrcGen.Runtime
 {
     public static class Utf8Extensions
     {
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int WriteUtf8(this byte[] utf8, int start, string value)
+        public static int WriteAscii(this byte[] utf8, int start, string value)
         {
             unsafe
             {

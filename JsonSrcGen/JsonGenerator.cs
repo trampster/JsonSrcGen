@@ -84,8 +84,6 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("JsonSpanExtensions.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("ICustomConverter.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("CustomConverterAttribute.cs", context, compilation, GenerationFolder);
-            compilation = GenerateFromResource("IJsonBuilder.cs", context, compilation, GenerationFolder);
-            compilation = GenerateFromResource("JsonStringBuilder.cs", context, compilation, GenerationFolder);
         
             var classBuilder = new CodeBuilder();
 
@@ -193,10 +191,18 @@ namespace JsonSrcGen
                 fromJsonGenerator.GenerateDictionary(dictionaryType.Item1, dictionaryType.Item2, classBuilder);
             }
 
+            //generate to string classes
             foreach (var jsonClass in classes)
             {
                 toJsonGenerator.Generate(jsonClass, classBuilder);
                 fromJsonGenerator.Generate(jsonClass, classBuilder);
+            }
+
+            //generate to utf8 classes
+            foreach (var jsonClass in classes)
+            {
+                //toJsonGenerator.GenerateUtf8(jsonClass, classBuilder);
+                //fromJsonGenerator.Generate(jsonClass, classBuilder);
             }
 
             var valueTypes = GetValueAttributesInfo(receiver.CandidateAttributes, compilation);
