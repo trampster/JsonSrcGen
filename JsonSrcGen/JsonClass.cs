@@ -4,12 +4,14 @@ namespace JsonSrcGen
 {
     public class JsonClass
     {
-        public JsonClass(string name, string classNamespace, List<JsonProperty> properties, bool ignoreNull)
+        public JsonClass(string name, string classNamespace, List<JsonProperty> properties, bool ignoreNull, bool structRef = false, bool readOnly = false)
         {
             Name = name;
             Namespace = classNamespace;
             Properties = properties;
             IgnoreNull = ignoreNull;
+            StructRef = structRef;
+            ReadOnly = readOnly;
         }
 
         public IReadOnlyCollection<JsonProperty> Properties
@@ -31,6 +33,17 @@ namespace JsonSrcGen
         {
             get;
         }
+
+        public bool StructRef
+        {
+            get;
+        }
+
+        public bool ReadOnly
+        {
+            get;
+        }
+
 
         public string FullName => $"{Namespace}.{Name}";
     }

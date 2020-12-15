@@ -35,60 +35,42 @@ namespace Benchmarks
     }
 
 
-    ///// <summary>
-    ///// Equals JsonClass1
-    ///// Next version
-    ///// </summary>
-    //[JsonSrcGen.Json]
-    //public ref struct JsonStruct
-    //{
-    //    public string Name { get; set; }
+    /// <summary>
+    /// struct
+    /// </summary>
+    [JsonSrcGen.Json]
+    public struct JsonStruct2
+    {
+        public string Name { get; set; }
 
-    //    public int Age { get; set; }
+        public int Age { get; set; }
 
-    //    public bool On { get; set; }
+        public bool On { get; set; }
 
-    //    public byte Value { get; set; }
-    //}
+        public byte Value { get; set; }
+    }
 
-    ///// <summary>
-    ///// Equals JsonClass1
-    ///// Next version
-    ///// </summary>
-    //[JsonSrcGen.Json]
-    //public struct JsonStruct2
-    //{
-    //    public string Name { get; set; }
+    /// <summary>
+    /// readonly ref struct
+    /// </summary>
+    [JsonSrcGen.Json]
+    public readonly ref struct JsonStruct3
+    {
+        public readonly string Name { get;  }
 
-    //    public int Age { get; set; }
+        public readonly int Age { get;  }
 
-    //    public bool On { get; set; }
+        public readonly bool On { get;  }
 
-    //    public byte Value { get; set; }
-    //}
+        public readonly byte Value { get; }
 
-    ///// <summary>
-    ///// Equals JsonClass1
-    ///// Next version
-    ///// </summary>
-    //[JsonSrcGen.Json]
-    //public readonly ref struct JsonStruct3
-    //{
-    //    public readonly string Name { get;  }
-
-    //    public readonly int Age { get;  }
-
-    //    public readonly bool On { get;  }
-
-    //    public readonly byte Value { get; }
-
-    //    public JsonStruct3(string name, int age, bool on, byte value) : this()
-    //    {
-    //        Value = value;
-    //        Age = age;
-    //        Name = name;
-    //        On = on;
-    //    }
-    //}
+        public JsonStruct3(string name, int age, bool on, byte value) : this()
+        {
+            Value = value;
+            Age = age;
+            Name = name;
+            On = on;
+        }
+    }
 }
-
+   

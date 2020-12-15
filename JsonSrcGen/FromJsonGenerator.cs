@@ -73,8 +73,20 @@ namespace JsonSrcGen
 
         public void Generate(JsonClass jsonClass, CodeBuilder codeBuilder)
         {
+            if (jsonClass.ReadOnly)
+            {
+                return;
+            }
 
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> FromJson({jsonClass.Namespace}.{jsonClass.Name} value, ReadOnlySpan<char> json)");
+            if (jsonClass.StructRef)
+            {
+                codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> FromJson(ref {jsonClass.FullName} value, ReadOnlySpan<char> json)");
+            }
+            else
+            {
+                codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> FromJson({jsonClass.FullName} value, ReadOnlySpan<char> json)");
+            }
+
             codeBuilder.AppendLine(2, "{");
 
             codeBuilder.AppendLine(3, "json = json.SkipWhitespaceTo('{');");

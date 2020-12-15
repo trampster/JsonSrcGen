@@ -1,6 +1,4 @@
 ﻿using BenchmarkDotNet.Running;
-using System;
-using System.Threading.Tasks;
 
 [assembly: JsonSrcGen.JsonArray(typeof(int))]
 
@@ -10,7 +8,10 @@ namespace Benchmarks
     {
         static void Main(string[] args)
         {
-            BenchmarkRunner.Run<SerializeToString>();
+            BenchmarkRunner.Run<SerializeStructToString>();
+
+            //Benchmark Examples
+            //BenchmarkRunner.Run<DeserializeToStruct>();
             //BenchmarkRunner.Run<SerializeToArray>();
 
             //BenchmarkRunner.Run<DeserializeToClass>();

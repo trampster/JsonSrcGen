@@ -13,3 +13,4 @@ BenchmarkDotNet.Artifacts
 *.user
 *.v2
 *.json
+/.vs/slnx.sqlite-journal

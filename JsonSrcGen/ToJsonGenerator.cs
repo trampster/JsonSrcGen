@@ -27,7 +27,15 @@ namespace JsonSrcGen
 
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
         {
-            classBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({jsonClass.Namespace}.{jsonClass.Name} value)");
+            if (jsonClass.StructRef)
+            {
+                classBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson(ref {jsonClass.Namespace}.{jsonClass.Name} value)");
+            }
+            else
+            {
+                classBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({jsonClass.Namespace}.{jsonClass.Name} value)");
+            }
+
             classBuilder.AppendLine(2, "{");
             classBuilder.AppendLine(0, BuilderText);
             classBuilder.AppendLine(3, "ToJson(value, builder);");
