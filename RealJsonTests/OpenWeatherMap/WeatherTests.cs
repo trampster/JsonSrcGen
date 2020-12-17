@@ -206,6 +206,9 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
         [Test]
         public void ToJsonReduced_CorrectJson()
         {
+            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-us");
+            System.Threading.Thread.CurrentThread.CurrentCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
+
             // arrange
             Weather weather = new Weather()
             {

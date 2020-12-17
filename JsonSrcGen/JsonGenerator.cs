@@ -11,9 +11,38 @@ using System.Text;
 
 namespace JsonSrcGen
 {
+    internal class JsonSyntaxReceiver : ISyntaxReceiver
+    {
+        public List<TypeDeclarationSyntax> Targets = new();
+
+        public List<AttributeSyntax> CandidateAttributes = new();
+
+        public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+        {
+ 
+            if (syntaxNode is AttributeSyntax attrDeclarationSyntax)
+            {
+                CandidateAttributes.Add(attrDeclarationSyntax);
+            }
+            else if (syntaxNode is StructDeclarationSyntax structDeclarationSyntax)
+            {
+                Targets.Add(structDeclarationSyntax);
+            }
+            else if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax)
+            {
+                Targets.Add(classDeclarationSyntax);
+            }
+        }
+    }
+
     [Generator]
     public class JsonGenerator : ISourceGenerator
     {
+        public void Initialize(GeneratorInitializationContext context)
+        {
+            context.RegisterForSyntaxNotifications(() => new JsonSyntaxReceiver());
+        }
+
         public void Execute(GeneratorExecutionContext context)
         {
             try
@@ -51,7 +80,7 @@ namespace JsonSrcGen
         {
 
             // retreive the populated receiver
-            if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
+            if (context.SyntaxReceiver is not JsonSyntaxReceiver receiver)
                 return;
 
             Compilation compilation = context.Compilation;
@@ -101,8 +130,7 @@ namespace JsonSrcGen
         [ThreadStatic]
         JsonStringBuilder? Builder;
 ");
-
-            var classes = GetJsonClassInfo(receiver.CandidateClasses, compilation);
+            var classes = GetJsonClassInfo(receiver.Targets, compilation);
 
             var generators = new IJsonGenerator[] 
             {
@@ -120,6 +148,7 @@ namespace JsonSrcGen
                 new AppendReadGenerator("UInt16"), 
                 new AppendReadGenerator("Byte"),
                 new AppendReadGenerator("Double"),
+                new AppendReadGenerator("Decimal"),
                 new AppendReadGenerator("Single") {ReadType="Double"},
                 new NullableAppendReadGenerator("UInt64?"),
                 new NullableAppendReadGenerator("UInt32?"),
@@ -129,6 +158,7 @@ namespace JsonSrcGen
                 new NullableAppendReadGenerator("Int16?") {ReadType="Int32?"},
                 new NullableAppendReadGenerator("Int64?"),
                 new NullableAppendReadGenerator("Double?"),
+                new NullableAppendReadGenerator("Decimal?"),
                 new NullableAppendReadGenerator("Single?") {ReadType="Double?"},
                 new BoolGenerator(),
                 new NullableBoolGenerator(),
@@ -150,8 +180,8 @@ namespace JsonSrcGen
                 _generators.Add(customClass.FullName, new CustomTypeGenerator(customClass.FullName));
             }
 
-            var customTypeConverters = GetCustomTypeConverters(receiver.CandidateClasses, compilation); 
-            foreach(var customTypeConverter in customTypeConverters) 
+            var customTypeConverters = GetCustomTypeConverters(receiver.Targets, compilation);
+            foreach (var customTypeConverter in customTypeConverters)
             {
                 LogLine($"Adding customTypeConverter GeneratorId: {customTypeConverter.GeneratorId}");
 
@@ -196,13 +226,6 @@ namespace JsonSrcGen
             {
                 toJsonGenerator.Generate(jsonClass, classBuilder);
                 fromJsonGenerator.Generate(jsonClass, classBuilder);
-            }
-
-            //generate to utf8 classes
-            foreach (var jsonClass in classes)
-            {
-                //toJsonGenerator.GenerateUtf8(jsonClass, classBuilder);
-                //fromJsonGenerator.Generate(jsonClass, classBuilder);
             }
 
             var valueTypes = GetValueAttributesInfo(receiver.CandidateAttributes, compilation);
@@ -283,7 +306,7 @@ namespace JsonSrcGen
             var listTypes = new List<JsonType>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonList") 
+                if(attribute.Name.ToString().Contains("JsonList")) 
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 
@@ -329,7 +352,7 @@ namespace JsonSrcGen
             var listTypes = new List<(JsonType, JsonType)>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonDictionary") 
+                if(attribute.Name.ToString().Contains("JsonDictionary"))
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
                     var keyType = GetJsonType(attribute.ArgumentList.Arguments[0], model);
@@ -362,7 +385,7 @@ namespace JsonSrcGen
             var arrayTypes = new List<JsonType>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonValue") 
+                if(attribute.Name.ToString().Contains("JsonValue"))
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 
@@ -387,7 +410,7 @@ namespace JsonSrcGen
             var arrayTypes = new List<JsonType>();
             foreach(var attribute in attributeDeclarations)
             {
-                if(attribute.Name.ToString() == "JsonArray") 
+                if(attribute.Name.ToString().Contains("JsonArray"))
                 {
                     SemanticModel model = compilation.GetSemanticModel(attribute.SyntaxTree);
 
@@ -407,7 +430,7 @@ namespace JsonSrcGen
             return arrayTypes;
         }
 
-        IReadOnlyCollection<JsonClass> GetJsonClassInfo(List<ClassDeclarationSyntax> classDeclarations, Compilation compilation)
+        IReadOnlyCollection<JsonClass> GetJsonClassInfo(List<TypeDeclarationSyntax> classDeclarations, Compilation compilation)
         {
             var jsonClasses = new List<JsonClass>();
 
@@ -423,33 +446,38 @@ namespace JsonSrcGen
 
                     bool ignoreNull = HasJsonIgnoreNullAttribute(classSymbol);
 
+                    bool struct1 =  candidateClass.Kind() == SyntaxKind.StructDeclaration;
+                    bool structRef = struct1 || candidateClass.Modifiers.Any(s => s.Value.ToString().ToLower() == "ref");
+
+                    bool readOnly = candidateClass.Modifiers.Any(s => s.Value.ToString().ToLower() == "readonly");
+
                     var jsonProperties = new List<JsonProperty>();
 
-                    foreach(var member in classSymbol.GetMembers().Where(member => member.Kind == SymbolKind.Property))
-                    { 
+                    foreach (var member in classSymbol.GetMembers().Where(member => member.Kind == SymbolKind.Property))
+                    {
                         var property = member as IPropertySymbol;
 
                         string jsonPropertyName = null;
                         var attributes = property.GetAttributes();
                         bool hasIgnoreAttribute = false;
                         bool hasOptionalAttribute = false;
-                        foreach(var attribute in attributes)
+                        foreach (var attribute in attributes)
                         {
-                            if(attribute.AttributeClass.Name == "JsonIgnoreAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen")
+                            if (attribute.AttributeClass.Name == "JsonIgnoreAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen")
                             {
                                 hasIgnoreAttribute = true;
                                 break;
                             }
-                            if(attribute.AttributeClass.Name == "JsonNameAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen")
+                            if (attribute.AttributeClass.Name == "JsonNameAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen")
                             {
                                 jsonPropertyName = (string)attribute.ConstructorArguments.First().Value;
                             }
-                            if(attribute.AttributeClass.Name == "JsonOptionalAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen")
+                            if (attribute.AttributeClass.Name == "JsonOptionalAttribute" && attribute.AttributeClass.ContainingNamespace.Name == "JsonSrcGen")
                             {
                                 hasOptionalAttribute = true;
                             }
                         }
-                        if(hasIgnoreAttribute)
+                        if (hasIgnoreAttribute)
                         {
                             continue;
                         }
@@ -459,13 +487,13 @@ namespace JsonSrcGen
                         jsonProperties.Add(new JsonProperty(jsonPropertyType, jsonPropertyName ?? codePropertyName, codePropertyName, hasOptionalAttribute));
                     }
 
-                    jsonClasses.Add(new JsonClass(jsonClassName, jsonClassNamespace, jsonProperties, ignoreNull));
+                    jsonClasses.Add(new JsonClass(jsonClassName, jsonClassNamespace, jsonProperties, ignoreNull, structRef, readOnly));
                 }
             }
-            return jsonClasses; 
+            return jsonClasses;
         }
         static string GenerationFolder;
-        IReadOnlyCollection<IJsonGenerator> GetCustomTypeConverters(List<ClassDeclarationSyntax> classDeclarations, Compilation compilation)
+        IReadOnlyCollection<IJsonGenerator> GetCustomTypeConverters(List<TypeDeclarationSyntax> classDeclarations, Compilation compilation)
         {
             var customTypeConverters = new List<IJsonGenerator>();
 
@@ -610,40 +638,6 @@ namespace JsonSrcGen
             }
             return list;
         }
-
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            // Register a factory that can create our custom syntax receiver
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver()); 
-        }
     }
 
-    /// <summary>
-    /// Created on demand before each generation pass
-    /// </summary>
-    class SyntaxReceiver : ISyntaxReceiver
-    {
-        public List<ClassDeclarationSyntax> CandidateClasses { get; } = new List<ClassDeclarationSyntax>();
-
-        public List<AttributeSyntax> CandidateAttributes { get; } = new List<AttributeSyntax>();
-
-        /// <summary>
-        /// Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation
-        /// </summary>
-        public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
-        {
-            var classes = new List<JsonClass>();
-            // any method with at least one attribute is a candidate for property generation
-            if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
-                && classDeclarationSyntax.AttributeLists.Count > 0)
-            {
-                CandidateClasses.Add(classDeclarationSyntax);
-            }
-
-            if (syntaxNode is AttributeSyntax attributeSyntax)
-            {
-                CandidateAttributes.Add(attributeSyntax);
-            }
-        }
-    }
 }
