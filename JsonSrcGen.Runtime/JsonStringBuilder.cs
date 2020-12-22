@@ -150,6 +150,17 @@ namespace JsonSrcGen
             return this;
         }
 
+        public IJsonBuilder Append(decimal value)
+        {
+            if (_index + 30 > _buffer.Length)
+            {
+                ResizeBuffer(30);
+            }
+            value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
+            _index += charsWriten;
+            return this;
+        }
+
         public IJsonBuilder Append(double value)
         {
             if (_index + 19 > _buffer.Length)
@@ -192,7 +203,7 @@ namespace JsonSrcGen
 
         void InitializeEscapingLookups()
         {
-            for(int index = 0; index < 32; index++)
+            for (int index = 0; index < 32; index++)
             {
                 _needsEscaping[index] = true;
             }
@@ -206,13 +217,13 @@ namespace JsonSrcGen
             _needsEscaping['\r'] = true;
             _needsEscaping['\t'] = true;
 
-            for(int index = 0; index < 32; index++)
+            for (int index = 0; index < 32; index++)
             {
                 var hex = index.ToString("X4");
                 _escapeLookup[index] = "\\u" + hex;
             }
             _escapeLookup['\"'] = "\\\"";
-            _escapeLookup ['\\'] = "\\\\";
+            _escapeLookup['\\'] = "\\\\";
             _escapeLookup['/'] = "\\/";
             _escapeLookup['\b'] = "\\b";
             _escapeLookup['\f'] = "\\f";
@@ -223,7 +234,7 @@ namespace JsonSrcGen
 
         public IJsonBuilder AppendEscaped(char input)
         {
-            if(input < 93 && _needsEscaping[input])
+            if (input < 93 && _needsEscaping[input])
             {
                 return Append(_escapeLookup[input]);
             }
@@ -233,11 +244,11 @@ namespace JsonSrcGen
         public IJsonBuilder AppendEscaped(string input)
         {
             int start = 0;
-            for(int index = 0; index < input.Length; index++)
+            for (int index = 0; index < input.Length; index++)
             {
                 char character = input[index];
 
-                if(character < 93 && _needsEscaping[character])
+                if (character < 93 && _needsEscaping[character])
                 {
                     this.Append(input.AsSpan(start, index - start));
                     this.Append(_escapeLookup[character]);
@@ -254,12 +265,12 @@ namespace JsonSrcGen
         string GetOffset()
         {
             int tickCount = Environment.TickCount;
-            if(_offsetCacheTime + 1000 < tickCount)
+            if (_offsetCacheTime + 1000 < tickCount)
             {
                 _offsetCacheTime = tickCount;
                 var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
                 var builder = new JsonStringBuilder();
-                if(offset.TotalMinutes > 0) builder.Append('+');
+                if (offset.TotalMinutes > 0) builder.Append('+');
                 else builder.Append('-');
                 builder.AppendIntTwo(Math.Abs(offset.Hours));
                 builder.Append(':');
@@ -275,7 +286,7 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(6);
             }
-            if(offset.TotalMinutes >= 0) Append('+');
+            if (offset.TotalMinutes >= 0) Append('+');
             else Append('-');
             AppendIntTwo(Math.Abs(offset.Hours));
             Append(':');
@@ -298,24 +309,24 @@ namespace JsonSrcGen
             Append(':');
             AppendIntTwo(date.Second);
             var fractions = date.Ticks % TimeSpan.TicksPerSecond * TimeSpan.TicksPerMillisecond;
-            if(fractions != 0)
+            if (fractions != 0)
             {
                 Append('.');
                 AppendDateTimeFraction(fractions);
             }
 
             //offset
-            if(date.Kind == DateTimeKind.Utc)
+            if (date.Kind == DateTimeKind.Utc)
             {
                 return Append("Z\"");
             }
-            else if(date.Kind == DateTimeKind.Unspecified)
+            else if (date.Kind == DateTimeKind.Unspecified)
             {
                 return Append('\"');
             }
             Append(GetOffset());
             Append('\"');
-            
+
             return this;
         }
 
@@ -334,7 +345,7 @@ namespace JsonSrcGen
             Append(':');
             AppendIntTwo(date.Second);
             var fractions = date.Ticks % TimeSpan.TicksPerSecond * TimeSpan.TicksPerMillisecond;
-            if(fractions != 0)
+            if (fractions != 0)
             {
                 Append('.');
                 AppendDateTimeFraction(fractions);
@@ -343,7 +354,7 @@ namespace JsonSrcGen
             //offset
             AppendOffset(date.Offset);
             Append('\"');
-            
+
             return this;
         }
 
@@ -353,8 +364,8 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(2);
             }
-            int tens = number/10;
-            int soFar = tens*10;
+            int tens = number / 10;
+            int soFar = tens * 10;
             _buffer[_index] = (char)('0' + tens);
             _index++;
 
@@ -370,18 +381,18 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(4);
             }
-            int thousands = (number)/1000;
-            int soFar = thousands*1000;
+            int thousands = (number) / 1000;
+            int soFar = thousands * 1000;
             _buffer[_index] = (char)('0' + thousands);
             _index++;
 
-            int hundreds = (number-soFar)/100;
-            soFar += hundreds*100;
+            int hundreds = (number - soFar) / 100;
+            soFar += hundreds * 100;
             _buffer[_index] = (char)('0' + hundreds);
             _index++;
-            
-            int tens = (number - soFar)/10;
-            soFar += tens*10;
+
+            int tens = (number - soFar) / 10;
+            soFar += tens * 10;
             _buffer[_index] = (char)('0' + tens);
             _index++;
 
@@ -401,66 +412,66 @@ namespace JsonSrcGen
             //24 973 300 000
             long soFar = 0;
 
-            long tenBillions = (number)/10000000000;
-            soFar += tenBillions*10000000000;
+            long tenBillions = (number) / 10000000000;
+            soFar += tenBillions * 10000000000;
             _buffer[_index] = (char)('0' + tenBillions);
             _index++;
-            long leftLong = number-soFar;
-            if(leftLong == 0) return this;
+            long leftLong = number - soFar;
+            if (leftLong == 0) return this;
 
-            long billions = leftLong/1000000000;
+            long billions = leftLong / 1000000000;
             _buffer[_index] = (char)('0' + billions);
             _index++;
-            int left = (int)(leftLong-(billions*1000000000));
-            if(left == 0) return this;
+            int left = (int)(leftLong - (billions * 1000000000));
+            if (left == 0) return this;
 
-            int hundredMillions = left/100000000;
+            int hundredMillions = left / 100000000;
             _buffer[_index] = (char)('0' + hundredMillions);
             _index++;
-            left = left-(hundredMillions*100000000);
-            if(left == 0) return this;
+            left = left - (hundredMillions * 100000000);
+            if (left == 0) return this;
 
-            int tenMillions = left/10000000;
+            int tenMillions = left / 10000000;
             _buffer[_index] = (char)('0' + tenMillions);
             _index++;
-            left = left-(tenMillions*10000000);
-            if(left == 0) return this;
+            left = left - (tenMillions * 10000000);
+            if (left == 0) return this;
 
-            int millions = left/1000000;
+            int millions = left / 1000000;
             _buffer[_index] = (char)('0' + millions);
             _index++;
-            left = left-(millions*1000000);
-            if(left == 0) return this;
+            left = left - (millions * 1000000);
+            if (left == 0) return this;
 
-            int hundredThousands = left/100000;
+            int hundredThousands = left / 100000;
             _buffer[_index] = (char)('0' + hundredThousands);
             _index++;
-            left = left-(hundredThousands*100000);
-            if(left == 0) return this;
+            left = left - (hundredThousands * 100000);
+            if (left == 0) return this;
 
-            int tenThousands = left/10000;
+            int tenThousands = left / 10000;
             _buffer[_index] = (char)('0' + tenThousands);
             _index++;
-            left = left-(tenThousands*10000);
-            if(left == 0) return this;
+            left = left - (tenThousands * 10000);
+            if (left == 0) return this;
 
-            int thousands = left/1000;
+            int thousands = left / 1000;
             _buffer[_index] = (char)('0' + thousands);
             _index++;
-            left = left-(thousands*1000);
-            if(left == 0) return this;
+            left = left - (thousands * 1000);
+            if (left == 0) return this;
 
-            int hundreds = left/100;
+            int hundreds = left / 100;
             _buffer[_index] = (char)('0' + hundreds);
             _index++;
-            left = left-(hundreds*100);
-            if(left == 0) return this;
+            left = left - (hundreds * 100);
+            if (left == 0) return this;
 
-            int tens = left/10;
+            int tens = left / 10;
             _buffer[_index] = (char)('0' + tens);
             _index++;
-            left = left-(tens*10);
-            if(left == 0) return this;
+            left = left - (tens * 10);
+            if (left == 0) return this;
 
             int ones = left;
             _buffer[_index] = (char)('0' + ones);

@@ -5,3 +5,9 @@ Generated/Generated.cs
 Generated
 *.log
 BenchmarkDotNet.Artifacts
+*.suo
+*.manifest
+*.testlog
+*.v2
+*.bak
+*.sqlite
