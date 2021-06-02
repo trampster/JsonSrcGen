@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
-
+using System.Text;
 
 namespace UnitTests
 {
@@ -13,9 +13,26 @@ namespace UnitTests
         public string NullProperty {get;set;}
     }
 
-    public class StringPropertyTests
+    public class StringPropertyTests : StringPropertyTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override string ToJson(JsonClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8StringPropertyTests : StringPropertyTestsBase
+    {
+        protected override string ToJson(JsonClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class StringPropertyTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
 
         const string EscapePropertyJson = "quote\\\"backslash\\\\forwardslash\\/backspace\\bformfeed\\fnewline\\ncarragereturn\\rtab\\t";
         const string NeedsEscaping = "quote\"backslash\\forwardslash/backspace\bformfeed\fnewline\ncarragereturn\rtab\t";
@@ -27,6 +44,8 @@ namespace UnitTests
         {
             _convert = new JsonConverter();
         }
+
+        protected abstract string ToJson(JsonClass jsonClass);
 
         [Test]
         public void ToJson_CorrectString()
@@ -41,12 +60,11 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
-            Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
-        } 
-
+            Assert.That(json, Is.EqualTo(ExpectedJson));
+        }
 
         [Test]
         public void FromJson_CorrectJsonClass()

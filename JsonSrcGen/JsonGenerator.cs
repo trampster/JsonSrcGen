@@ -129,6 +129,9 @@ namespace JsonSrcGen
     {
         [ThreadStatic]
         JsonStringBuilder? Builder;
+
+        [ThreadStatic]
+        JsonUtf8Builder? Utf8Builder;
 ");
             var classes = GetJsonClassInfo(receiver.Targets, compilation);
 
@@ -225,6 +228,7 @@ namespace JsonSrcGen
             foreach (var jsonClass in classes)
             {
                 toJsonGenerator.Generate(jsonClass, classBuilder);
+                toJsonGenerator.GenerateUtf8(jsonClass, classBuilder);
                 fromJsonGenerator.Generate(jsonClass, classBuilder);
             }
 

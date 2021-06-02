@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections;
+using System.Text;
 
 namespace UnitTests
 {
@@ -29,15 +30,35 @@ namespace UnitTests
         }
     }
 
-    public class CharPropertyTests
+    public class CharPropertyTests : CharPropertyTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override string ToJson(JsonCharClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8CharPropertyTests : CharPropertyTestsBase
+    {
+        protected override string ToJson(JsonCharClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class CharPropertyTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
 
         [SetUp]
         public void Setup()
         {
             _convert = new JsonConverter();
         }
+
+        protected abstract string ToJson(JsonCharClass jsonClass);
+
 
         [Test, TestCaseSource(typeof(CharTestCaseData), "TestCases")]
         public void ToJson_CorrectString(char character, string expectedPropertyValue)
@@ -49,7 +70,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo($"{{\"Property\":{expectedPropertyValue}}}"));

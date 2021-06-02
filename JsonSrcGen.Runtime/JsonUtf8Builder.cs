@@ -58,14 +58,27 @@ namespace JsonSrcGen
 
         public IJsonBuilder Append(byte value)
         {
-            // if (_index + 3 > _buffer.Length)
-            // {
-            //     ResizeBuffer(3);
-            // }
-            // value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
-            // _index += charsWriten;
-            // return this;
-            throw new NotImplementedException();
+            if (_index + 3 > _buffer.Length)
+            {
+                ResizeBuffer(3);
+            }
+            int intValue = value;
+            
+            if(intValue > 99) goto hundreds;
+            if(intValue > 10) goto tens;
+            else goto ones;
+
+            hundreds:
+            _buffer[_index++] = (byte)((intValue / 100) + '0');
+            intValue = (intValue % 100);
+
+            tens:
+            _buffer[_index++] = (byte)((intValue / 10)  + '0');
+            intValue = intValue % 10;
+
+            ones:
+            _buffer[_index++] = (byte)(intValue + '0');
+            return this;
         }
 
         public IJsonBuilder Append(short value)
@@ -164,6 +177,18 @@ namespace JsonSrcGen
             throw new NotImplementedException();
         }
 
+        public IJsonBuilder Append(decimal value)
+        {
+            // if (_index + 30 > _buffer.Length)
+            // {
+            //     ResizeBuffer(30);
+            // }
+            // value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
+            // _index += charsWriten;
+            // return this;
+            throw new NotImplementedException();
+        }
+
         public IJsonBuilder Append(Guid value)
         {
             // if (_index + 36 > _buffer.Length)
@@ -187,10 +212,9 @@ namespace JsonSrcGen
             throw new NotImplementedException();
         }
 
-        public ReadOnlySpan<char> AsSpan()
+        public ReadOnlySpan<byte> AsSpan()
         {
-            // return _buffer.AsSpan(0, _index);
-            throw new NotImplementedException();
+            return _buffer.AsSpan(0, _index);
         }
 
         bool[] _needsEscaping = new bool[128];
@@ -233,7 +257,7 @@ namespace JsonSrcGen
             {
                 return Append(_escapeLookup[input]);
             }
-            return Append(input);
+            return Append(input.ToString());
         }
 
         public IJsonBuilder AppendEscaped(string input)

@@ -18,6 +18,15 @@ namespace JsonSrcGen
             }
             builder.Clear();";
 
+        const string Utf8BuilderText = @"
+            var builder = Utf8Builder;
+            if(builder == null)
+            {
+                builder = new JsonUtf8Builder();
+                Utf8Builder = builder;
+            }
+            builder.Clear();";
+
         readonly Func<JsonType, IJsonGenerator> _getGeneratorForType;
 
         public ToJsonGenerator(Func<JsonType, IJsonGenerator> getGeneratorForType)
@@ -93,15 +102,15 @@ namespace JsonSrcGen
         {
         	if (jsonClass.StructRef)
 			{
-				classBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJson(ref {jsonClass.Namespace}.{jsonClass.Name} value)");
+				classBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8(ref {jsonClass.Namespace}.{jsonClass.Name} value)");
 		    }
 		    else
 		    {
-		    	classBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJson({jsonClass.Namespace}.{jsonClass.Name} value)");
+		    	classBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8({jsonClass.Namespace}.{jsonClass.Name} value)");
 		    }
 		    
             classBuilder.AppendLine(2, "{");
-            classBuilder.AppendLine(0, BuilderText);
+            classBuilder.AppendLine(0, Utf8BuilderText);
             classBuilder.AppendLine(3, "ToJson(value, builder);");
             classBuilder.AppendLine(3, "return builder.AsSpan();");
             classBuilder.AppendLine(2, "}"); 
