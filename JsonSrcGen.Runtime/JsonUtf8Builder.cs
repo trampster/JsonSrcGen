@@ -65,7 +65,7 @@ namespace JsonSrcGen
             int intValue = value;
             
             if(intValue > 99) goto hundreds;
-            if(intValue > 10) goto tens;
+            if(intValue > 9) goto tens;
             else goto ones;
 
             hundreds:
@@ -83,14 +83,43 @@ namespace JsonSrcGen
 
         public IJsonBuilder Append(short value)
         {
-            // if (_index + 6 > _buffer.Length)
-            // {
-            //     ResizeBuffer(6);
-            // }
-            // value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
-            // _index += charsWriten;
-            // return this;
-            throw new NotImplementedException();
+            if (_index + 6 > _buffer.Length)
+            {
+                ResizeBuffer(6);
+            }
+            int intValue = value;
+            
+            if(intValue < 0)
+            {
+                _buffer[_index++] = (byte)'-';
+                intValue = intValue * -1;
+            }
+
+            if(intValue > 9999) goto tensOfThousands;
+            if(intValue > 999) goto thousands;
+            if(intValue > 99) goto hundreds;
+            if(intValue > 9) goto tens;
+            else goto ones;
+
+            tensOfThousands:
+            _buffer[_index++] = (byte)((intValue / 10000) + '0');
+            intValue = (intValue % 10000);
+
+            thousands:
+            _buffer[_index++] = (byte)((intValue / 1000) + '0');
+            intValue = (intValue % 1000);
+
+            hundreds:
+            _buffer[_index++] = (byte)((intValue / 100) + '0');
+            intValue = (intValue % 100);
+
+            tens:
+            _buffer[_index++] = (byte)((intValue / 10)  + '0');
+            intValue = intValue % 10;
+
+            ones:
+            _buffer[_index++] = (byte)(intValue + '0');
+            return this;
         }
 
         public IJsonBuilder Append(ushort value)
