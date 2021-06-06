@@ -81,44 +81,75 @@ namespace JsonSrcGen
             return this;
         }
 
+        static byte[] _decimalPairs = new byte[]
+        {
+            (byte)'0',(byte)'0',(byte)'0',(byte)'1',(byte)'0',(byte)'2',(byte)'0',(byte)'3',(byte)'0',(byte)'4',(byte)'0',(byte)'5',(byte)'0',(byte)'6',(byte)'0',(byte)'7',(byte)'0',(byte)'8',(byte)'0',(byte)'9',
+            (byte)'1',(byte)'0',(byte)'1',(byte)'1',(byte)'1',(byte)'2',(byte)'1',(byte)'3',(byte)'1',(byte)'4',(byte)'1',(byte)'5',(byte)'1',(byte)'6',(byte)'1',(byte)'7',(byte)'1',(byte)'8',(byte)'1',(byte)'9',
+            (byte)'2',(byte)'0',(byte)'2',(byte)'1',(byte)'2',(byte)'2',(byte)'2',(byte)'3',(byte)'2',(byte)'4',(byte)'2',(byte)'5',(byte)'2',(byte)'6',(byte)'2',(byte)'7',(byte)'2',(byte)'8',(byte)'2',(byte)'9',
+            (byte)'3',(byte)'0',(byte)'3',(byte)'1',(byte)'3',(byte)'2',(byte)'3',(byte)'3',(byte)'3',(byte)'4',(byte)'3',(byte)'5',(byte)'3',(byte)'6',(byte)'3',(byte)'7',(byte)'3',(byte)'8',(byte)'3',(byte)'9',
+            (byte)'4',(byte)'0',(byte)'4',(byte)'1',(byte)'4',(byte)'2',(byte)'4',(byte)'3',(byte)'4',(byte)'4',(byte)'4',(byte)'5',(byte)'4',(byte)'6',(byte)'4',(byte)'7',(byte)'4',(byte)'8',(byte)'4',(byte)'9',
+            (byte)'5',(byte)'0',(byte)'5',(byte)'1',(byte)'5',(byte)'2',(byte)'5',(byte)'3',(byte)'5',(byte)'4',(byte)'5',(byte)'5',(byte)'5',(byte)'6',(byte)'5',(byte)'7',(byte)'5',(byte)'8',(byte)'5',(byte)'9',
+            (byte)'6',(byte)'0',(byte)'6',(byte)'1',(byte)'6',(byte)'2',(byte)'6',(byte)'3',(byte)'6',(byte)'4',(byte)'6',(byte)'5',(byte)'6',(byte)'6',(byte)'6',(byte)'7',(byte)'6',(byte)'8',(byte)'6',(byte)'9',
+            (byte)'7',(byte)'0',(byte)'7',(byte)'1',(byte)'7',(byte)'2',(byte)'7',(byte)'3',(byte)'7',(byte)'4',(byte)'7',(byte)'5',(byte)'7',(byte)'6',(byte)'7',(byte)'7',(byte)'7',(byte)'8',(byte)'7',(byte)'9',
+            (byte)'8',(byte)'0',(byte)'8',(byte)'1',(byte)'8',(byte)'2',(byte)'8',(byte)'3',(byte)'8',(byte)'4',(byte)'8',(byte)'5',(byte)'8',(byte)'6',(byte)'8',(byte)'7',(byte)'8',(byte)'8',(byte)'8',(byte)'9',
+            (byte)'9',(byte)'0',(byte)'9',(byte)'1',(byte)'9',(byte)'2',(byte)'9',(byte)'3',(byte)'9',(byte)'4',(byte)'9',(byte)'5',(byte)'9',(byte)'6',(byte)'9',(byte)'7',(byte)'9',(byte)'8',(byte)'9',(byte)'9'
+        };
+
         public IJsonBuilder Append(short value)
         {
-            if (_index + 6 > _buffer.Length)
+            int index = _index;
+            var buffer = _buffer;
+            if (index + 6 > buffer.Length)
             {
                 ResizeBuffer(6);
+                buffer = _buffer;
             }
+
             int intValue = value;
-            
+
             if(intValue < 0)
             {
-                _buffer[_index++] = (byte)'-';
+                buffer[index++] = (byte)'-';
                 intValue = intValue * -1;
             }
 
-            if(intValue > 9999) goto tensOfThousands;
-            if(intValue > 999) goto thousands;
-            if(intValue > 99) goto hundreds;
-            if(intValue > 9) goto tens;
-            else goto ones;
+            int decimalIndex = 0;
 
-            tensOfThousands:
-            _buffer[_index++] = (byte)((intValue / 10000) + '0');
-            intValue = (intValue % 10000);
+            if(intValue > 9999) 
+            {
+                buffer[index++] = (byte)((intValue / 10000) + '0');
+                intValue = (intValue % 10000);
+                goto thousands;
+            }
+            if(intValue > 999) goto thousands;
+            if(intValue > 99) 
+            {
+                buffer[index++] = (byte)((intValue / 100) + '0');
+                intValue = (intValue % 100);
+                goto tens;
+            }
+            if(intValue > 9) goto tens;
+
+            buffer[index++] = (byte)(intValue + '0');
+            goto end;
 
             thousands:
-            _buffer[_index++] = (byte)((intValue / 1000) + '0');
-            intValue = (intValue % 1000);
-
-            hundreds:
-            _buffer[_index++] = (byte)((intValue / 100) + '0');
+            int pair = intValue / 100;
+            decimalIndex = pair*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
             intValue = (intValue % 100);
 
             tens:
-            _buffer[_index++] = (byte)((intValue / 10)  + '0');
-            intValue = intValue % 10;
+            decimalIndex = intValue*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            _index = index;
+            return this;
 
-            ones:
-            _buffer[_index++] = (byte)(intValue + '0');
+            end:
+            _index = index;
+            
             return this;
         }
 
