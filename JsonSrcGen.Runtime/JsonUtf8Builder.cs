@@ -155,16 +155,54 @@ namespace JsonSrcGen
 
         public IJsonBuilder Append(ushort value)
         {
-            // if (_index + 5 > _buffer.Length)
-            // {
-            //     ResizeBuffer(5);
-            // }
-            // value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
-            // _index += charsWriten;
-            // return this;
-            throw new NotImplementedException();
-        }
+            int index = _index;
+            var buffer = _buffer;
+            if (index + 6 > buffer.Length)
+            {
+                ResizeBuffer(6);
+                buffer = _buffer;
+            }
 
+            int intValue = value;
+            int decimalIndex = 0;
+
+            if(intValue > 9999) 
+            {
+                buffer[index++] = (byte)((intValue / 10000) + '0');
+                intValue = (intValue % 10000);
+                goto thousands;
+            }
+            if(intValue > 999) goto thousands;
+            if(intValue > 99) 
+            {
+                buffer[index++] = (byte)((intValue / 100) + '0');
+                intValue = (intValue % 100);
+                goto tens;
+            }
+            if(intValue > 9) goto tens;
+
+            buffer[index++] = (byte)(intValue + '0');
+            goto end;
+
+            thousands:
+            int pair = intValue / 100;
+            decimalIndex = pair*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            intValue = (intValue % 100);
+
+            tens:
+            decimalIndex = intValue*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            _index = index;
+            return this;
+
+            end:
+            _index = index;
+            
+            return this;
+        }
         public IJsonBuilder Append(int value)
         {
             // if (_index + 11 > _buffer.Length)
