@@ -41,6 +41,7 @@ namespace UnitTests
         {
             _convert = new JsonConverter();
         }
+        
         protected abstract string ToJson(JsonShortClass jsonClass);
 
         [Test]
