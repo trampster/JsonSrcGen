@@ -205,14 +205,95 @@ namespace JsonSrcGen
         }
         public IJsonBuilder Append(int value)
         {
-            // if (_index + 11 > _buffer.Length)
-            // {
-            //     ResizeBuffer(11);
-            // }
-            // value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
-            // _index += charsWriten;
-            // return this;
-            throw new NotImplementedException();
+            int index = _index;
+            var buffer = _buffer;
+            if (index + 6 > buffer.Length)
+            {
+                ResizeBuffer(6);
+                buffer = _buffer;
+            }
+
+            uint intValue = 0;
+
+            if(value < 0)
+            {
+                buffer[index++] = (byte)'-';
+                intValue = (uint)(value * -1);
+            }
+            else
+            {
+                intValue = (uint)value;
+            }
+
+            uint decimalIndex = 0;
+            if(intValue > 999_999_999) goto billions;
+            if(intValue > 99_999_999) 
+            {
+                buffer[index++] = (byte)((intValue / 100_000_000) + '0');
+                intValue = (intValue % 100_000_000);
+                goto tenMillions;
+            }
+            if(intValue > 99_99_999) goto tenMillions;
+            if(intValue > 999_999) 
+            {
+                buffer[index++] = (byte)((intValue / 1_000_000) + '0');
+                intValue = (intValue % 1_000_000);
+                goto hundredThousands;
+            }
+            if(intValue > 99_999) goto hundredThousands;
+            if(intValue > 9_999) 
+            {
+                buffer[index++] = (byte)((intValue / 10_000) + '0');
+                intValue = (intValue % 10_000);
+                goto thousands;
+            }
+            if(intValue > 999) goto thousands;
+            if(intValue > 99) 
+            {
+                buffer[index++] = (byte)((intValue / 100) + '0');
+                intValue = (intValue % 100);
+                goto tens;
+            }
+            if(intValue > 9) goto tens;
+
+            buffer[index++] = (byte)(intValue + '0');
+            goto end;
+
+            billions:
+            decimalIndex = (intValue / 100_000_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            intValue = (intValue % 100_000_000);
+
+            tenMillions:
+            decimalIndex = (intValue / 1_000_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            intValue = (intValue % 1_000_000);
+
+            hundredThousands:
+            decimalIndex = (intValue / 10_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            intValue = (intValue % 10_000);
+
+            thousands:
+            decimalIndex = (intValue / 100)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            intValue = (intValue % 100);
+
+            tens:
+            decimalIndex = intValue*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            _index = index;
+            return this;
+
+            end:
+            _index = index;
+            
+            return this;
         }
 
         public IJsonBuilder Append(uint value)
