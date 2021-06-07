@@ -64,8 +64,26 @@ namespace JsonSrcGen.Runtime.Tests
 
         [Test]
         public void AppendInt_CorrectResult([Values(
-            int.MinValue, (int)-1_000_000_000, (int)-999_999_999, -100_000_000, -99_999_999, -10_000_000, -9_999_999, -1_000_000, -999_999, -100_000, -99_999, -10000, -9999, -1000, -999, -100, -99, -10, -9, -1, 
-            0, 1, 9, 10, 99, 100, 999, 1_000, 9_999, 10_000, 99_999, 100_000, 999_999, 1_000_000, 9_999_999, 10_000_000, 99_999_999, 100_000_000, (int)999_999_999, (int)1_000_000_000, int.MaxValue)]int value)
+            int.MinValue, (int)-1_000_000_000, (int)-999_999_999, -100_000_000, -99_999_999, -10_000_000, -9_999_999, 
+            -1_000_000, -999_999, -100_000, -99_999, -10000, -9999, -1000, -999, -100, -99, -10, -9, -1, 
+            0, 1, 9, 10, 99, 100, 999, 1_000, 9_999, 10_000, 99_999, 100_000, 999_999, 1_000_000, 9_999_999, 
+            10_000_000, 99_999_999, 100_000_000, (int)999_999_999, (int)1_000_000_000, int.MaxValue)]int value)
+        {
+            // arrange
+            _builder.Clear();
+
+            // act
+            _builder.Append(value);
+
+            // assert
+            var bytes = _builder.AsSpan();
+            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo(value.ToString()));
+        }
+
+        [Test]
+        public void AppendUInt_CorrectResult([Values(
+            uint.MinValue, 1u, 9u, 10u, 99u, 100u, 999u, 1_000u, 9_999u, 10_000u, 99_999u, 100_000u, 999_999u, 
+            1_000_000u, 9_999_999u, 10_000_000u, 99_999_999u, 100_000_000u, 999_999_999u, 1_000_000_000u, uint.MaxValue)]uint value)
         {
             // arrange
             _builder.Clear();
