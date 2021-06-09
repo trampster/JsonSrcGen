@@ -401,11 +401,6 @@ namespace JsonSrcGen
                 longValue = (ulong)value;
             }
 
-            /// <summary>
-            ///  9_223_372_036_854_775_807
-            /// ST_0QT_0TR_00B_00M_00T_000
-            /// </summary>
-
             ulong decimalIndex = 0;
             if(longValue > 999_999_999_999_999_999)
             {
@@ -535,16 +530,152 @@ namespace JsonSrcGen
             return this;
         }
 
-        public IJsonBuilder Append(ulong value)
+        public IJsonBuilder Append(ulong longValue)
         {
-            // if (_index + 20 > _buffer.Length)
-            // {
-            //     ResizeBuffer(20);
-            // }
-            // value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
-            // _index += charsWriten;
-            // return this;
-            throw new NotImplementedException();
+            int index = _index;
+            var buffer = _buffer;
+            if (index + 26 > buffer.Length)
+            {
+                ResizeBuffer(26);
+                buffer = _buffer;
+            }
+            // 9_223_372_036_854_775_807
+            //18_446_744_073_709_551_615
+
+            ulong decimalIndex = 0;
+            if(longValue > 9_999_999_999_999_999_999) goto quintrillion;
+            if(longValue > 999_999_999_999_999_999)
+            {
+                buffer[index++] = (byte)((longValue / 1_000_000_000_000_000_000) + '0');
+                longValue = longValue % 1_000_000_000_000_000_000;
+                goto tenQuadtrillions;
+            }
+            if(longValue > 99_999_999_999_999_999) goto tenQuadtrillions;
+            if(longValue > 9_999_999_999_999_999)
+            {
+                buffer[index++] = (byte)((longValue / 10_000_000_000_000_000) + '0');
+                longValue = longValue % 10_000_000_000_000_000;
+                goto quadtrillions;
+            }
+            if(longValue > 999_999_999_999_999) goto quadtrillions;
+            if(longValue > 99_999_999_999_999) 
+            {
+                buffer[index++] = (byte)((longValue / 100_000_000_000_000) + '0');
+                longValue = longValue % 100_000_000_000_000;
+                goto tenTrillions;
+            }
+            if(longValue > 9_999_999_999_999) goto tenTrillions;
+            if(longValue > 999_999_999_999) 
+            {
+                buffer[index++] = (byte)((longValue / 1_000_000_000_000) + '0');
+                longValue = longValue % 1_000_000_000_000;
+                goto hundredBillions;
+            }
+            if(longValue > 99_999_999_999) goto hundredBillions;
+            if(longValue > 9_999_999_999) 
+            {
+                buffer[index++] = (byte)((longValue / 10_000_000_000) + '0');
+                longValue = longValue % 10_000_000_000;
+                goto billions;
+            }
+            if(longValue > 999_999_999) goto billions;
+            if(longValue > 99_999_999)
+            {
+                buffer[index++] = (byte)((longValue / 100_000_000) + '0');
+                longValue = (longValue % 100_000_000);
+                goto tenMillions;
+            }
+            if(longValue > 9_999_999) goto tenMillions;
+            if(longValue > 999_999) 
+            {
+                buffer[index++] = (byte)((longValue / 1_000_000) + '0');
+                longValue = (longValue % 1_000_000);
+                goto hundredThousands;
+            }
+            if(longValue > 99_999) goto hundredThousands;
+            if(longValue > 9_999) 
+            {
+                buffer[index++] = (byte)((longValue / 10_000) + '0');
+                longValue = (longValue % 10_000);
+                goto thousands;
+            }
+            if(longValue > 999) goto thousands;
+            if(longValue > 99) 
+            {
+                buffer[index++] = (byte)((longValue / 100) + '0');
+                longValue = (longValue % 100);
+                goto tens;
+            }
+            if(longValue > 9) goto tens;
+
+            buffer[index++] = (byte)(longValue + '0');
+            goto end;
+
+            quintrillion:
+            decimalIndex = (longValue / 1_000_000_000_000_000_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = longValue % 1_000_000_000_000_000_000;
+
+            tenQuadtrillions:
+            decimalIndex = (longValue / 10_000_000_000_000_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = longValue % 10_000_000_000_000_000;
+
+            quadtrillions:
+            decimalIndex = (longValue / 100_000_000_000_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = longValue % 100_000_000_000_000;
+
+            tenTrillions:
+            decimalIndex = (longValue / 1_000_000_000_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = longValue % 1_000_000_000_000;
+
+            hundredBillions:
+            decimalIndex = (longValue / 10_000_000_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = longValue % 10_000_000_000;
+
+            billions:
+            decimalIndex = (longValue / 100_000_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = (longValue % 100_000_000);
+
+            tenMillions:
+            decimalIndex = (longValue / 1_000_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = (longValue % 1_000_000);
+
+            hundredThousands:
+            decimalIndex = (longValue / 10_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = (longValue % 10_000);
+
+            thousands:
+            decimalIndex = (longValue / 100)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = (longValue % 100);
+
+            tens:
+            decimalIndex = longValue*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            _index = index;
+            return this;
+
+            end:
+            _index = index;
+            
+            return this;
         }
 
         public IJsonBuilder Append(float value)
