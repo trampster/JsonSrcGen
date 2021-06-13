@@ -64,7 +64,12 @@ namespace UnitTests
             var json = ToJson(jsonClass);
 
             //assert
-            Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
+            var resultClass = System.Text.Json.JsonSerializer.Deserialize<JsonFloatClass>(json);
+            Assert.That(resultClass.Age, Is.EqualTo(jsonClass.Age));
+            Assert.That(resultClass.Height, Is.EqualTo(jsonClass.Height));
+            Assert.That(resultClass.Max, Is.EqualTo(jsonClass.Max));
+            Assert.That(resultClass.Min, Is.EqualTo(jsonClass.Min));
+            Assert.That(resultClass.Zero, Is.EqualTo(jsonClass.Zero));
         }
 
         [Test]

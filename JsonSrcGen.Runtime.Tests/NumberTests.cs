@@ -146,7 +146,7 @@ namespace JsonSrcGen.Runtime.Tests
         public void AppendFloat_CorrectResult([Values(
             1, 12, 123, 1234, 12345, 123456, 1234567, 123456789, 1234567891,
             -1, -12, -123, -1234, -12345, -123456, -1234567, -123456789, -1234567891,
-            0.1f, 0.5f, 0.00123f, 0.00009f, 0.00000123f, 54.905f,
+            0.1f, 0.5f, 0.00123f, 0.00009f, 0.00000123f, 54.905f, 42.21f,
             float.MaxValue, float.MinValue, 0)]float value)
         {
             // arrange
