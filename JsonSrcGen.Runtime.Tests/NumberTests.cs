@@ -141,5 +141,29 @@ namespace JsonSrcGen.Runtime.Tests
             var bytes = _builder.AsSpan();
             Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo(value.ToString()));
         }
+
+        [Test]
+        public void AppendFloat_CorrectResult([Values(
+            1, 12, 123, 1234, 12345, 123456, 1234567, 123456789, 1234567891,
+            -1, -12, -123, -1234, -12345, -123456, -1234567, -123456789, -1234567891,
+            0.1f, 0.5f, 0.00123f, 0.00009f, 0.00000123f, 54.905f,
+            float.MaxValue, float.MinValue, 0)]float value)
+        {
+            // arrange
+            _builder.Clear();
+
+            // act
+            _builder.Append(value);
+
+            // assert
+            var bytes = _builder.AsSpan();
+            var resultString = Encoding.UTF8.GetString(bytes);
+            var resultFloat = float.Parse(resultString);
+
+            var expectedString = value.ToString();
+            var expectedFloat = float.Parse(expectedString);
+
+            Assert.That(resultFloat, Is.EqualTo(expectedFloat));
+        }
     }
 }

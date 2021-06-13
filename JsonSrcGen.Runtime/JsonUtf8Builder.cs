@@ -680,14 +680,84 @@ namespace JsonSrcGen
 
         public IJsonBuilder Append(float value)
         {
-            // if (_index + 19 > _buffer.Length)
-            // {
-            //     ResizeBuffer(19);
-            // }
-            // value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
-            // _index += charsWriten;
-            // return this;
-            throw new NotImplementedException();
+            if (_index + 19 > _buffer.Length)
+            {
+                ResizeBuffer(19);
+            }
+
+            double machineEpsilon =  5.96e-08;
+
+            var buffer = _buffer;
+            var index = _index;
+
+            if(value == 0)
+            {
+                buffer[index++] = (byte)'0';
+                _index = index;
+                return this;
+            }
+            if(value < 0)
+            {
+                buffer[index++] = (byte)'-';
+                value = value * -1;
+            }
+            int exponent = (int)Math.Log10(value);
+            double noramlized = value / Math.Pow(10, exponent);
+            double error = machineEpsilon*noramlized;
+            long longValue = (long)(noramlized * 1_000_000_000);
+            long longError = (long)(error *1_000_000_000);
+
+            //billions:
+            var decimalIndex = (longValue / 100_000_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = (byte)'.';
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = (longValue % 100_000_000);
+            if(longValue < longError) goto exponent;
+
+            //tenMillions:
+            decimalIndex = (longValue / 1_000_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = (longValue % 1_000_000);
+            if(longValue < longError) goto exponent;
+
+            //hundredThousands:
+            decimalIndex = (longValue / 10_000)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = (longValue % 10_000);
+            if(longValue < longError) goto exponent;
+
+            //thousands:
+            decimalIndex = (longValue / 100)*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+            longValue = (longValue % 100);
+            if(longValue < longError) goto exponent;
+
+            //tens:
+            decimalIndex = longValue*2;
+            buffer[index++] = _decimalPairs[decimalIndex++];
+            buffer[index++] = _decimalPairs[decimalIndex];
+
+            exponent:
+
+            if(exponent == 0)
+            {
+                _index = index;
+                return this;
+            }
+            buffer[index++] = (byte)'E';
+            if(exponent > 0)
+            {
+                buffer[index++] = (byte)'+';
+            }
+
+            _index = index;
+            this.Append((short)exponent);
+
+            return this;
         }
 
         public IJsonBuilder Append(double value)
