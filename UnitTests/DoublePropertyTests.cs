@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
-
+using System.Text;
 
 namespace UnitTests
 {
@@ -14,9 +14,26 @@ namespace UnitTests
         public double Zero {get;set;}
     }
 
-    public class DoublePropertyTests 
+    public class DoublePropertyTests : DoublePropertyTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override string ToJson(JsonDoubleClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8DoublePropertyTests : DoublePropertyTestsBase
+    {
+        protected override string ToJson(JsonDoubleClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class DoublePropertyTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
         const string ExpectedJson = "{\"Age\":42.21,\"Height\":176.568,\"Max\":1.7976931348623157E+308,\"Min\":-1.7976931348623157E+308,\"Zero\":0}";
 
         [SetUp]
@@ -26,6 +43,8 @@ namespace UnitTests
             System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-us");
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
         }
+
+        protected abstract string ToJson(JsonDoubleClass jsonClass);
 
         [Test]
         public void ToJson_CorrectString()
@@ -41,7 +60,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));

@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Text;
 
 namespace JsonSrcGen
 {
@@ -762,14 +763,13 @@ namespace JsonSrcGen
 
         public IJsonBuilder Append(double value)
         {
-            // if (_index + 19 > _buffer.Length)
-            // {
-            //     ResizeBuffer(19);
-            // }
-            // value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
-            // _index += charsWriten;
-            // return this;
-            throw new NotImplementedException();
+            if (_index + 19 > _buffer.Length)
+            {
+                ResizeBuffer(19);
+            }
+            Utf8Formatter.TryFormat(value, _buffer.AsSpan(), out int bytesWritten);
+            _index += bytesWritten;
+            return this;
         }
 
         public IJsonBuilder Append(decimal value)

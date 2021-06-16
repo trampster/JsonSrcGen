@@ -165,5 +165,29 @@ namespace JsonSrcGen.Runtime.Tests
 
             Assert.That(resultFloat, Is.EqualTo(expectedFloat));
         }
+
+        [Test]
+        public void AppendDouble_CorrectResult([Values(123456789, 0.1f, 0.00000123f, 0.00123f,
+            123456789, 1, 12, 123, 1234, 12345, 123456, 1234567, 1234567891,
+            -1, -12, -123, -1234, -12345, -123456, -1234567, -123456789, -1234567891,
+            0.1f, 0.5f, 0.00123f, 0.00009f, 0.00000123f, 54.905f, 42.21f,
+            float.MaxValue, float.MinValue, double.MaxValue, double.MinValue, 0)]double value)
+        {
+            // arrange
+            _builder.Clear();
+
+            // act
+            _builder.Append(value);
+
+            // assert
+            var bytes = _builder.AsSpan();
+            var resultString = Encoding.UTF8.GetString(bytes);
+            var resultFloat = double.Parse(resultString);
+
+            var expectedString = value.ToString();
+            var expectedFloat = double.Parse(expectedString);
+
+            Assert.That(resultFloat, Is.EqualTo(expectedFloat));
+        }
     }
 }
