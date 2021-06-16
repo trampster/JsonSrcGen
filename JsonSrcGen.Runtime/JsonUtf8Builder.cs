@@ -767,7 +767,7 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(19);
             }
-            Utf8Formatter.TryFormat(value, _buffer.AsSpan(), out int bytesWritten);
+            Utf8Formatter.TryFormat(value, _buffer.AsSpan(_index), out int bytesWritten);
             _index += bytesWritten;
             return this;
         }
