@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Globalization;
 
 #nullable enable
 namespace JsonSrcGen
@@ -150,7 +151,7 @@ namespace JsonSrcGen
                 _sbNumber.Append(character);
             }
 
-            if (decimal.TryParse(_sbNumber.ToString(), out value))
+            if (decimal.TryParse(_sbNumber.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out value))
             {
                 value *= sign;
                 return json.Slice(index);

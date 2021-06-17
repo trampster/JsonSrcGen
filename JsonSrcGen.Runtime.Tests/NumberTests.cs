@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System.Text;
 using System;
 using System.Linq;
+using System.Globalization;
 
 namespace JsonSrcGen.Runtime.Tests
 {
@@ -158,10 +159,10 @@ namespace JsonSrcGen.Runtime.Tests
             // assert
             var bytes = _builder.AsSpan();
             var resultString = Encoding.UTF8.GetString(bytes);
-            var resultFloat = float.Parse(resultString);
+            var resultFloat = float.Parse(resultString, provider: CultureInfo.InvariantCulture);
 
-            var expectedString = value.ToString();
-            var expectedFloat = float.Parse(expectedString);
+            var expectedString = value.ToString(CultureInfo.InvariantCulture);
+            var expectedFloat = float.Parse(expectedString, provider: CultureInfo.InvariantCulture);
 
             Assert.That(resultFloat, Is.EqualTo(expectedFloat));
         }
@@ -182,10 +183,76 @@ namespace JsonSrcGen.Runtime.Tests
             // assert
             var bytes = _builder.AsSpan();
             var resultString = Encoding.UTF8.GetString(bytes);
-            var resultFloat = double.Parse(resultString);
+            var resultFloat = double.Parse(resultString, provider: CultureInfo.InvariantCulture);
 
-            var expectedString = value.ToString();
-            var expectedFloat = double.Parse(expectedString);
+            var expectedString = value.ToString(CultureInfo.InvariantCulture);
+            var expectedFloat = double.Parse(expectedString, provider: CultureInfo.InvariantCulture);
+
+            Assert.That(resultFloat, Is.EqualTo(expectedFloat));
+        }
+
+        [Test]
+        public void AppendDecimal_CorrectResult([Values(
+            123456789, 1, 12, 123, 1234, 12345, 123456, 1234567, 1234567891,
+            -1, -12, -123, -1234, -12345, -123456, -1234567, -123456789, -1234567891,
+            0.1f, 0.5f, 0.00123f, 0.00009f, 0.00000123f, 54.905f, 42.21f, 0)]double doubleValue)
+        {
+            // arrange
+            var value = (decimal)doubleValue;
+            _builder.Clear();
+
+            // act
+            _builder.Append(value);
+
+            // assert
+            var bytes = _builder.AsSpan();
+            var resultString = Encoding.UTF8.GetString(bytes);
+            var resultFloat = double.Parse(resultString, provider: CultureInfo.InvariantCulture);
+
+            var expectedString = value.ToString(CultureInfo.InvariantCulture);
+            var expectedFloat = double.Parse(expectedString, provider: CultureInfo.InvariantCulture);
+
+            Assert.That(resultFloat, Is.EqualTo(expectedFloat));
+        }
+
+        [Test]
+        public void AppendDecimal_MaxValue_CorrectResult()
+        {
+            // arrange
+            var value = decimal.MaxValue;
+            _builder.Clear();
+
+            // act
+            _builder.Append(value);
+
+            // assert
+            var bytes = _builder.AsSpan();
+            var resultString = Encoding.UTF8.GetString(bytes);
+            var resultFloat = double.Parse(resultString, provider: CultureInfo.InvariantCulture);
+
+            var expectedString = value.ToString(CultureInfo.InvariantCulture);
+            var expectedFloat = double.Parse(expectedString, provider: CultureInfo.InvariantCulture);
+
+            Assert.That(resultFloat, Is.EqualTo(expectedFloat));
+        }
+
+        [Test]
+        public void AppendDecimal_MinValue_CorrectResult()
+        {
+            // arrange
+            var value = decimal.MinValue;
+            _builder.Clear();
+
+            // act
+            _builder.Append(value);
+
+            // assert
+            var bytes = _builder.AsSpan();
+            var resultString = Encoding.UTF8.GetString(bytes);
+            var resultFloat = double.Parse(resultString, provider: CultureInfo.InvariantCulture);
+
+            var expectedString = value.ToString(CultureInfo.InvariantCulture);
+            var expectedFloat = double.Parse(expectedString, provider: CultureInfo.InvariantCulture);
 
             Assert.That(resultFloat, Is.EqualTo(expectedFloat));
         }

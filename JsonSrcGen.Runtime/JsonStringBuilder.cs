@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace JsonSrcGen
 {
@@ -145,7 +146,7 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(19);
             }
-            value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
+            value.TryFormat(_buffer.AsSpan(_index), out int charsWriten, provider: CultureInfo.InvariantCulture);
             _index += charsWriten;
             return this;
         }
@@ -156,7 +157,7 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(30);
             }
-            value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
+            value.TryFormat(_buffer.AsSpan(_index), out int charsWriten, provider: CultureInfo.InvariantCulture);
             _index += charsWriten;
             return this;
         }
@@ -167,7 +168,7 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(19);
             }
-            value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
+            value.TryFormat(_buffer.AsSpan(_index), out int charsWriten, default(ReadOnlySpan<char>), CultureInfo.InvariantCulture);
             _index += charsWriten;
             return this;
         }

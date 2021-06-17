@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Text;
+using System.Threading;
 
 namespace UnitTests
 {
@@ -40,8 +41,9 @@ namespace UnitTests
         public void Setup()
         {
             _convert = new JsonConverter();
-            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-us");
-            System.Threading.Thread.CurrentThread.CurrentCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
+            //pt-BR using comma so this checks that we are not using the current culture (json spec requires dot)
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("pt-BR");
+            Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture;
         }
 
         protected abstract string ToJson(JsonDoubleClass jsonClass);
