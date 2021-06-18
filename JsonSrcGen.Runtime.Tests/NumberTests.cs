@@ -1,12 +1,10 @@
 using NUnit.Framework;
 using System.Text;
-using System;
-using System.Linq;
 using System.Globalization;
 
 namespace JsonSrcGen.Runtime.Tests
 {
-    public class Tests
+    public class NumberTests
     {
         JsonUtf8Builder _builder;
 
