@@ -1,6 +1,6 @@
 using System;
 using System.Buffers.Text;
-using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace JsonSrcGen
 {
@@ -784,16 +784,188 @@ namespace JsonSrcGen
             return this;
         }
 
+        const byte Dash = (byte)'-';
+
+        const byte Zero = (byte)'0';
+        const byte One = (byte)'1';
+        const byte Two = (byte)'2';
+        const byte Three = (byte)'3';
+        const byte Four = (byte)'4';
+        const byte Five = (byte)'5';
+        const byte Six = (byte)'6';
+        const byte Seven = (byte)'7';
+        const byte Eight = (byte)'8';
+        const byte Nine = (byte)'9';
+        const byte A = (byte)'a';
+        const byte B = (byte)'b';
+        const byte C = (byte)'c';
+        const byte D = (byte)'d';
+        const byte E = (byte)'e';
+        const byte F = (byte)'f';
+
+        static readonly byte[] _lowerHexLookup = new byte[256]
+        {
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F,
+            Zero,One,Two,Three,Four,Five,Six,Seven,Eight,Nine,A,B,C,D,E,F
+        };
+        static readonly byte[] _uperHexLookup = new byte[256]
+        {
+            Zero,Zero,Zero,Zero,Zero,Zero,Zero,Zero,Zero,Zero,Zero,Zero,Zero,Zero,Zero,Zero,
+            One,One,Zero,One,Zero,One,Zero,One,Zero,One,One,One,One,One,One,One,
+            Two,Two,Two,Two,Two,Two,Two,Two,Two,Two,Two,Two,Two,Two,Two,Two,
+            Three,Three,Three,Three,Three,Three,Three,Three,Three,Three,Three,Three,Three,Three,Three,Three,
+            Four,Four,Four,Four,Four,Four,Four,Four,Four,Four,Four,Four,Four,Four,Four,Four,
+            Five,Five,Five,Five,Five,Five,Five,Five,Five,Five,Five,Five,Five,Five,Five,Five,
+            Six,Six,Six,Six,Six,Six,Six,Six,Six,Six,Six,Six,Six,Six,Six,Six,
+            Seven,Seven,Seven,Seven,Seven,Seven,Seven,Seven,Seven,Seven,Seven,Seven,Seven,Seven,Seven,Seven,
+            Eight,Eight,Eight,Eight,Eight,Eight,Eight,Eight,Eight,Eight,Eight,Eight,Eight,Eight,Eight,Eight,
+            Nine,Nine,Nine,Nine,Nine,Nine,Nine,Nine,Nine,Nine,Nine,Nine,Nine,Nine,Nine,Nine,
+            A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,
+            B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,
+            C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,
+            D,D,D,D,D,D,D,D,D,D,D,D,D,D,D,D,
+            E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,
+            F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F
+        };
+
         public IJsonBuilder Append(Guid value)
         {
-            // if (_index + 36 > _buffer.Length)
-            // {
-            //     ResizeBuffer(36);
-            // }
-            // value.TryFormat(_buffer.AsSpan(_index), out int charsWriten);
-            // _index += charsWriten;
-            // return this;
-            throw new NotImplementedException();
+            if (_index + 36 > _buffer.Length)
+            {
+                ResizeBuffer(36);
+            }
+
+            DecomposedGuid guidAsBytes = default;
+            guidAsBytes.Guid = value;
+
+            var destination = _buffer.AsSpan(_index);
+
+            ///nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn
+            
+            // this forces a jit bounds check (lookup get optimzed away) which means
+            // the rest of the lookups don't need to be bounds checked
+            { _ = destination[35]; }
+            if (BitConverter.IsLittleEndian)
+            {
+                destination[0] = _uperHexLookup[guidAsBytes.Byte03];
+                destination[1] = _lowerHexLookup[guidAsBytes.Byte03];
+                destination[2] = _uperHexLookup[guidAsBytes.Byte02];
+                destination[3] = _lowerHexLookup[guidAsBytes.Byte02];
+                destination[4] = _uperHexLookup[guidAsBytes.Byte01];
+                destination[5] = _lowerHexLookup[guidAsBytes.Byte01];
+                destination[6] = _uperHexLookup[guidAsBytes.Byte00];
+                destination[7] = _lowerHexLookup[guidAsBytes.Byte00];
+            }
+            else
+            {
+                destination[0] = _uperHexLookup[guidAsBytes.Byte00];
+                destination[1] = _lowerHexLookup[guidAsBytes.Byte00];
+                destination[2] = _uperHexLookup[guidAsBytes.Byte01];
+                destination[3] = _lowerHexLookup[guidAsBytes.Byte01];
+                destination[4] = _uperHexLookup[guidAsBytes.Byte02];
+                destination[5] = _lowerHexLookup[guidAsBytes.Byte02];
+                destination[6] = _uperHexLookup[guidAsBytes.Byte03];
+                destination[7] = _lowerHexLookup[guidAsBytes.Byte03];
+            }
+
+            destination[8] = Dash;
+
+            if (BitConverter.IsLittleEndian)
+            {
+                destination[9] = _uperHexLookup[guidAsBytes.Byte05];
+                destination[10] = _lowerHexLookup[guidAsBytes.Byte05];
+                destination[11] = _uperHexLookup[guidAsBytes.Byte04];
+                destination[12] = _lowerHexLookup[guidAsBytes.Byte04];
+            }
+            else
+            {
+                destination[9] = _uperHexLookup[guidAsBytes.Byte04];
+                destination[10] = _lowerHexLookup[guidAsBytes.Byte04];
+                destination[11] = _uperHexLookup[guidAsBytes.Byte05];
+                destination[12] = _lowerHexLookup[guidAsBytes.Byte05];
+            }
+
+            destination[13] = Dash;
+
+            if (BitConverter.IsLittleEndian)
+            {
+                destination[14] = _uperHexLookup[guidAsBytes.Byte07];
+                destination[15] = _lowerHexLookup[guidAsBytes.Byte07];
+                destination[16] = _uperHexLookup[guidAsBytes.Byte06];
+                destination[17] = _lowerHexLookup[guidAsBytes.Byte06];
+            }
+            else
+            {
+                destination[14] = _uperHexLookup[guidAsBytes.Byte06];
+                destination[15] = _lowerHexLookup[guidAsBytes.Byte06];
+                destination[16] = _uperHexLookup[guidAsBytes.Byte07];
+                destination[17] = _lowerHexLookup[guidAsBytes.Byte07];
+            }
+
+            destination[18] = Dash;
+
+
+            destination[19] = _uperHexLookup[guidAsBytes.Byte08];
+            destination[20] = _lowerHexLookup[guidAsBytes.Byte08];
+            destination[21] = _uperHexLookup[guidAsBytes.Byte09];
+            destination[22] = _lowerHexLookup[guidAsBytes.Byte09];
+
+            destination[23] = Dash;
+
+            destination[24] = _uperHexLookup[guidAsBytes.Byte10];
+            destination[25] = _lowerHexLookup[guidAsBytes.Byte10];
+            destination[26] = _uperHexLookup[guidAsBytes.Byte11];
+            destination[27] = _lowerHexLookup[guidAsBytes.Byte11];
+            destination[28] = _uperHexLookup[guidAsBytes.Byte12];
+            destination[29] = _lowerHexLookup[guidAsBytes.Byte12];
+            destination[30] = _uperHexLookup[guidAsBytes.Byte13];
+            destination[31] = _lowerHexLookup[guidAsBytes.Byte13];
+            destination[32] = _uperHexLookup[guidAsBytes.Byte14];
+            destination[33] = _lowerHexLookup[guidAsBytes.Byte14];
+            destination[34] = _uperHexLookup[guidAsBytes.Byte15];
+            destination[35] = _lowerHexLookup[guidAsBytes.Byte15];
+
+            _index += 36;
+            return this;
+        }
+
+                /// <summary>
+        /// Used to provide access to the individual bytes of a GUID.
+        /// </summary>
+        [StructLayout(LayoutKind.Explicit)]
+        struct DecomposedGuid
+        {
+            [FieldOffset(00)] public Guid Guid;
+            [FieldOffset(00)] public byte Byte00;
+            [FieldOffset(01)] public byte Byte01;
+            [FieldOffset(02)] public byte Byte02;
+            [FieldOffset(03)] public byte Byte03;
+            [FieldOffset(04)] public byte Byte04;
+            [FieldOffset(05)] public byte Byte05;
+            [FieldOffset(06)] public byte Byte06;
+            [FieldOffset(07)] public byte Byte07;
+            [FieldOffset(08)] public byte Byte08;
+            [FieldOffset(09)] public byte Byte09;
+            [FieldOffset(10)] public byte Byte10;
+            [FieldOffset(11)] public byte Byte11;
+            [FieldOffset(12)] public byte Byte12;
+            [FieldOffset(13)] public byte Byte13;
+            [FieldOffset(14)] public byte Byte14;
+            [FieldOffset(15)] public byte Byte15;
         }
 
         public void Clear()
