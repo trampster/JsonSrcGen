@@ -1,112 +1,145 @@
-// using NUnit.Framework;
-// using JsonSrcGen;
-// using System.Collections.Generic;
-// using System;
+using NUnit.Framework;
+using JsonSrcGen;
+using System;
+using System.Text;
+using System.Collections.Generic;
 
-// [assembly: JsonArray(typeof(UnitTests.ArrayTests.CustomClass))] 
+[assembly: JsonArray(typeof(UnitTests.ArrayTests.CustomClass))] 
+[assembly: JsonList(typeof(UnitTests.ArrayTests.CustomClass))] 
 
 
-// namespace UnitTests.ArrayTests
-// {
-//     [Json]
-//     public class CustomClass
-//     {
-//         public string Name {get;set;}
-//     }
+namespace UnitTests.ArrayTests
+{
+    [Json]
+    public class CustomClass
+    {
+        public string Name {get;set;} 
+    }
 
-//     public class CustomClassArrayTests
-//     { 
-//         JsonSrcGen.JsonConverter _convert;
+    public class CustomClassArrayTests : CustomClassArrayTestsBase
+    {
+        protected override string ToJson(CustomClass[] json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
 
-//         string ExpectedJson = "[{\"Name\":\"William\"},null,{\"Name\":\"Susen\"}]";
+        protected override string ToJson(List<CustomClass> json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
 
-//         [SetUp]
-//         public void Setup()
-//         {
-//             _convert = new JsonConverter();
-//         }
+    public class UtfCustomClassArrayTests : CustomClassArrayTestsBase
+    {
+        protected override string ToJson(CustomClass[] json) 
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
 
-//         [Test] 
-//         public void ToJson_CorrectString()
-//         {
-//             //arrange
-//             var array = new CustomClass[]{new CustomClass{Name = "William"}, null, new CustomClass(){Name="Susen"}};
+        protected override string ToJson(List<CustomClass> json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
 
-//             //act
-//             var json = _convert.ToJson(array);
+    public abstract class CustomClassArrayTestsBase
+    { 
+        protected JsonSrcGen.JsonConverter _convert;
 
-//             //assert
-//             Assert.That(json, Is.EqualTo(ExpectedJson));
-//         }
+        string ExpectedJson = "[{\"Name\":\"William\"},null,{\"Name\":\"Susen\"}]";
 
-//         [Test]
-//         public void ToJson_Null_CorrectString()
-//         {
-//             //arrange
-//             //act
-//             var json = _convert.ToJson((CustomClass[])null);
+        [SetUp]
+        public void Setup()
+        {
+            _convert = new JsonConverter();
+        }
+        protected abstract string ToJson(CustomClass[] json);
 
-//             //assert
-//             Assert.That(json, Is.EqualTo("null"));
-//         }
+        protected abstract string ToJson(List<CustomClass> json);
 
-//         [Test]
-//         public void FromJson_EmptyArray_CorrectArray() 
-//         {
-//             //arrange
-//             var array = new CustomClass[]{};
+        [Test] 
+        public void ToJson_CorrectString()
+        {
+            //arrange
+            var array = new CustomClass[]{new CustomClass{Name = "William"}, null, new CustomClass(){Name="Susen"}};
 
-//             //act
-//             array = _convert.FromJson(array, ExpectedJson);
+            //act
+            var json = ToJson(array);
 
-//             //assert
-//             Assert.That(array.Length, Is.EqualTo(3));
-//             Assert.That(array[0].Name, Is.EqualTo("William"));
-//             Assert.That(array[1], Is.Null);
-//             Assert.That(array[2].Name, Is.EqualTo("Susen"));
-//         }
+            //assert
+            Assert.That(new String(json), Is.EqualTo(ExpectedJson));
+        }
 
-//         [Test] 
-//         public void FromJson_PopulatedArray_CorrectArray()
-//         {
-//             //arrange
-//             var array = new CustomClass[]{new CustomClass(), new CustomClass(), new CustomClass()};
+        [Test]
+        public void ToJson_Null_CorrectString()
+        {
+            //arrange
+            //act
+            var json = ToJson((CustomClass[])null);
 
-//             //act
-//             array = _convert.FromJson(array, ExpectedJson);
+            //assert
+            Assert.That(new String(json), Is.EqualTo("null"));
+        }
 
-//             //assert
-//             Assert.That(array.Length, Is.EqualTo(3));
-//             Assert.That(array[0].Name, Is.EqualTo("William"));
-//             Assert.That(array[1], Is.Null);
-//             Assert.That(array[2].Name, Is.EqualTo("Susen"));
-//         }
+        [Test]
+        public void FromJson_EmptyArray_CorrectArray() 
+        {
+            //arrange
+            var array = new CustomClass[]{};
 
-//         [Test] 
-//         public void FromJson_JsonNull_ReturnsNull()
-//         {
-//             //arrange
-//             var array = new CustomClass[]{new CustomClass(), new CustomClass(), new CustomClass()};
+            //act
+            array = _convert.FromJson(array, ExpectedJson);
 
-//             //act
-//             array = _convert.FromJson(array, "null");
+            //assert
+            Assert.That(array.Length, Is.EqualTo(3));
+            Assert.That(array[0].Name, Is.EqualTo("William"));
+            Assert.That(array[1], Is.Null);
+            Assert.That(array[2].Name, Is.EqualTo("Susen"));
+        }
 
-//             //assert
-//             Assert.That(array, Is.Null);
-//         }
+        [Test] 
+        public void FromJson_PopulatedArray_CorrectArray()
+        {
+            //arrange
+            var array = new CustomClass[]{new CustomClass(), new CustomClass(), new CustomClass()};
 
-//         [Test] 
-//         public void FromJson_ArrayNull_MakesArray()
-//         {
-//             //arrange
-//             //act
-//             var array = _convert.FromJson((CustomClass[])null, ExpectedJson);
+            //act
+            array = _convert.FromJson(array, ExpectedJson);
 
-//             //assert
-//             Assert.That(array.Length, Is.EqualTo(3));
-//             Assert.That(array[0].Name, Is.EqualTo("William"));
-//             Assert.That(array[1], Is.Null);
-//             Assert.That(array[2].Name, Is.EqualTo("Susen"));
-//         }
-//     }
-// }
+            //assert
+            Assert.That(array.Length, Is.EqualTo(3));
+            Assert.That(array[0].Name, Is.EqualTo("William"));
+            Assert.That(array[1], Is.Null);
+            Assert.That(array[2].Name, Is.EqualTo("Susen"));
+        }
+
+        [Test] 
+        public void FromJson_JsonNull_ReturnsNull()
+        {
+            //arrange
+            var array = new CustomClass[]{new CustomClass(), new CustomClass(), new CustomClass()};
+
+            //act
+            array = _convert.FromJson(array, "null");
+
+            //assert
+            Assert.That(array, Is.Null);
+        }
+
+        [Test] 
+        public void FromJson_ArrayNull_MakesArray()
+        {
+            //arrange
+            //act
+            var array = _convert.FromJson((CustomClass[])null, ExpectedJson);
+
+            //assert
+            Assert.That(array.Length, Is.EqualTo(3));
+            Assert.That(array[0].Name, Is.EqualTo("William"));
+            Assert.That(array[1], Is.Null);
+            Assert.That(array[2].Name, Is.EqualTo("Susen"));
+        }
+    }
+}

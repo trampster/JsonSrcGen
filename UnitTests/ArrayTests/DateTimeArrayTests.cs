@@ -1,15 +1,32 @@
 using NUnit.Framework;
 using JsonSrcGen;
-using System.Collections.Generic;
 using System;
+using System.Text;
 
 [assembly: JsonArray(typeof(DateTime))] 
 
 namespace UnitTests.ArrayTests
 {
-    public class DateTimeArrayTests
+    public class DateTimeArrayTests : DateTimeArrayTestsBase
+    {
+        protected override string ToJson(DateTime[] json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class UtfDateTimeArrayTests : DateTimeArrayTestsBase
+    {
+        protected override string ToJson(DateTime[] json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class DateTimeArrayTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[\"2017-07-25T00:00:00\",\"2017-07-25T23:59:58\",\"2017-07-25T23:59:58.196\"]";
 
@@ -19,6 +36,9 @@ namespace UnitTests.ArrayTests
             _convert = new JsonConverter();
         }
 
+        protected abstract string ToJson(DateTime[] json);
+
+
         [Test] 
         public void ToJson_CorrectString()
         {
@@ -26,7 +46,7 @@ namespace UnitTests.ArrayTests
             var array = new DateTime[]{new DateTime(2017,7,25), new DateTime(2017,7,25,23,59,58), new DateTime(2017,7,25,23,59,58).AddMilliseconds(196)};
 
             //act
-            var json = _convert.ToJson(array);
+            var json = ToJson(array);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -37,7 +57,7 @@ namespace UnitTests.ArrayTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((DateTime[])null);
+            var json = ToJson((DateTime[])null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));

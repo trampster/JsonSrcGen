@@ -1,15 +1,32 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
-using System;
+using System.Text;
 
 [assembly: JsonArray(typeof(byte))] 
 
 namespace UnitTests.ArrayTests
 {
-    public class ByteArrayTests
+    public class ByteArrayTests : ByteArrayTestsBase
+    {
+        protected override string ToJson(byte[] json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class UtfByteArrayTests : ByteArrayTestsBase
+    {
+        protected override string ToJson(byte[] json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class ByteArrayTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[0,1,255]";
 
@@ -19,6 +36,8 @@ namespace UnitTests.ArrayTests
             _convert = new JsonConverter();
         }
 
+        protected abstract string ToJson(byte[] json);
+
         [Test] 
         public void ToJson_CorrectString()
         {
@@ -26,7 +45,7 @@ namespace UnitTests.ArrayTests
             var list = new byte[]{0, 1, 255};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -37,7 +56,7 @@ namespace UnitTests.ArrayTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((byte[])null);
+            var json = ToJson((byte[])null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));

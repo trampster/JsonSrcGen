@@ -1045,10 +1045,10 @@ namespace JsonSrcGen
                 .Append(input.AsSpan(start, input.Length - start));
         }
 
-        string _offset = "";
+        byte[] _offset = new byte[6];
         int _offsetCacheTime = 0;
 
-        string GetOffset()
+        byte[] GetOffset()
         {
             int tickCount = Environment.TickCount;
             if(_offsetCacheTime + 1000 < tickCount)
@@ -1061,7 +1061,11 @@ namespace JsonSrcGen
                 builder.AppendIntTwo(Math.Abs(offset.Hours));
                 builder.Append(':');
                 builder.AppendIntTwo(offset.Minutes);
-                _offset = builder.ToString();
+                var offsetSpan = builder.AsSpan();
+                for(int index = 0; index < 6; index++)
+                {
+                    _offset[index] = offsetSpan[index];
+                }
             }
             return _offset;
         }
@@ -1082,22 +1086,27 @@ namespace JsonSrcGen
 
         public IJsonBuilder AppendDate(DateTime date)
         {
-            Append('\"');
+            if (_index + 38 > _buffer.Length)
+            {
+                ResizeBuffer(38);
+            }
+            var buffer = _buffer;
+            buffer[_index++] = (byte)'\"'; 
             AppendIntFour(date.Year);
-            Append('-');
+            buffer[_index++] = (byte)'-'; 
             AppendIntTwo(date.Month);
-            Append('-');
+            buffer[_index++] = (byte)'-'; 
             AppendIntTwo(date.Day);
-            Append('T');
+            buffer[_index++] = (byte)'T'; 
             AppendIntTwo(date.Hour);
-            Append(':');
+            buffer[_index++] = (byte)':';
             AppendIntTwo(date.Minute);
-            Append(':');
+            buffer[_index++] = (byte)':';
             AppendIntTwo(date.Second);
             var fractions = date.Ticks % TimeSpan.TicksPerSecond * TimeSpan.TicksPerMillisecond;
             if(fractions != 0)
             {
-                Append('.');
+                buffer[_index++] = (byte)'.';
                 AppendDateTimeFraction(fractions);
             }
 
@@ -1108,10 +1117,15 @@ namespace JsonSrcGen
             }
             else if(date.Kind == DateTimeKind.Unspecified)
             {
-                return Append('\"');
+                buffer[_index++] = (byte)'\"';
+                return this;
             }
-            Append(GetOffset());
-            Append('\"');
+            var offset = GetOffset();
+            for(int index = 0; index < offset.Length; index++)
+            {
+                buffer[_index++] = offset[index];
+            }
+            buffer[_index++] = (byte)'\"';
             
             return this;
         }

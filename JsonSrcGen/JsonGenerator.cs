@@ -207,6 +207,7 @@ namespace JsonSrcGen
             foreach(var listType in listTypes) 
             {
                 toJsonGenerator.GenerateList(listType, classBuilder);
+                toJsonGenerator.GenerateListUtf8(listType, classBuilder);
                 fromJsonGenerator.GenerateList(listType, classBuilder);
             }
 
@@ -214,6 +215,7 @@ namespace JsonSrcGen
             foreach(var arrayType in arrayTypes)
             {
                 toJsonGenerator.GenerateArray(arrayType, classBuilder);
+                toJsonGenerator.GenerateArrayUtf8(arrayType, classBuilder); 
                 fromJsonGenerator.GenerateArray(arrayType, classBuilder);
             }
 

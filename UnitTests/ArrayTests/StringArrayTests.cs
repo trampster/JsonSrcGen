@@ -1,15 +1,31 @@
 using NUnit.Framework;
 using JsonSrcGen;
-using System.Collections.Generic;
-using System;
+using System.Text;
 
 [assembly: JsonArray(typeof(string))] 
 
 namespace UnitTests.ArrayTests
 {
-    public class StringArrayTests
+    public class StringArrayTests : StringArrayTestsBase
+    {
+        protected override string ToJson(string[] json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class Utf8StringArrayTests : StringArrayTestsBase
+    {
+        protected override string ToJson(string[] json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class StringArrayTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[\"one\",null,\"two\"]";
 
@@ -19,6 +35,8 @@ namespace UnitTests.ArrayTests
             _convert = new JsonConverter();
         }
 
+        protected abstract string ToJson(string[] json);
+
         [Test] 
         public void ToJson_CorrectString()
         {
@@ -26,7 +44,7 @@ namespace UnitTests.ArrayTests
             var array = new string[]{"one", null, "two"};
 
             //act
-            var json = _convert.ToJson(array);
+            var json = ToJson(array);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson.ToString()));
@@ -37,7 +55,7 @@ namespace UnitTests.ArrayTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((string[])null);
+            var json = ToJson((string[])null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));

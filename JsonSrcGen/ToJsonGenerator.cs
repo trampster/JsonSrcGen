@@ -176,11 +176,39 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "}"); 
         }
 
+        public void GenerateListUtf8(JsonType type, CodeBuilder codeBuilder) 
+        {
+            codeBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8(List<{type.Namespace}.{type.Name}> value)");
+            codeBuilder.AppendLine(2, "{");
+            codeBuilder.AppendLine(0, Utf8BuilderText);
+
+            var listJsonType = new JsonType("List", "List", "System.Collection.Generic", false, new List<JsonType>(){type}, true, true);
+            var generator = _getGeneratorForType(listJsonType);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), listJsonType, "value", listJsonType.CanBeNull);
+
+            codeBuilder.AppendLine(3, "return builder.AsSpan();");
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
         public void GenerateArray(JsonType type, CodeBuilder codeBuilder) 
         {
             codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({type.Namespace}.{type.Name}[] value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
+
+            var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true, true);
+            var generator = _getGeneratorForType(arrayJsonType);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull);
+
+            codeBuilder.AppendLine(3, "return builder.AsSpan();");
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
+        public void GenerateArrayUtf8(JsonType type, CodeBuilder codeBuilder)
+        {
+            codeBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8({type.Namespace}.{type.Name}[] value)");
+            codeBuilder.AppendLine(2, "{");
+            codeBuilder.AppendLine(0, Utf8BuilderText);
 
             var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true, true);
             var generator = _getGeneratorForType(arrayJsonType);
