@@ -1,15 +1,32 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
-using System;
+using System.Text;
 
 [assembly: JsonList(typeof(bool))] 
 
 namespace UnitTests.ListTests
 {
-    public class BooleanListTests
+    public class BooleanListTests : BooleanListTestsBase
+    {
+        protected override string ToJson(List<bool> json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class Utf8BooleanListTests : BooleanListTestsBase
+    {
+        protected override string ToJson(List<bool> json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class BooleanListTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[true,false]"; 
 
@@ -19,6 +36,8 @@ namespace UnitTests.ListTests
             _convert = new JsonConverter();
         }
 
+        protected abstract string ToJson(List<bool> json);
+
         [Test] 
         public void ToJson_CorrectString()
         {
@@ -26,7 +45,7 @@ namespace UnitTests.ListTests
             var list = new List<bool>(){true, false};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -37,7 +56,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<bool>)null);
+            var json = ToJson((List<bool>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));

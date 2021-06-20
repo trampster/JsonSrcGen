@@ -1,15 +1,32 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
-using System;
+using System.Text;
 
 [assembly: JsonList(typeof(int))] 
 
 namespace UnitTests.ListTests
 {
-    public class IntListTests
+    public class IntListTests : IntListTestsBase
+    {
+        protected override string ToJson(List<int> json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class Utf8IntListTests : IntListTestsBase
+    {
+        protected override string ToJson(List<int> json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class IntListTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[-2147483648,-1,0,1,42,2147483647]";
 
@@ -19,6 +36,8 @@ namespace UnitTests.ListTests
             _convert = new JsonConverter();
         }
 
+        protected abstract string ToJson(List<int> json);
+
         [Test] 
         public void ToJson_CorrectString()
         {
@@ -26,7 +45,7 @@ namespace UnitTests.ListTests
             var list = new List<int>(){int.MinValue,-1,0, 1, 42, int.MaxValue};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -37,7 +56,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<int>)null);
+            var json = ToJson((List<int>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));

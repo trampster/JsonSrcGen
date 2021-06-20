@@ -1,15 +1,32 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
-using System;
+using System.Text;
 
 [assembly: JsonList(typeof(ushort))] 
 
 namespace UnitTests.ListTests
 {
-    public class UShortListTests
+    public class UShortListTests : UShortListTestsBase
+    {
+        protected override string ToJson(List<ushort> json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class Utf8UShortListTests : UShortListTestsBase
+    {
+        protected override string ToJson(List<ushort> json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class UShortListTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[0,1,42,65535]";
 
@@ -19,6 +36,8 @@ namespace UnitTests.ListTests
             _convert = new JsonConverter();
         }
 
+        protected abstract string ToJson(List<ushort> json);
+
         [Test] 
         public void ToJson_CorrectString()
         {
@@ -26,7 +45,7 @@ namespace UnitTests.ListTests
             var list = new List<ushort>(){0, 1, 42, ushort.MaxValue};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson.ToString()));
@@ -37,7 +56,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<ushort>)null);
+            var json = ToJson((List<ushort>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));

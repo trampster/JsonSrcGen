@@ -2,14 +2,32 @@ using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
 using System;
+using System.Text;
 
 [assembly: JsonList(typeof(DateTime?))] 
 
 namespace UnitTests.ListTests
 {
-    public class NullableDateTimeListTests
+    public class NullableDateTimeListTests : NullableDateTimeListTestsBase
+    {
+        protected override string ToJson(List<DateTime?> json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class Utf8NullableDateTimeListTests : NullableDateTimeListTestsBase
+    {
+        protected override string ToJson(List<DateTime?> json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class NullableDateTimeListTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[\"2017-07-25T00:00:00\",\"2017-07-25T23:59:58\",null,\"2017-07-25T23:59:58.196\"]";
 
@@ -19,6 +37,8 @@ namespace UnitTests.ListTests
             _convert = new JsonConverter();
         }
 
+        protected abstract string ToJson(List<DateTime?> json);
+
         [Test] 
         public void ToJson_CorrectString()
         {
@@ -26,7 +46,7 @@ namespace UnitTests.ListTests
             var list = new List<DateTime?>(){new DateTime(2017,7,25), new DateTime(2017,7,25,23,59,58), null, new DateTime(2017,7,25,23,59,58).AddMilliseconds(196)};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -37,7 +57,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<DateTime?>)null);
+            var json = ToJson((List<DateTime?>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));

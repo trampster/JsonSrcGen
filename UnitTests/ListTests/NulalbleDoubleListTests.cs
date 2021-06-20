@@ -1,15 +1,32 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
-using System;
+using System.Text;
 
 [assembly: JsonList(typeof(double?))] 
 
 namespace UnitTests.ListTests
 {
-    public class NullableDoubleListTests
+    public class NullableDoubleListTests : NullableDoubleListTestsBase
+    {
+        protected override string ToJson(List<double?> json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class Utf8NullableDoubleListTests : NullableDoubleListTestsBase
+    {
+        protected override string ToJson(List<double?> json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class NullableDoubleListTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[42.21,176.568,1.7976931348623157E+308,-1.7976931348623157E+308,null,0]";
 
@@ -21,6 +38,7 @@ namespace UnitTests.ListTests
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
 
         }
+        protected abstract string ToJson(List<double?> json);
 
         [Test] 
         public void ToJson_CorrectString()
@@ -29,7 +47,7 @@ namespace UnitTests.ListTests
             var list = new List<double?>(){42.21d, 176.568d, double.MaxValue, double.MinValue, null, 0};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -40,7 +58,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<double?>)null);
+            var json = ToJson((List<double?>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));

@@ -1,15 +1,32 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
-using System;
+using System.Text;
 
 [assembly: JsonList(typeof(byte?))] 
 
 namespace UnitTests.ListTests
 {
-    public class NullableByteListTests
-    { 
-        JsonSrcGen.JsonConverter _convert;
+    public class NullableByteListTests : NullableByteListTestsBase
+    {
+        protected override string ToJson(List<byte?> json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class Utf8NullableByteListTests : NullableByteListTestsBase
+    {
+        protected override string ToJson(List<byte?> json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class NullableByteListTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[0,1,null,255]";
 
@@ -19,6 +36,8 @@ namespace UnitTests.ListTests
             _convert = new JsonConverter();
         }
 
+        protected abstract string ToJson(List<byte?> json);
+
         [Test] 
         public void ToJson_CorrectString()
         {
@@ -26,7 +45,7 @@ namespace UnitTests.ListTests
             var list = new List<byte?>(){0, 1, null, 255};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -37,7 +56,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<byte?>)null);
+            var json = ToJson((List<byte?>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));

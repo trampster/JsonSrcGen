@@ -1,112 +1,130 @@
-// using NUnit.Framework;
-// using JsonSrcGen;
-// using System.Collections.Generic;
-// using System;
+using NUnit.Framework;
+using JsonSrcGen;
+using System.Collections.Generic;
+using System.Text;
 
-// [assembly: JsonList(typeof(UnitTests.ListTests.CustomClass))] 
+[assembly: JsonList(typeof(UnitTests.ListTests.CustomClass))] 
 
+namespace UnitTests.ListTests
+{
+    [Json]
+    public class CustomClass
+    {
+        public string Name {get;set;}
+    }
 
-// namespace UnitTests.ListTests
-// {
-//     [Json]
-//     public class CustomClass
-//     {
-//         public string Name {get;set;}
-//     }
+    public class CustomClassListTests : CustomClassListTestsBase
+    {
+        protected override string ToJson(List<CustomClass> json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
 
-//     public class CustomClassListTests
-//     { 
-//         JsonSrcGen.JsonConverter _convert;
+    public class UtfCustomClassListTests : CustomClassListTestsBase
+    {
+        protected override string ToJson(List<CustomClass> json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
 
-//         string ExpectedJson = "[{\"Name\":\"William\"},null,{\"Name\":\"Susen\"}]";
+    public abstract class CustomClassListTestsBase
+    { 
+        protected JsonSrcGen.JsonConverter _convert;
 
-//         [SetUp]
-//         public void Setup()
-//         {
-//             _convert = new JsonConverter();
-//         }
+        string ExpectedJson = "[{\"Name\":\"William\"},null,{\"Name\":\"Susen\"}]";
 
-//         [Test] 
-//         public void ToJson_CorrectString()
-//         {
-//             //arrange
-//             var list = new List<CustomClass>(){new CustomClass(){Name = "William"}, null, new CustomClass(){Name="Susen"}};
+        [SetUp]
+        public void Setup()
+        {
+            _convert = new JsonConverter();
+        }
 
-//             //act
-//             var json = _convert.ToJson(list);
+        protected abstract string ToJson(List<CustomClass> json);
 
-//             //assert
-//             Assert.That(json, Is.EqualTo(ExpectedJson));
-//         }
+        [Test] 
+        public void ToJson_CorrectString()
+        {
+            //arrange
+            var list = new List<CustomClass>(){new CustomClass(){Name = "William"}, null, new CustomClass(){Name="Susen"}};
 
-//         [Test]
-//         public void ToJson_Null_CorrectString()
-//         {
-//             //arrange
-//             //act
-//             var json = _convert.ToJson((List<CustomClass>)null);
+            //act
+            var json = ToJson(list);
 
-//             //assert
-//             Assert.That(json, Is.EqualTo("null"));
-//         }
+            //assert
+            Assert.That(new string(json), Is.EqualTo(ExpectedJson));
+        }
 
-//         [Test]
-//         public void FromJson_EmptyList_CorrectList() 
-//         {
-//             //arrange
-//             var list = new List<CustomClass>();
+        [Test]
+        public void ToJson_Null_CorrectString()
+        {
+            //arrange
+            //act
+            var json = ToJson((List<CustomClass>)null);
 
-//             //act
-//             _convert.FromJson(list, ExpectedJson);
+            //assert
+            Assert.That(new string(json), Is.EqualTo("null"));
+        }
 
-//             //assert
-//             Assert.That(list.Count, Is.EqualTo(3));
-//             Assert.That(list[0].Name, Is.EqualTo("William"));
-//             Assert.That(list[1], Is.Null);
-//             Assert.That(list[2].Name, Is.EqualTo("Susen"));
-//         }
+        [Test]
+        public void FromJson_EmptyList_CorrectList() 
+        {
+            //arrange
+            var list = new List<CustomClass>();
 
-//         [Test] 
-//         public void FromJson_PopulatedList_CorrectList()
-//         {
-//             //arrange
-//             var list = new List<CustomClass>(){new CustomClass(), new CustomClass(), new CustomClass()};
+            //act
+            _convert.FromJson(list, ExpectedJson);
 
-//             //act
-//             list =_convert.FromJson(list, ExpectedJson);
+            //assert
+            Assert.That(list.Count, Is.EqualTo(3));
+            Assert.That(list[0].Name, Is.EqualTo("William"));
+            Assert.That(list[1], Is.Null);
+            Assert.That(list[2].Name, Is.EqualTo("Susen"));
+        }
 
-//             //assert
-//             Assert.That(list.Count, Is.EqualTo(3));
-//             Assert.That(list[0].Name, Is.EqualTo("William"));
-//             Assert.That(list[1], Is.Null);
-//             Assert.That(list[2].Name, Is.EqualTo("Susen"));
-//         }
+        [Test] 
+        public void FromJson_PopulatedList_CorrectList()
+        {
+            //arrange
+            var list = new List<CustomClass>(){new CustomClass(), new CustomClass(), new CustomClass()};
 
-//         [Test] 
-//         public void FromJson_JsonNull_ReturnsNull()
-//         {
-//             //arrange
-//             var list = new List<CustomClass>(){new CustomClass(), new CustomClass(), new CustomClass()};
+            //act
+            list =_convert.FromJson(list, ExpectedJson);
 
-//             //act
-//             list = _convert.FromJson(list, "null");
+            //assert
+            Assert.That(list.Count, Is.EqualTo(3));
+            Assert.That(list[0].Name, Is.EqualTo("William"));
+            Assert.That(list[1], Is.Null);
+            Assert.That(list[2].Name, Is.EqualTo("Susen"));
+        }
 
-//             //assert
-//             Assert.That(list, Is.Null);
-//         }
+        [Test] 
+        public void FromJson_JsonNull_ReturnsNull()
+        {
+            //arrange
+            var list = new List<CustomClass>(){new CustomClass(), new CustomClass(), new CustomClass()};
 
-//         [Test] 
-//         public void FromJson_ListNull_MakesList()
-//         {
-//             //arrange
-//             //act
-//             var list = _convert.FromJson((List<CustomClass>)null, ExpectedJson);
+            //act
+            list = _convert.FromJson(list, "null");
 
-//             //assert
-//             Assert.That(list.Count, Is.EqualTo(3));
-//             Assert.That(list[0].Name, Is.EqualTo("William"));
-//             Assert.That(list[1], Is.Null);
-//             Assert.That(list[2].Name, Is.EqualTo("Susen"));
-//         }
-//     }
-// }
+            //assert
+            Assert.That(list, Is.Null);
+        }
+
+        [Test] 
+        public void FromJson_ListNull_MakesList()
+        {
+            //arrange
+            //act
+            var list = _convert.FromJson((List<CustomClass>)null, ExpectedJson);
+
+            //assert
+            Assert.That(list.Count, Is.EqualTo(3));
+            Assert.That(list[0].Name, Is.EqualTo("William"));
+            Assert.That(list[1], Is.Null);
+            Assert.That(list[2].Name, Is.EqualTo("Susen"));
+        }
+    }
+}

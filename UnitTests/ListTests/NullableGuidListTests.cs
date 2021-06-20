@@ -2,14 +2,32 @@ using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
 using System;
+using System.Text;
 
 [assembly: JsonList(typeof(Guid?))] 
 
 namespace UnitTests.ListTests
 {
-    public class NullableGuidListTests
+    public class NullableGuidListTests : NullableGuidListTestsBase
+    {
+        protected override string ToJson(List<Guid?> json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class Utf8NullableGuidListTests : NullableGuidListTestsBase
+    {
+        protected override string ToJson(List<Guid?> json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class NullableGuidListTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "[\"00000001-0002-0003-0405-060708090a0b\",null,\"00000002-0002-0003-0405-060708090a0b\"]";
 
@@ -19,6 +37,8 @@ namespace UnitTests.ListTests
             _convert = new JsonConverter();
         }
 
+        protected abstract string ToJson(List<Guid?> json);
+
         [Test] 
         public void ToJson_CorrectString()
         {
@@ -26,7 +46,7 @@ namespace UnitTests.ListTests
             var list = new List<Guid?>(){new Guid(1,2,3,4,5,6,7,8,9,10,11), null, new Guid(2,2,3,4,5,6,7,8,9,10,11)};
 
             //act
-            var json = _convert.ToJson(list);
+            var json = ToJson(list);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -37,7 +57,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((List<Guid?>)null);
+            var json = ToJson((List<Guid?>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));

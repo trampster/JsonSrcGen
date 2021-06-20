@@ -1,23 +1,42 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
-using System;
+using System.Text;
 
 [assembly: JsonList(typeof(string))] 
 
 namespace UnitTests.ListTests
 {
-    public class StringListTests
-    { 
-        JsonSrcGen.JsonConverter _convert;
+    public class StringListTests : StringListTestsBase
+    {
+        protected override string ToJson(List<string> json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
 
-        string ExpectedJson = "[\"one\",null,\"two\"]";
+    public class Utf8StringListTests : StringListTestsBase
+    {
+        protected override string ToJson(List<string> json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class StringListTestsBase
+    { 
+        protected JsonSrcGen.JsonConverter _convert;
+
+        const string ExpectedJson = "[\"one\",null,\"two\"]";
 
         [SetUp]
         public void Setup()
         {
             _convert = new JsonConverter();
         }
+
+        protected abstract string ToJson(List<string> json);
 
         [Test] 
         public void ToJson_CorrectString()
