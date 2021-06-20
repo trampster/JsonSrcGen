@@ -987,7 +987,7 @@ namespace JsonSrcGen
                 var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
                 var builder = new JsonUtf8Builder();
                 if(offset.TotalMinutes > 0) builder.AppendAscii('+');
-                else builder.Append('-');
+                else builder.AppendAscii('-');
                 builder.AppendIntTwo(Math.Abs(offset.Hours));
                 builder.AppendAscii(':');
                 builder.AppendIntTwo(offset.Minutes);
