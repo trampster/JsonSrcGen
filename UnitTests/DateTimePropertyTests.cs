@@ -64,7 +64,6 @@ namespace UnitTests
         }
     }
 
-    [TestFixture]
     public abstract class DateTimePropertyTestsBase
     {
         protected JsonConverter _convert = new JsonConverter();
