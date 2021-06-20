@@ -1,19 +1,39 @@
 using NUnit.Framework;
 using JsonSrcGen;
+using System.Text;
 
 [assembly: JsonValue(typeof(string))] 
 
 namespace UnitTests
 {
-    public class StringValueTests
+    public class StringValueTests : StringValueTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override string ToJson(string json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class Utf8StringValueTests : StringValueTestsBase
+    {
+        protected override string ToJson(string json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class StringValueTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
 
         [SetUp]
         public void Setup()
         {
             _convert = new JsonConverter();
         }
+
+        protected abstract string ToJson(string json);
 
         [TestCase("1", "\"1\"")]
         [TestCase("first", "\"first\"")]
@@ -22,7 +42,7 @@ namespace UnitTests
         {
             //arrange
             //act
-            var json = _convert.ToJson(value);
+            var json = ToJson(value);
 
             //asserts
             Assert.That(json.ToString(), Is.EqualTo(expectedJson));

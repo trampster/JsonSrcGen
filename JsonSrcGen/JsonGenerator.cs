@@ -227,7 +227,6 @@ namespace JsonSrcGen
                 fromJsonGenerator.GenerateDictionary(dictionaryType.Item1, dictionaryType.Item2, classBuilder);
             }
 
-            //generate to string classes
             foreach (var jsonClass in classes)
             {
                 toJsonGenerator.Generate(jsonClass, classBuilder);
@@ -239,6 +238,7 @@ namespace JsonSrcGen
             foreach(var valueType in valueTypes)
             {
                 toJsonGenerator.GenerateValue(valueType, classBuilder);
+                toJsonGenerator.GenerateValueUtf8(valueType, classBuilder);
                 fromJsonGenerator.GenerateValue(valueType, classBuilder); 
             }
 

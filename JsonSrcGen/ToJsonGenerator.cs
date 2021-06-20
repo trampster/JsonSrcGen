@@ -231,6 +231,19 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "}"); 
         }
 
+        public void GenerateValueUtf8(JsonType type, CodeBuilder codeBuilder) 
+        {
+            codeBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8({type.Namespace}.{type.Name} value)");
+            codeBuilder.AppendLine(2, "{");
+            codeBuilder.AppendLine(0, Utf8BuilderText);
+
+            var generator = _getGeneratorForType(type);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), type, "value", type.CanBeNull);
+
+            codeBuilder.AppendLine(3, "return builder.AsSpan();");
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
         public void GenerateDictionary(JsonType keyType, JsonType valueType, CodeBuilder codeBuilder) 
         {
             codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson(Dictionary<{keyType.FullName},{valueType.FullName}> value)");
