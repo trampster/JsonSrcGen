@@ -223,6 +223,7 @@ namespace JsonSrcGen
             foreach(var dictionaryType in dictionaryTypes)
             {
                 toJsonGenerator.GenerateDictionary(dictionaryType.Item1, dictionaryType.Item2, classBuilder);
+                toJsonGenerator.GenerateDictionaryUtf8(dictionaryType.Item1, dictionaryType.Item2, classBuilder);
                 fromJsonGenerator.GenerateDictionary(dictionaryType.Item1, dictionaryType.Item2, classBuilder);
             }
 

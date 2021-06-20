@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using JsonSrcGen;
-using System.Collections.Generic;
 using System.Text;
 
 [assembly: JsonArray(typeof(bool))]
@@ -15,7 +14,7 @@ namespace UnitTests.ListTests
         }
     }
 
-    public class UtfBooleanArrayTests : BooleanArrayTestsBase
+    public class Utf8BooleanArrayTests : BooleanArrayTestsBase
     {
         protected override string ToJson(bool[] json)
         {

@@ -2,14 +2,32 @@ using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
 using System;
+using System.Text;
 
 [assembly: JsonDictionary(typeof(string), typeof(int))] 
 
 namespace UnitTests.ListTests
 {
-    public class IntDictionaryArrayTests 
+    public class IntDictionaryArrayTests : IntDictionaryArrayTestsBase
+    {
+        protected override string ToJson(Dictionary<string, int> json)
+        {
+            return _convert.ToJson(json).ToString();
+        }
+    }
+
+    public class Utf8IntDictionaryArrayTests : IntDictionaryArrayTestsBase
+    {
+        protected override string ToJson(Dictionary<string, int> json)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(json); 
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class IntDictionaryArrayTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "{\"First\":1,\"Second\":2,\"Third\":3}";
 
@@ -18,6 +36,7 @@ namespace UnitTests.ListTests
         {
             _convert = new JsonConverter();
         }
+        protected abstract string ToJson(Dictionary<string, int> json);
 
         [Test] 
         public void ToJson_CorrectString()
@@ -31,7 +50,7 @@ namespace UnitTests.ListTests
             };
 
             //act
-            var json = _convert.ToJson(dictionary);
+            var json = ToJson(dictionary);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -42,7 +61,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var json = _convert.ToJson((Dictionary<string, int>)null);
+            var json = ToJson((Dictionary<string, int>)null);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));
