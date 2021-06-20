@@ -21,7 +21,7 @@ namespace UnitTests
         }
     }
 
-    public class UUtf8ShortPropertyTests : ShortPropertyTestsBase
+    public class Utf8UShortPropertyTests : ShortPropertyTestsBase
     {
         protected override string ToJson(JsonShortClass jsonClass)
         {

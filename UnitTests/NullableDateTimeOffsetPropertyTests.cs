@@ -2,6 +2,7 @@ using NUnit.Framework;
 using JsonSrcGen;
 using System;
 using System.Collections;
+using System.Text;
 
 namespace UnitTests
 {
@@ -64,11 +65,29 @@ namespace UnitTests
         }
     }
 
-
-    [TestFixture]
-    public class NullableDateTimeOffsetPropertyTests
+    public class NullableDateTimeOffsetPropertyTests : NullableDateTimeOffsetPropertyTestsBase
     {
-        JsonConverter _convert = new JsonConverter();
+        protected override string ToJson(NullableDateTimeOffsetClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8NullableDateTimeOffsetPropertyTests : NullableDateTimeOffsetPropertyTestsBase
+    {
+        protected override string ToJson(NullableDateTimeOffsetClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+
+    public abstract class NullableDateTimeOffsetPropertyTestsBase
+    {
+        protected JsonConverter _convert = new JsonConverter();
+
+        protected abstract string ToJson(NullableDateTimeOffsetClass jsonClass);
 
         [Test, TestCaseSource(typeof(DateTimeOffsetTestCaseData), "TestCases")]
         public void DateTimeProperty_CorrectlyDeserialized(string value, DateTimeOffset expectedDateTime)
@@ -91,7 +110,7 @@ namespace UnitTests
             dateTimeObject.Property = new DateTimeOffset(new DateTime(2017,3,7), new TimeSpan(13,00,00));
 
             //act
-            var json = _convert.ToJson(dateTimeObject);
+            var json = ToJson(dateTimeObject);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"Property\":\"2017-03-07T00:00:00+13:00\"}"));
@@ -105,7 +124,7 @@ namespace UnitTests
             dateTimeObject.Property = new DateTimeOffset(new DateTime(2016,1,2,23,59,58,555), new TimeSpan(-9,-15,00));
 
             //act
-            var json = _convert.ToJson(dateTimeObject);
+            var json = ToJson(dateTimeObject);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"Property\":\"2016-01-02T23:59:58.555-09:15\"}"));
@@ -119,7 +138,7 @@ namespace UnitTests
             dateTimeObject.Property = new DateTime(2016,1,2,23,59,58,555, DateTimeKind.Utc);
 
             //act
-            var json = _convert.ToJson(dateTimeObject);
+            var json = ToJson(dateTimeObject);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"Property\":\"2016-01-02T23:59:58.555+00:00\"}"));
@@ -133,7 +152,7 @@ namespace UnitTests
             dateTimeObject.Property = null;
 
             //act
-            var json = _convert.ToJson(dateTimeObject);
+            var json = ToJson(dateTimeObject);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"Property\":null}"));

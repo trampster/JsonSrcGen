@@ -986,10 +986,10 @@ namespace JsonSrcGen
                 _offsetCacheTime = tickCount;
                 var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
                 var builder = new JsonUtf8Builder();
-                if(offset.TotalMinutes > 0) builder.Append('+');
+                if(offset.TotalMinutes > 0) builder.AppendAscii('+');
                 else builder.Append('-');
                 builder.AppendIntTwo(Math.Abs(offset.Hours));
-                builder.Append(':');
+                builder.AppendAscii(':');
                 builder.AppendIntTwo(offset.Minutes);
                 var offsetSpan = builder.AsSpan();
                 for(int index = 0; index < 6; index++)
@@ -1006,10 +1006,10 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(6);
             }
-            if(offset.TotalMinutes >= 0) Append('+');
-            else Append('-');
+            if(offset.TotalMinutes >= 0) _buffer[_index++] = (byte)'+';
+            else _buffer[_index++] = (byte)'-';
             AppendIntTwo(Math.Abs(offset.Hours));
-            Append(':');
+            _buffer[_index++] = (byte)':';
             AppendIntTwo(Math.Abs(offset.Minutes));
             return this;
         }
@@ -1062,28 +1062,33 @@ namespace JsonSrcGen
 
         public IJsonBuilder AppendDateTimeOffset(DateTimeOffset date)
         {
-            Append('\"');
+            if (_index + 38 > _buffer.Length)
+            {
+                ResizeBuffer(38);
+            }
+            var buffer = _buffer;
+            buffer[_index++] = (byte)'\"'; 
             AppendIntFour(date.Year);
-            Append('-');
+            buffer[_index++] = (byte)'-'; 
             AppendIntTwo(date.Month);
-            Append('-');
+            buffer[_index++] = (byte)'-'; 
             AppendIntTwo(date.Day);
-            Append('T');
+            buffer[_index++] = (byte)'T'; 
             AppendIntTwo(date.Hour);
-            Append(':');
+            buffer[_index++] = (byte)':';
             AppendIntTwo(date.Minute);
-            Append(':');
+            buffer[_index++] = (byte)':';
             AppendIntTwo(date.Second);
             var fractions = date.Ticks % TimeSpan.TicksPerSecond * TimeSpan.TicksPerMillisecond;
             if(fractions != 0)
             {
-                Append('.');
+                buffer[_index++] = (byte)'.';
                 AppendDateTimeFraction(fractions);
             }
 
             //offset
             AppendOffset(date.Offset);
-            Append('\"');
+            buffer[_index++] = (byte)'\"';
             
             return this;
         }

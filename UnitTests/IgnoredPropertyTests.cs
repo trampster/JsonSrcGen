@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
-
+using System.Text;
 
 namespace UnitTests
 {
@@ -14,9 +14,26 @@ namespace UnitTests
         public int Ignored {get;set;}
     }
 
-    public class IgnoredPropertyTests
+    public class IgnoredPropertyTests : IgnoredPropertyTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override string ToJson(JsonIgnoredPropertyClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8IgnoredPropertyTests : IgnoredPropertyTestsBase
+    {
+        protected override string ToJson(JsonIgnoredPropertyClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class IgnoredPropertyTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
         const string ExpectedJson = "{\"Age\":42,\"Escaping\":12,\"Height\":176}";
 
         [SetUp]
@@ -24,6 +41,8 @@ namespace UnitTests
         {
             _convert = new JsonConverter(); 
         }
+
+        protected abstract string ToJson(JsonIgnoredPropertyClass jsonClass);
 
         [Test]
         public void ToJson_CorrectString()
@@ -37,7 +56,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));

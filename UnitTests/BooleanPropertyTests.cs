@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
-
+using System.Text;
 
 namespace UnitTests
 {
@@ -11,15 +11,34 @@ namespace UnitTests
         public bool IsFalse {get;set;}
     }
 
-    public class BooleanPropertyTests
+    public class BooleanPropertyTests : BooleanPropertyTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override string ToJson(JsonBooleanClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8BooleanPropertyTests : BooleanPropertyTestsBase
+    {
+        protected override string ToJson(JsonBooleanClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class BooleanPropertyTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
 
         [SetUp]
         public void Setup()
         {
             _convert = new JsonConverter();
         }
+
+        protected abstract string ToJson(JsonBooleanClass jsonClass);
 
         [Test]
         public void ToJson_CorrectString()
@@ -32,7 +51,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"IsFalse\":false,\"IsTrue\":true}"));

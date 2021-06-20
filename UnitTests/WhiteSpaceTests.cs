@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
 
-
 namespace UnitTests
 {
     [Json]

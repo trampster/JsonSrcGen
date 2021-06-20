@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
+using System.Text;
 
 namespace UnitTests
 {
@@ -9,9 +10,26 @@ namespace UnitTests
         public bool[] BooleanArray {get;set;} 
     }
 
-    public class ArrayPropertyTests
+    public class ArrayPropertyTests : ArrayPropertyTestsBase
+    {
+        protected override string ToJson(JsonArrayClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8ArrayPropertyTests : ArrayPropertyTestsBase
+    {
+        protected override string ToJson(JsonArrayClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class ArrayPropertyTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = $"{{\"BooleanArray\":[true,false]}}";
 
@@ -20,6 +38,8 @@ namespace UnitTests
         {
             _convert = new JsonConverter();
         }
+
+        protected abstract string ToJson(JsonArrayClass jsonClass);
 
         [Test] 
         public void ToJson_CorrectString()
@@ -31,7 +51,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson.ToString()));
@@ -47,7 +67,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"BooleanArray\":null}"));

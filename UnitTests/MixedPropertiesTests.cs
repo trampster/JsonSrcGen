@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
-
+using System.Text;
 
 namespace UnitTests
 {
@@ -13,15 +13,34 @@ namespace UnitTests
         public bool IsTrue {get;set;}
     }
 
-    public class MixedPropertiesTests
+    public class MixedPropertiesTests : MixedPropertiesTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override string ToJson(MixedJsonClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8MixedPropertiesTests : MixedPropertiesTestsBase
+    {
+        protected override string ToJson(MixedJsonClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class MixedPropertiesTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
 
         [SetUp]
         public void Setup()
         {
             _convert = new JsonConverter();
         }
+
+        protected abstract string ToJson(MixedJsonClass jsonClass);
 
         [Test]
         public void ToJson_CorrectString()
@@ -36,7 +55,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass); 
+            var json = ToJson(jsonClass); 
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"Age\":97,\"IsTrue\":true,\"Name\":\"Jack\",\"NullProperty\":null}"));

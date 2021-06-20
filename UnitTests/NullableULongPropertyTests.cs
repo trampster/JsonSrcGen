@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
-
+using System.Text;
 
 namespace UnitTests
 {
@@ -14,9 +14,26 @@ namespace UnitTests
         public ulong? Null {get;set;}
     }
 
-    public class NullableULongPropertyTests
+    public class NullableULongPropertyTests : NullableULongPropertyTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override string ToJson(JsonNullableULongClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8NullableULongPropertyTests : NullableULongPropertyTestsBase
+    {
+        protected override string ToJson(JsonNullableULongClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class NullableULongPropertyTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
         const string ExpectedJson = "{\"Age\":42,\"Height\":176,\"Max\":18446744073709551615,\"Min\":0,\"Null\":null}";
 
         [SetUp]
@@ -24,6 +41,8 @@ namespace UnitTests
         {
             _convert = new JsonConverter();
         }
+
+        protected abstract string ToJson(JsonNullableULongClass jsonClass);
 
         [Test]
         public void ToJson_CorrectString()
@@ -39,7 +58,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));

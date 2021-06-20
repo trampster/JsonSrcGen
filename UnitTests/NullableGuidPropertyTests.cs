@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System;
-
+using System.Text;
 
 namespace UnitTests
 {
@@ -12,9 +12,26 @@ namespace UnitTests
         public Guid? Null {get;set;}
     }
 
-    public class NullableGuidPropertyTests
+    public class NullableGuidPropertyTests : NullableGuidPropertyTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override string ToJson(JsonNullableGuidClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8NullableGuidPropertyTests : NullableGuidPropertyTestsBase
+    {
+        protected override string ToJson(JsonNullableGuidClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class NullableGuidPropertyTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
         const string ExpectedJson = "{\"GuidProperty\":\"00000001-0002-0003-0405-060708090a0b\",\"Null\":null}";
 
         [SetUp]
@@ -22,6 +39,8 @@ namespace UnitTests
         {
             _convert = new JsonConverter();
         }
+
+        protected abstract string ToJson(JsonNullableGuidClass jsonClass);
 
         [Test]
         public void ToJson_CorrectString()
@@ -34,7 +53,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson)); 

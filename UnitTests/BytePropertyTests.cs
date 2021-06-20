@@ -43,7 +43,6 @@ namespace UnitTests
 
         protected abstract string ToJson(JsonByteClass jsonClass);
 
-
         [Test]
         public void ToJson_CorrectString()
         {

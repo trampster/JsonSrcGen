@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
-
+using System.Text;
 
 namespace UnitTests
 {
@@ -15,9 +15,26 @@ namespace UnitTests
         public float? Zero {get;set;}
     }
 
-    public class NullableFloatPropertyTests 
+    public class NullableFloatPropertyTests : NullableFloatPropertyTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override string ToJson(JsonNullableFloatClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8NullableFloatPropertyTests : NullableFloatPropertyTestsBase
+    {
+        protected override string ToJson(JsonNullableFloatClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class NullableFloatPropertyTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
         const string ExpectedJson = "{\"Age\":42.21,\"Height\":176.568,\"Max\":3.4028235E+38,\"Min\":-3.4028235E+38,\"Null\":null,\"Zero\":0}";
 
         [SetUp]
@@ -26,8 +43,10 @@ namespace UnitTests
             _convert = new JsonConverter();
             System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-us");
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
-
         }
+
+        protected abstract string ToJson(JsonNullableFloatClass jsonClass);
+
 
         [Test]
         public void ToJson_CorrectString()
@@ -44,7 +63,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));

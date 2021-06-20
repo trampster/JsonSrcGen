@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
-
+using System.Text;
 
 namespace UnitTests
 {
@@ -18,9 +18,26 @@ namespace UnitTests
         public int Age {get;set;} 
     }
 
-    public class NestedClassTests
+    public class NestedClassTests : NestedClassTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override string ToJson(JsonParentClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8NestedClassTests : NestedClassTestsBase
+    {
+        protected override string ToJson(JsonParentClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class NestedClassTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = "{\"Child\":{\"Age\":8,\"Name\":\"Samuel\"},\"Null\":null}";
 
@@ -29,6 +46,8 @@ namespace UnitTests
         {
             _convert = new JsonConverter();
         }
+
+        protected abstract string ToJson(JsonParentClass jsonClass);
 
         [Test]
         public void ToJson_CorrectString()
@@ -45,7 +64,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));

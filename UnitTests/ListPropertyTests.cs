@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections.Generic;
-
+using System.Text;
 
 namespace UnitTests
 {
@@ -11,11 +11,30 @@ namespace UnitTests
         public System.Collections.Generic.List<bool> BooleanList {get;set;} 
     }
 
-    public class ListPropertyTests
+    public class ListPropertyTests : ListPropertyTestsBase
+    {
+        protected override string ToJson(JsonListClass jsonClass)
+        {
+            return _convert.ToJson(jsonClass).ToString();
+        }
+    }
+
+    public class Utf8ListPropertyTests: ListPropertyTestsBase
+    {
+        protected override string ToJson(JsonListClass jsonClass)
+        {
+            var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
+            return Encoding.UTF8.GetString(jsonUtf8);
+        }
+    }
+
+    public abstract class ListPropertyTestsBase
     { 
-        JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert;
 
         string ExpectedJson = $"{{\"BooleanList\":[true,false]}}";
+
+        protected abstract string ToJson(JsonListClass jsonClass);
 
         [SetUp]
         public void Setup()
@@ -33,7 +52,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
@@ -49,7 +68,7 @@ namespace UnitTests
             };
 
             //act
-            var json = _convert.ToJson(jsonClass);
+            var json = ToJson(jsonClass);
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"BooleanList\":null}"));
