@@ -9,7 +9,7 @@
   <PropertyGroup>
     <Version>1.1.0.0</Version>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <PackageVersion>1.1.0.0-alpha.1</PackageVersion>
+    <PackageVersion>1.1.0.0-alpha.2</PackageVersion>
     <PackageId>JsonSrcGen.Runtime</PackageId>
     <Authors>Daniel Hughes</Authors>
     <Description>
