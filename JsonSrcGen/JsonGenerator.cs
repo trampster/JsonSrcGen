@@ -111,6 +111,7 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("JsonListAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonNameAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonSpanExtensions.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonUtf8SpanExtensions.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("ICustomConverter.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("CustomConverterAttribute.cs", context, compilation, GenerationFolder);
         
@@ -240,6 +241,7 @@ namespace JsonSrcGen
                 toJsonGenerator.GenerateValue(valueType, classBuilder);
                 toJsonGenerator.GenerateValueUtf8(valueType, classBuilder);
                 fromJsonGenerator.GenerateValue(valueType, classBuilder); 
+                fromJsonGenerator.GenerateValueUtf8(valueType, classBuilder); 
             }
 
             foreach(var generator in _generators)

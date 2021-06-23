@@ -71,6 +71,19 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "}"); 
         }
 
+        public void GenerateValueUtf8(JsonType type, CodeBuilder codeBuilder) 
+        {
+            codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name}{type.NullibleReferenceTypeAnnotation} FromJson({type.Namespace}.{type.Name}{type.NullibleReferenceTypeAnnotation} value, ReadOnlySpan<byte> json)");
+            codeBuilder.AppendLine(2, "{");
+
+            var generator = _getGeneratorForType(type);
+
+            generator.GenerateFromJson(codeBuilder, 3, type, value => $"value = {value};", "value");
+
+            codeBuilder.AppendLine(3, "return value;"); 
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
         public void Generate(JsonClass jsonClass, CodeBuilder codeBuilder)
         {
             if (jsonClass.ReadOnly)

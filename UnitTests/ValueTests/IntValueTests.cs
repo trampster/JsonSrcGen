@@ -12,6 +12,11 @@ namespace UnitTests
         {
             return _convert.ToJson(json).ToString();
         }
+
+        protected override int FromJson(int value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class Utf8IntValueTests : IntValueTestsBase
@@ -20,6 +25,11 @@ namespace UnitTests
         {
             var jsonUtf8 = _convert.ToJsonUtf8(json); 
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override int FromJson(int value, string json)
+        {
+            return _convert.FromJson(value, Encoding.UTF8.GetBytes(json));
         }
     }
 
@@ -46,7 +56,10 @@ namespace UnitTests
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(expectedJson));
-        } 
+        }
+
+        protected abstract int FromJson(int value, string json);
+
 
         [TestCase(1, "1")]
         [TestCase(int.MaxValue, "2147483647")]
@@ -56,7 +69,7 @@ namespace UnitTests
             //arrange
             int value = 0;
             //act
-            value = _convert.FromJson(value, json); 
+            value = FromJson(value, json); 
 
             //assert
             Assert.That(value, Is.EqualTo(expectedValue));
