@@ -44,7 +44,6 @@ namespace JsonSrcGen
             get;
         }
 
-
-        public string FullName => $"{Namespace}.{Name}";
+        public string FullName => string.IsNullOrEmpty(Namespace) ? Name : $"{Namespace}.{Name}";
     }
 }

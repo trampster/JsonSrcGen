@@ -367,7 +367,7 @@ namespace JsonSrcGen
                     var keyType = GetJsonType(attribute.ArgumentList.Arguments[0], model);
                     if(keyType.FullName != "System.String")
                     {
-                        throw new NotSupportedException("JsonSrcGen only supports Dictionary with String keys.");
+                        throw new NotSupportedException($"JsonSrcGen only supports Dictionary with String keys but was {keyType.FullName}.");
                     }
                     var valueType = GetJsonType(attribute.ArgumentList.Arguments[1], model);
                     listTypes.Add((keyType, valueType));
@@ -451,7 +451,11 @@ namespace JsonSrcGen
                 if (HasJsonClassAttribute(classSymbol))
                 {
                     string jsonClassName = classSymbol.Name;
-                    string jsonClassNamespace = classSymbol.ContainingNamespace.ToString();
+                    string jsonClassNamespace = "";
+                    if(!classSymbol.ContainingNamespace.IsGlobalNamespace)
+                    {
+                        jsonClassNamespace = classSymbol.ContainingNamespace.ToString();
+                    }
 
                     bool ignoreNull = HasJsonIgnoreNullAttribute(classSymbol);
 
@@ -608,7 +612,13 @@ namespace JsonSrcGen
             }
             bool canBeNull = typeSymbol.IsReferenceType; 
             bool isCustomType = HasJsonClassAttribute(typeSymbol);
-            return new JsonType(isCustomType ? $"{typeSymbol.ContainingNamespace}.{typeSymbol.Name}" : typeSymbol.Name, typeSymbol.Name, FullNamespace(typeSymbol), isCustomType, GetGenericArguments(typeSymbol, semanticModel), canBeNull, typeSymbol.IsReferenceType);
+
+            return new JsonType(
+                isCustomType ? $"{typeSymbol.ContainingNamespace}.{typeSymbol.Name}" : typeSymbol.Name, 
+                typeSymbol.Name, 
+                FullNamespace(typeSymbol), 
+                isCustomType, 
+                GetGenericArguments(typeSymbol, semanticModel), canBeNull, typeSymbol.IsReferenceType);
         }
 
         string FullNamespace(ITypeSymbol symbol)
@@ -617,7 +627,7 @@ namespace JsonSrcGen
             var containingNamespace  = symbol.ContainingNamespace;
             while(true)
             {
-                if(containingNamespace.Name != "")
+                if(containingNamespace.Name != "" && !containingNamespace.IsGlobalNamespace)
                 {
                     namespaceBuilder.Add(containingNamespace.Name);
                 }

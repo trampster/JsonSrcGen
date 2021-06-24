@@ -17,7 +17,7 @@ namespace JsonSrcGen
         public string GeneratorId {get;}
         public string Name {get;}
         public string Namespace {get;}
-        public string FullName => $"{Namespace}.{Name}";
+        public string FullName => string.IsNullOrEmpty(Namespace) ? Name : $"{Namespace}.{Name}";
         public bool IsCustomType {get;}
         public bool CanBeNull {get;}
         public List<JsonType> GenericArguments {get;}

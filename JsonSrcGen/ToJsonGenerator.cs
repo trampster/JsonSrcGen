@@ -36,13 +36,13 @@ namespace JsonSrcGen
 
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
         {
-        	if (jsonClass.StructRef)
+            if (jsonClass.StructRef)
         	{
-            	classBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson(ref {jsonClass.Namespace}.{jsonClass.Name} value)");
+            	classBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson(ref {jsonClass.FullName} value)");
         	}
         	else
         	{
-        		classBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({jsonClass.Namespace}.{jsonClass.Name} value)");
+        		classBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({jsonClass.FullName} value)");
         	}
         	
             classBuilder.AppendLine(2, "{");
@@ -52,7 +52,7 @@ namespace JsonSrcGen
             classBuilder.AppendLine(2, "}"); 
 
 
-            classBuilder.AppendLine(2, $"public void ToJson({jsonClass.Namespace}.{jsonClass.Name} value, JsonStringBuilder builder)");
+            classBuilder.AppendLine(2, $"public void ToJson({jsonClass.FullName} value, JsonStringBuilder builder)");
             classBuilder.AppendLine(2, "{");
 
             var appendBuilder = new StringBuilder();
@@ -102,11 +102,11 @@ namespace JsonSrcGen
         {
         	if (jsonClass.StructRef)
 			{
-				classBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8(ref {jsonClass.Namespace}.{jsonClass.Name} value)");
+				classBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8(ref {jsonClass.FullName} value)");
 		    }
 		    else
 		    {
-		    	classBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8({jsonClass.Namespace}.{jsonClass.Name} value)");
+		    	classBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8({jsonClass.FullName} value)");
 		    }
 		    
             classBuilder.AppendLine(2, "{");
@@ -116,7 +116,7 @@ namespace JsonSrcGen
             classBuilder.AppendLine(2, "}"); 
 
 
-            classBuilder.AppendLine(2, $"public void ToJson({jsonClass.Namespace}.{jsonClass.Name} value, JsonUtf8Builder builder)");
+            classBuilder.AppendLine(2, $"public void ToJson({jsonClass.FullName} value, JsonUtf8Builder builder)");
             classBuilder.AppendLine(2, "{");
 
             var appendBuilder = new StringBuilder();
@@ -164,7 +164,7 @@ namespace JsonSrcGen
 
         public void GenerateList(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson(List<{type.Namespace}.{type.Name}> value)");
+            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson(List<{type.FullName}> value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
@@ -178,7 +178,7 @@ namespace JsonSrcGen
 
         public void GenerateListUtf8(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8(List<{type.Namespace}.{type.Name}> value)");
+            codeBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8(List<{type.FullName}> value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, Utf8BuilderText);
 
@@ -192,7 +192,7 @@ namespace JsonSrcGen
 
         public void GenerateArray(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({type.Namespace}.{type.Name}[] value)");
+            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({type.FullName}[] value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
@@ -206,7 +206,7 @@ namespace JsonSrcGen
 
         public void GenerateArrayUtf8(JsonType type, CodeBuilder codeBuilder)
         {
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8({type.Namespace}.{type.Name}[] value)");
+            codeBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8({type.FullName}[] value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, Utf8BuilderText);
 
@@ -220,7 +220,7 @@ namespace JsonSrcGen
 
         public void GenerateValue(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({type.Namespace}.{type.Name} value)");
+            codeBuilder.AppendLine(2, $"public ReadOnlySpan<char> ToJson({type.FullName} value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, BuilderText);
 
@@ -233,7 +233,7 @@ namespace JsonSrcGen
 
         public void GenerateValueUtf8(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8({type.Namespace}.{type.Name} value)");
+            codeBuilder.AppendLine(2, $"public ReadOnlySpan<byte> ToJsonUtf8({type.FullName} value)");
             codeBuilder.AppendLine(2, "{");
             codeBuilder.AppendLine(0, Utf8BuilderText);
 

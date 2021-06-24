@@ -46,7 +46,7 @@ namespace JsonSrcGen
 
         public void GenerateArray(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name}{type.NullibleReferenceTypeAnnotation}[]? FromJson({type.Namespace}.{type.Name}{type.NullibleReferenceTypeAnnotation}[]? value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, $"public {type.FullName}{type.NullibleReferenceTypeAnnotation}[]? FromJson({type.FullName}{type.NullibleReferenceTypeAnnotation}[]? value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
 
             var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true, true);
@@ -60,7 +60,7 @@ namespace JsonSrcGen
 
         public void GenerateValue(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name}{type.NullibleReferenceTypeAnnotation} FromJson({type.Namespace}.{type.Name}{type.NullibleReferenceTypeAnnotation} value, ReadOnlySpan<char> json)");
+            codeBuilder.AppendLine(2, $"public {type.FullName}{type.NullibleReferenceTypeAnnotation} FromJson({type.FullName}{type.NullibleReferenceTypeAnnotation} value, ReadOnlySpan<char> json)");
             codeBuilder.AppendLine(2, "{");
 
             var generator = _getGeneratorForType(type);
@@ -73,7 +73,7 @@ namespace JsonSrcGen
 
         public void GenerateValueUtf8(JsonType type, CodeBuilder codeBuilder) 
         {
-            codeBuilder.AppendLine(2, $"public {type.Namespace}.{type.Name}{type.NullibleReferenceTypeAnnotation} FromJson({type.Namespace}.{type.Name}{type.NullibleReferenceTypeAnnotation} value, ReadOnlySpan<byte> json)");
+            codeBuilder.AppendLine(2, $"public {type.FullName}{type.NullibleReferenceTypeAnnotation} FromJson({type.FullName}{type.NullibleReferenceTypeAnnotation} value, ReadOnlySpan<byte> json)");
             codeBuilder.AppendLine(2, "{");
 
             var generator = _getGeneratorForType(type);
