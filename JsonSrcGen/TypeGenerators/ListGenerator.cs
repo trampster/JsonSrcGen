@@ -14,7 +14,7 @@ namespace JsonSrcGen.TypeGenerators
             _getGeneratorForType = getGeneratorForType;
         }
 
-        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
+        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter, JsonFormat format)
         {
             var listElementType = type.GenericArguments[0];
             var generator = _getGeneratorForType(listElementType);
@@ -55,18 +55,22 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel+2, "break;");
             codeBuilder.AppendLine(indentLevel+1, "}");
 
-            generator.GenerateFromJson(codeBuilder, indentLevel+1, listElementType, listAdder, null);
+            string cast = format == JsonFormat.String ? "" : "(byte)";
+
+            generator.GenerateFromJson(codeBuilder, indentLevel+1, listElementType, listAdder, null, format);
             codeBuilder.AppendLine(indentLevel+1, "json = json.SkipWhitespace();");
             codeBuilder.AppendLine(indentLevel+1, "switch (json[0])");
             codeBuilder.AppendLine(indentLevel+1, "{");
-            codeBuilder.AppendLine(indentLevel+2, "case ',':");
+            codeBuilder.AppendLine(indentLevel+2, $"case {cast}',':");
             codeBuilder.AppendLine(indentLevel+3, "json = json.Slice(1);");
             codeBuilder.AppendLine(indentLevel+3, "continue;");
-            codeBuilder.AppendLine(indentLevel+2, "case ']':");
+            codeBuilder.AppendLine(indentLevel+2, $"case {cast}']':");
             codeBuilder.AppendLine(indentLevel+3, "json = json.Slice(1);");
             codeBuilder.AppendLine(indentLevel+3, "break;");
             codeBuilder.AppendLine(indentLevel+2, "default:");
-            codeBuilder.AppendLine(indentLevel+3, "throw new InvalidJsonException($\"Unexpected character while parsing list Expected ',' or ']' but got '{json[0]}'\", json);");
+
+            string getJsonString = format == JsonFormat.String ? "json" : "Encoding.UTF8.GetString(json)";
+            codeBuilder.AppendLine(indentLevel+3, $"throw new InvalidJsonException($\"Unexpected character while parsing list Expected ',' or ']' but got '{{{cast}json[0]}}'\", {getJsonString});");
             codeBuilder.AppendLine(indentLevel+1, "}");
             codeBuilder.AppendLine(indentLevel+1, "break;");
             codeBuilder.AppendLine(indentLevel, "}");

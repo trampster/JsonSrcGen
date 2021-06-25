@@ -218,6 +218,7 @@ namespace JsonSrcGen
                 toJsonGenerator.GenerateArray(arrayType, classBuilder);
                 toJsonGenerator.GenerateArrayUtf8(arrayType, classBuilder); 
                 fromJsonGenerator.GenerateArray(arrayType, classBuilder);
+                fromJsonGenerator.GenerateArrayUtf8(arrayType, classBuilder);
             }
 
             var dictionaryTypes = GetDictionaryAttributesInfo(receiver.CandidateAttributes, compilation);
@@ -233,6 +234,7 @@ namespace JsonSrcGen
                 toJsonGenerator.Generate(jsonClass, classBuilder);
                 toJsonGenerator.GenerateUtf8(jsonClass, classBuilder);
                 fromJsonGenerator.Generate(jsonClass, classBuilder);
+                fromJsonGenerator.GenerateUtf8(jsonClass, classBuilder);
             }
 
             var valueTypes = GetValueAttributesInfo(receiver.CandidateAttributes, compilation);

@@ -24,7 +24,7 @@ namespace JsonSrcGen
             var arrayJsonType = new JsonType("List", "List", "System.Collection.Generic", false, new List<JsonType>(){type}, true, true);
             var generator = _getGeneratorForType(arrayJsonType);
 
-            generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value");
+            generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value", JsonFormat.String);
 
             codeBuilder.AppendLine(3, "return value;"); 
             codeBuilder.AppendLine(2, "}"); 
@@ -38,7 +38,7 @@ namespace JsonSrcGen
             var arrayJsonType = new JsonType("Dictionary", "Dictionary", "System.Coolection.Generic", false, new List<JsonType>(){keyType, valueType}, true, true);
             var generator = _getGeneratorForType(arrayJsonType);
 
-            generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value");
+            generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value", JsonFormat.String);
 
             codeBuilder.AppendLine(3, "return value;"); 
             codeBuilder.AppendLine(2, "}"); 
@@ -52,7 +52,21 @@ namespace JsonSrcGen
             var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true, true);
             var generator = _getGeneratorForType(arrayJsonType);
 
-            generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value");
+            generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value", JsonFormat.String);
+
+            codeBuilder.AppendLine(3, "return value;"); 
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
+        public void GenerateArrayUtf8(JsonType type, CodeBuilder codeBuilder) 
+        {
+            codeBuilder.AppendLine(2, $"public {type.FullName}{type.NullibleReferenceTypeAnnotation}[]? FromJson({type.FullName}{type.NullibleReferenceTypeAnnotation}[]? value, ReadOnlySpan<byte> json)");
+            codeBuilder.AppendLine(2, "{");
+
+            var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true, true);
+            var generator = _getGeneratorForType(arrayJsonType);
+
+            generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value", JsonFormat.UTF8);
 
             codeBuilder.AppendLine(3, "return value;"); 
             codeBuilder.AppendLine(2, "}"); 
@@ -65,7 +79,7 @@ namespace JsonSrcGen
 
             var generator = _getGeneratorForType(type);
 
-            generator.GenerateFromJson(codeBuilder, 3, type, value => $"value = {value};", "value");
+            generator.GenerateFromJson(codeBuilder, 3, type, value => $"value = {value};", "value", JsonFormat.String);
 
             codeBuilder.AppendLine(3, "return value;"); 
             codeBuilder.AppendLine(2, "}"); 
@@ -78,7 +92,7 @@ namespace JsonSrcGen
 
             var generator = _getGeneratorForType(type);
 
-            generator.GenerateFromJson(codeBuilder, 3, type, value => $"value = {value};", "value");
+            generator.GenerateFromJson(codeBuilder, 3, type, value => $"value = {value};", "value", JsonFormat.UTF8);
 
             codeBuilder.AppendLine(3, "return value;"); 
             codeBuilder.AppendLine(2, "}"); 
@@ -148,7 +162,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
             codeBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(':');");
             
-            GenerateProperties(properties, 4, codeBuilder);
+            GenerateProperties(properties, 4, codeBuilder, JsonFormat.String);
 
             codeBuilder.AppendLine(4, "json = json.SkipWhitespace();");
             codeBuilder.AppendLine(4, "if(json[0] == ',')");
@@ -161,7 +175,84 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "}");
         }
 
-        public void GenerateProperties(IReadOnlyCollection<JsonPropertyInstance> properties, int indentLevel, CodeBuilder classBuilder)
+        public void GenerateUtf8(JsonClass jsonClass, CodeBuilder codeBuilder)
+        {
+            if (jsonClass.ReadOnly)
+            {
+                return;
+            }
+
+            if (jsonClass.StructRef)
+            {
+                codeBuilder.AppendLine(2, $"public ReadOnlySpan<byte> FromJson(ref {jsonClass.FullName} value, ReadOnlySpan<byte> json)");
+            }
+            else
+            {
+                codeBuilder.AppendLine(2, $"public ReadOnlySpan<byte> FromJson({jsonClass.FullName} value, ReadOnlySpan<byte> json)");
+            }
+
+            codeBuilder.AppendLine(2, "{");
+
+            codeBuilder.AppendLine(3, "json = json.SkipWhitespaceTo('{');");
+
+            var properties = new List<JsonPropertyInstance>();
+            foreach(var property in jsonClass.Properties)
+            {
+                string wasSetVariable = null;
+                if(property.Optional)
+                {
+                    var generator = _getGeneratorForType(property.Type);
+                    wasSetVariable = generator.OnNewObject(codeBuilder, 3, propertyValue => $"value.{property.CodeName} = {propertyValue};");
+                }
+                properties.Add(new JsonPropertyInstance(property.Type, property.JsonName, property.CodeName, property.Optional, wasSetVariable));
+            }
+
+            codeBuilder.AppendLine(3, "while(true)");
+            codeBuilder.AppendLine(3, "{");
+            
+            codeBuilder.AppendLine(4, "json = json.SkipWhitespace();");
+
+            string valueVariable = $"value{UniqueNumberGenerator.UniqueNumber}";
+            codeBuilder.AppendLine(4, $"byte {valueVariable} = json[0];");
+            codeBuilder.AppendLine(4, $"if({valueVariable} == '\\\"')");
+            codeBuilder.AppendLine(4, "{");
+            codeBuilder.AppendLine(5, "json = json.Slice(1);");
+            codeBuilder.AppendLine(4, "}");
+            codeBuilder.AppendLine(4, $"else if({valueVariable} == '}}')");
+            codeBuilder.AppendLine(4, "{");
+            foreach(var property in properties)
+            {
+                if(property.Optional)
+                {
+                    var generator = _getGeneratorForType(property.Type);
+                    generator.OnObjectFinished(codeBuilder, 5, propertyValue => $"value.{property.CodeName} = {propertyValue};", property.WasSetVariable);
+                }
+            }
+            codeBuilder.AppendLine(5, "return json.Slice(1);");
+            codeBuilder.AppendLine(4, "}");
+            codeBuilder.AppendLine(4, "else");
+            codeBuilder.AppendLine(4, "{");
+            codeBuilder.AppendLine(5, $"throw new InvalidJsonException($\"Unexpected character! expected '}}}}' or '\\\"' but got '{{(byte){valueVariable}}}'\", Encoding.UTF8.GetString(json));");
+            codeBuilder.AppendLine(4, "}");
+
+            codeBuilder.AppendLine(4, "var propertyName = json.ReadTo('\\\"');");
+            codeBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
+            codeBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(':');");
+            
+            GenerateProperties(properties, 4, codeBuilder, JsonFormat.UTF8);
+
+            codeBuilder.AppendLine(4, "json = json.SkipWhitespace();");
+            codeBuilder.AppendLine(4, "if(json[0] == ',')");
+            codeBuilder.AppendLine(4, "{");
+            codeBuilder.AppendLine(5, "json = json.Slice(1);");
+            codeBuilder.AppendLine(4, "}");
+
+            codeBuilder.AppendLine(3, "}");
+
+            codeBuilder.AppendLine(2, "}");
+        }
+
+        public void GenerateProperties(IReadOnlyCollection<JsonPropertyInstance> properties, int indentLevel, CodeBuilder classBuilder, JsonFormat jsonFormat)
         {
             var propertyHashFactory = new PropertyHashFactory();
             var propertyHash = propertyHashFactory.FindBestHash(properties.Select(p => p.JsonName).ToArray());
@@ -178,11 +269,11 @@ namespace JsonSrcGen
 
             foreach(var switchGroup in switchGroups)
             {
-                GenerateSwitchGroup(switchGroup, classBuilder, indentLevel, propertyHash);
+                GenerateSwitchGroup(switchGroup, classBuilder, indentLevel, propertyHash, jsonFormat);
             }
         }
 
-        void GenerateSwitchGroup(SwitchGroup switchGroup, CodeBuilder classBuilder, int indentLevel, PropertyHash propertyHash)
+        void GenerateSwitchGroup(SwitchGroup switchGroup, CodeBuilder classBuilder, int indentLevel, PropertyHash propertyHash, JsonFormat format)
         {
             classBuilder.AppendLine(indentLevel, $"switch({propertyHash.GenerateHashCode()})");
             classBuilder.AppendLine(indentLevel, "{");
@@ -193,7 +284,7 @@ namespace JsonSrcGen
                 var subProperties = hashGroup.ToArray();
                 if(subProperties.Length != 1)
                 {
-                    GenerateProperties(subProperties, indentLevel+2, classBuilder);
+                    GenerateProperties(subProperties, indentLevel+2, classBuilder, format);
                     classBuilder.AppendLine(indentLevel+2, "break;");
                     continue;
                 }
@@ -208,7 +299,13 @@ namespace JsonSrcGen
                 classBuilder.AppendLine(indentLevel+2, "}");
 
                 var generator = _getGeneratorForType(property.Type);
-                generator.GenerateFromJson(classBuilder, indentLevel+2, property.Type, propertyValue => $"value.{property.CodeName} = {propertyValue};", $"value.{property.CodeName}");
+                generator.GenerateFromJson(
+                    classBuilder, 
+                    indentLevel+2, 
+                    property.Type, 
+                    propertyValue => $"value.{property.CodeName} = {propertyValue};", 
+                    $"value.{property.CodeName}",
+                    format);
                 if(property.WasSetVariable != null)
                 {
                     classBuilder.AppendLine(indentLevel+2, $"{property.WasSetVariable} = true;");

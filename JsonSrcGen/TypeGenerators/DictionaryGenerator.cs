@@ -15,7 +15,7 @@ namespace JsonSrcGen.TypeGenerators
             _getGeneratorForType = getGeneratorForType;
         }
 
-        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
+        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter, JsonFormat format)
         {
             var dictionaryKeyType = type.GenericArguments[0];
             var dictionaryValueType = type.GenericArguments[1];
@@ -59,7 +59,8 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel+1, "json = json.Read(out string? key);");
             codeBuilder.AppendLine(indentLevel+1, "if(key == null)");
             codeBuilder.AppendLine(indentLevel+1, "{");
-            codeBuilder.AppendLine(indentLevel+2, "throw new InvalidJsonException(\"Dictionary key cannot be null\", json);");
+            string jsonStringGetter = format == JsonFormat.String ? "json" : "Encoding.UTF8.GetString(json)";
+            codeBuilder.AppendLine(indentLevel+2, $"throw new InvalidJsonException(\"Dictionary key cannot be null\", {jsonStringGetter});");
             codeBuilder.AppendLine(indentLevel+1, "}");
 
             codeBuilder.AppendLine(indentLevel+1, "json = json.SkipWhitespaceTo(':');");
@@ -67,18 +68,20 @@ namespace JsonSrcGen.TypeGenerators
             //value
             var dictionary = new Dictionary<string, int>();
             Func<string, string> dictionaryAdder = value => $"{valueGetter}.Add(key, {value});";
-            generator.GenerateFromJson(codeBuilder, indentLevel+1, dictionaryValueType, dictionaryAdder, null);
+            generator.GenerateFromJson(codeBuilder, indentLevel+1, dictionaryValueType, dictionaryAdder, null, format);
             codeBuilder.AppendLine(indentLevel+1, "json = json.SkipWhitespace();");
             codeBuilder.AppendLine(indentLevel+1, "switch (json[0])");
             codeBuilder.AppendLine(indentLevel+1, "{");
-            codeBuilder.AppendLine(indentLevel+2, "case ',':");
+
+            string cast = format == JsonFormat.String ? "" : "(byte)";
+            codeBuilder.AppendLine(indentLevel+2, $"case {cast}',':");
             codeBuilder.AppendLine(indentLevel+3, "json = json.Slice(1);");
             codeBuilder.AppendLine(indentLevel+3, "continue;");
-            codeBuilder.AppendLine(indentLevel+2, "case '}':");
+            codeBuilder.AppendLine(indentLevel+2, $"case {cast}'}}':");
             codeBuilder.AppendLine(indentLevel+3, "json = json.Slice(1);");
             codeBuilder.AppendLine(indentLevel+3, "break;");
             codeBuilder.AppendLine(indentLevel+2, "default:");
-            codeBuilder.AppendLine(indentLevel+3, "throw new InvalidJsonException($\"Unexpected character while parsing list Expected ',' or ']' but got '{json[0]}'\", json);");
+            codeBuilder.AppendLine(indentLevel+3, $"throw new InvalidJsonException($\"Unexpected character while parsing list Expected ',' or ']' but got '{cast}{{json[0]}}'\", {jsonStringGetter});");
             codeBuilder.AppendLine(indentLevel+1, "}");
             codeBuilder.AppendLine(indentLevel+1, "break;");
             codeBuilder.AppendLine(indentLevel, "}");

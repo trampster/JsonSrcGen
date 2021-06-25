@@ -25,7 +25,7 @@ namespace JsonSrcGen.TypeGenerators
         public CodeBuilder ClassLevelBuilder => _classLevelBuilder;
 
 
-        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
+        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter, JsonFormat format)
         {
             string propertyValueName = $"property{UniqueNumberGenerator.UniqueNumber}Value";
 

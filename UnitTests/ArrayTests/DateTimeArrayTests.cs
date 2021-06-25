@@ -13,6 +13,11 @@ namespace UnitTests.ArrayTests
         {
             return _convert.ToJson(json).ToString();
         }
+
+        protected override DateTime[] FromJson(DateTime[] value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class UtfDateTimeArrayTests : DateTimeArrayTestsBase
@@ -21,6 +26,11 @@ namespace UnitTests.ArrayTests
         {
             var jsonUtf8 = _convert.ToJsonUtf8(json); 
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override DateTime[] FromJson(DateTime[] value, string json)
+        {
+            return _convert.FromJson(value, Encoding.UTF8.GetBytes(json));
         }
     }
 
@@ -62,6 +72,7 @@ namespace UnitTests.ArrayTests
             //assert
             Assert.That(json.ToString(), Is.EqualTo("null"));
         }
+        protected abstract DateTime[] FromJson(DateTime[] value, string json);
 
         [Test]
         public void FromJson_EmptyArray_CorrectArray()
@@ -70,7 +81,7 @@ namespace UnitTests.ArrayTests
             var array = new DateTime[]{};
 
             //act
-            array = _convert.FromJson(array, ExpectedJson);
+            array = FromJson(array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));
@@ -86,7 +97,7 @@ namespace UnitTests.ArrayTests
             var array = new DateTime[]{DateTime.Now, DateTime.Now, DateTime.Now};
 
             //act
-            array =_convert.FromJson(array, ExpectedJson);
+            array = FromJson(array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));
@@ -102,7 +113,7 @@ namespace UnitTests.ArrayTests
             var array = new DateTime[]{DateTime.Now, DateTime.Now, DateTime.Now};
 
             //act
-            array = _convert.FromJson(array, "null");
+            array = FromJson(array, "null");
 
             //assert
             Assert.That(array, Is.Null);
@@ -113,7 +124,7 @@ namespace UnitTests.ArrayTests
         {
             //arrange
             //act
-            var array = _convert.FromJson((DateTime[])null, ExpectedJson);
+            var array = FromJson((DateTime[])null, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));

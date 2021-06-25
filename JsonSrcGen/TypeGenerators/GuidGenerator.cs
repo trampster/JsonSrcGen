@@ -7,7 +7,7 @@ namespace JsonSrcGen.TypeGenerators
     public class GuidGenerator : IJsonGenerator
     {
         public string GeneratorId => "Guid"; 
-        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
+        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter, JsonFormat format)
         {
             string propertyValueName = $"property{UniqueNumberGenerator.UniqueNumber}Value";
             codeBuilder.AppendLine(indentLevel, $"json = json.ReadGuid(out Guid {propertyValueName});");

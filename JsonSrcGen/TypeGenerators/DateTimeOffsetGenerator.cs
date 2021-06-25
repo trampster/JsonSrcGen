@@ -9,7 +9,7 @@ namespace JsonSrcGen.TypeGenerators
         public string TypeName => "DateTimeOffset";
         public string GeneratorId => "DateTimeOffset";
 
-        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
+        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter, JsonFormat format)
         {
             string propertyValueName = $"property{UniqueNumberGenerator.UniqueNumber}Value";
             codeBuilder.AppendLine(indentLevel, $"json = json.ReadDateTimeOffset(out DateTimeOffset {propertyValueName});");

@@ -60,7 +60,6 @@ namespace UnitTests
 
         protected abstract int FromJson(int value, string json);
 
-
         [TestCase(1, "1")]
         [TestCase(int.MaxValue, "2147483647")]
         [TestCase(int.MinValue, "-2147483648")]
@@ -68,6 +67,7 @@ namespace UnitTests
         {
             //arrange
             int value = 0;
+            
             //act
             value = FromJson(value, json); 
 

@@ -12,6 +12,11 @@ namespace UnitTests.ListTests
         {
             return _convert.ToJson(json).ToString();
         }
+
+        protected override bool[] FromJson(bool[] value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class Utf8BooleanArrayTests : BooleanArrayTestsBase
@@ -20,6 +25,11 @@ namespace UnitTests.ListTests
         {
             var jsonUtf8 = _convert.ToJsonUtf8(json); 
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override bool[] FromJson(bool[] value, string json)
+        {
+            return _convert.FromJson(value, Encoding.UTF8.GetBytes(json));
         }
     }
 
@@ -48,7 +58,9 @@ namespace UnitTests.ListTests
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
-        } 
+        }
+
+        protected abstract bool[] FromJson(bool[] value, string json);
 
         [Test]
         public void FromJson_EmptyList_CorrectList()
@@ -57,7 +69,7 @@ namespace UnitTests.ListTests
             var array = new bool[0];
 
             //act
-            array = _convert.FromJson(array, ExpectedJson);
+            array = FromJson(array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(2));
@@ -72,7 +84,7 @@ namespace UnitTests.ListTests
             var array = new bool[]{false, false, false};
 
             //act
-            array =_convert.FromJson(array, ExpectedJson);
+            array = FromJson(array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(2));
@@ -87,7 +99,7 @@ namespace UnitTests.ListTests
             var array = new bool[]{false, false, false};
 
             //act
-            array = _convert.FromJson(array, "null");
+            array = FromJson(array, "null");
 
             //assert
             Assert.That(array, Is.Null); 
@@ -98,7 +110,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var array = _convert.FromJson((bool[])null, ExpectedJson);
+            var array = FromJson((bool[])null, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(2));

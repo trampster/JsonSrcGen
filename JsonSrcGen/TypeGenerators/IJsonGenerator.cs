@@ -4,11 +4,17 @@ using JsonSrcGen;
 
 namespace JsonSrcGen.TypeGenerators
 {
+    public enum JsonFormat
+    {
+        UTF8,
+        String
+    }
+
     public interface IJsonGenerator
     {
         string GeneratorId {get; }
 
-        void GenerateFromJson(CodeBuilder codeBuilder, int inputLevel, JsonType type, Func<string, string> valueSetter, string valueGetter);
+        void GenerateFromJson(CodeBuilder codeBuilder, int inputLevel, JsonType type, Func<string, string> valueSetter, string valueGetter, JsonFormat jsonFormat);
 
         void GenerateToJson(CodeBuilder codeBuilder, int inputLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull);
 

@@ -12,6 +12,11 @@ namespace UnitTests.ArrayTests
         {
             return _convert.ToJson(json).ToString();
         }
+
+        protected override double?[] FromJson(double?[] value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class Utf8NullableDoubleArrayTests : NullableDoubleArrayTestsBase
@@ -20,6 +25,11 @@ namespace UnitTests.ArrayTests
         {
             var jsonUtf8 = _convert.ToJsonUtf8(json); 
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override double?[] FromJson(double?[] value, string json)
+        {
+            return _convert.FromJson(value, Encoding.UTF8.GetBytes(json));
         }
     }
 
@@ -63,6 +73,8 @@ namespace UnitTests.ArrayTests
             Assert.That(json.ToString(), Is.EqualTo("null"));
         }
 
+        protected abstract double?[] FromJson(double?[] value, string json);
+
         [Test]
         public void FromJson_EmptyList_CorrectList()
         {
@@ -70,7 +82,7 @@ namespace UnitTests.ArrayTests
             var array = new double?[]{};
 
             //act
-            array = _convert.FromJson(array, ExpectedJson);
+            array = FromJson(array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(6));
@@ -89,7 +101,7 @@ namespace UnitTests.ArrayTests
             var array = new double?[]{1, 2, 3};
 
             //act
-            array =_convert.FromJson(array, ExpectedJson);
+            array = FromJson(array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(6));
@@ -108,7 +120,7 @@ namespace UnitTests.ArrayTests
             var array = new double?[]{1, 2, 3};
 
             //act
-            array = _convert.FromJson(array, "null");
+            array = FromJson(array, "null");
 
             //assert
             Assert.That(array, Is.Null);
@@ -119,7 +131,7 @@ namespace UnitTests.ArrayTests
         {
             //arrange
             //act
-            var array = _convert.FromJson((double?[])null, ExpectedJson);
+            var array = FromJson((double?[])null, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(6));

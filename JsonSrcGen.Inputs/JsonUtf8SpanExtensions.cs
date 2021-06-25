@@ -689,9 +689,7 @@ namespace JsonSrcGen
 
             if (json[0] <= 0x7F) //Single byte character
             {
-                Span<char> charSpan = stackalloc char[1];
-                enc.GetChars(json.Slice(0, 1), charSpan);
-                value = charSpan[0];
+                value = (char)json[0];
                 return json.Slice(1);
             }
 

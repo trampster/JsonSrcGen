@@ -21,6 +21,12 @@ namespace UnitTests
             value.Name = "was set";
             return span;
         }
+
+        public ReadOnlySpan<byte> FromJson(ReadOnlySpan<byte> span, ref MyType value) 
+        {
+            value.Name = "was set";
+            return span;
+        }
     }
 
     [Json]

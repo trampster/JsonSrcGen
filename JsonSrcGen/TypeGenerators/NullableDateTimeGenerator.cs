@@ -6,7 +6,7 @@ namespace JsonSrcGen.TypeGenerators
     public class NullableDateTimeGenerator : IJsonGenerator
     {
         public string GeneratorId => "DateTime?";
-        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter)
+        public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter, JsonFormat format)
         {
             string propertyValueName = $"property{UniqueNumberGenerator.UniqueNumber}Value";
             codeBuilder.AppendLine(indentLevel, $"json = json.ReadNullableDateTime(out DateTime? {propertyValueName});");

@@ -2,11 +2,8 @@ using NUnit.Framework;
 using JsonSrcGen;
 using System;
 using System.Text;
-using System.Collections.Generic;
 
 [assembly: JsonArray(typeof(UnitTests.ArrayTests.CustomClass))] 
-[assembly: JsonList(typeof(UnitTests.ArrayTests.CustomClass))] 
-
 
 namespace UnitTests.ArrayTests
 {
@@ -23,13 +20,13 @@ namespace UnitTests.ArrayTests
             return _convert.ToJson(json).ToString();
         }
 
-        protected override string ToJson(List<CustomClass> json)
+        protected override CustomClass[] FromJson(CustomClass[] value, string json)
         {
-            return _convert.ToJson(json).ToString();
+            return _convert.FromJson(value, json);
         }
     }
 
-    public class UtfCustomClassArrayTests : CustomClassArrayTestsBase
+    public class Utf8CustomClassArrayTests : CustomClassArrayTestsBase
     {
         protected override string ToJson(CustomClass[] json) 
         {
@@ -37,10 +34,9 @@ namespace UnitTests.ArrayTests
             return Encoding.UTF8.GetString(jsonUtf8);
         }
 
-        protected override string ToJson(List<CustomClass> json)
+        protected override CustomClass[] FromJson(CustomClass[] value, string json)
         {
-            var jsonUtf8 = _convert.ToJsonUtf8(json); 
-            return Encoding.UTF8.GetString(jsonUtf8);
+            return _convert.FromJson(value, Encoding.UTF8.GetBytes(json));
         }
     }
 
@@ -56,8 +52,6 @@ namespace UnitTests.ArrayTests
             _convert = new JsonConverter();
         }
         protected abstract string ToJson(CustomClass[] json);
-
-        protected abstract string ToJson(List<CustomClass> json);
 
         [Test] 
         public void ToJson_CorrectString()
@@ -83,6 +77,8 @@ namespace UnitTests.ArrayTests
             Assert.That(new String(json), Is.EqualTo("null"));
         }
 
+        protected abstract CustomClass[] FromJson(CustomClass[] value, string json);
+
         [Test]
         public void FromJson_EmptyArray_CorrectArray() 
         {
@@ -90,7 +86,7 @@ namespace UnitTests.ArrayTests
             var array = new CustomClass[]{};
 
             //act
-            array = _convert.FromJson(array, ExpectedJson);
+            array = FromJson(array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));
@@ -106,7 +102,7 @@ namespace UnitTests.ArrayTests
             var array = new CustomClass[]{new CustomClass(), new CustomClass(), new CustomClass()};
 
             //act
-            array = _convert.FromJson(array, ExpectedJson);
+            array = FromJson(array, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));
@@ -122,7 +118,7 @@ namespace UnitTests.ArrayTests
             var array = new CustomClass[]{new CustomClass(), new CustomClass(), new CustomClass()};
 
             //act
-            array = _convert.FromJson(array, "null");
+            array = FromJson(array, "null");
 
             //assert
             Assert.That(array, Is.Null);
@@ -133,7 +129,7 @@ namespace UnitTests.ArrayTests
         {
             //arrange
             //act
-            var array = _convert.FromJson((CustomClass[])null, ExpectedJson);
+            var array = FromJson((CustomClass[])null, ExpectedJson);
 
             //assert
             Assert.That(array.Length, Is.EqualTo(3));
