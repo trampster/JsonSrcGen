@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System;
+using System.Text;
 
 [assembly: GenerationOutputFolder("/home/daniel/Work/JsonSrcGen/Generated")]
 
@@ -28,6 +29,22 @@ namespace CustomConverterTests
             var dateTimeSpan = json.ReadTo('\"');
 
             value = DateTime.Parse(dateTimeSpan);
+
+            return json.Slice(dateTimeSpan.Length + 1); 
+        }
+
+        public ReadOnlySpan<byte> FromJson(ReadOnlySpan<byte> json, ref DateTime value)
+        {
+            json = json.SkipWhitespace();
+            if(json[0] != (byte)'\"')
+            {
+                throw new InvalidJsonException("DateTime should start with a quote", Encoding.UTF8.GetString(json));
+            }
+            json = json.Slice(1);
+
+            var dateTimeSpan = json.ReadTo('\"');
+
+            value = DateTime.Parse(Encoding.UTF8.GetString(dateTimeSpan));
 
             return json.Slice(dateTimeSpan.Length + 1); 
         }

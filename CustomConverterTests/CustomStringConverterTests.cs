@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System;
+using System.Text;
 
 namespace CustomConverterTests
 {
@@ -20,6 +21,22 @@ namespace CustomConverterTests
             if(json[0] != '\"')
             {
                 throw new InvalidJsonException("String should start with a quote", json);
+            }
+            json = json.Slice(1);
+
+            var upercase = json.ReadTo('\"');
+
+            value = upercase.ToString().ToLower();
+
+            return json.Slice(upercase.Length + 1); 
+        }
+
+        public ReadOnlySpan<byte> FromJson(ReadOnlySpan<byte> json, ref string value)
+        {
+            json = json.SkipWhitespace();
+            if(json[0] != '\"')
+            {
+                throw new InvalidJsonException("String should start with a quote", Encoding.UTF8.GetString(json));
             }
             json = json.Slice(1);
 
