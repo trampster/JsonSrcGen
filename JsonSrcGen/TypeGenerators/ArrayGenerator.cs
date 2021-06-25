@@ -37,7 +37,6 @@ namespace JsonSrcGen.TypeGenerators
             return listFieldName;
         }
 
-
         public void GenerateFromJson(CodeBuilder codeBuilder, int indentLevel, JsonType type, Func<string, string> valueSetter, string valueGetter, JsonFormat format)
         {
             var listElementType = type.GenericArguments[0];
