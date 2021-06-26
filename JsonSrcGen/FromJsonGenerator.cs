@@ -30,6 +30,20 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(2, "}"); 
         }
 
+        public void GenerateListUtf8(JsonType type, CodeBuilder codeBuilder)
+        {
+            codeBuilder.AppendLine(2, $"public List<{type.FullName}{type.NullibleReferenceTypeAnnotation}>? FromJson(List<{type.FullName}{type.NullibleReferenceTypeAnnotation}>? value, ReadOnlySpan<byte> json)");
+            codeBuilder.AppendLine(2, "{"); 
+            
+            var arrayJsonType = new JsonType("List", "List", "System.Collection.Generic", false, new List<JsonType>(){type}, true, true);
+            var generator = _getGeneratorForType(arrayJsonType);
+
+            generator.GenerateFromJson(codeBuilder, 3, arrayJsonType, value => $"value = {value};", "value", JsonFormat.UTF8);
+
+            codeBuilder.AppendLine(3, "return value;"); 
+            codeBuilder.AppendLine(2, "}"); 
+        }
+
         public void GenerateDictionary(JsonType keyType, JsonType valueType, CodeBuilder codeBuilder) 
         {
             codeBuilder.AppendLine(2, $"public Dictionary<{keyType.FullName}, {valueType.FullName}>? FromJson(Dictionary<{keyType.FullName}, {valueType.FullName}>? value, ReadOnlySpan<char> json)");

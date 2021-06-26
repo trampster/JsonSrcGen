@@ -210,6 +210,7 @@ namespace JsonSrcGen
                 toJsonGenerator.GenerateList(listType, classBuilder);
                 toJsonGenerator.GenerateListUtf8(listType, classBuilder);
                 fromJsonGenerator.GenerateList(listType, classBuilder);
+                fromJsonGenerator.GenerateListUtf8(listType, classBuilder);
             }
 
             var arrayTypes = GetArrayAttributesInfo(receiver.CandidateAttributes, compilation);

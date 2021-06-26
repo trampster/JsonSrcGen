@@ -19,6 +19,11 @@ namespace UnitTests.ListTests
         {
             return _convert.ToJson(json).ToString();
         }
+
+        protected override List<CustomClass> FromJson(List<CustomClass> value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class UtfCustomClassListTests : CustomClassListTestsBase
@@ -27,6 +32,11 @@ namespace UnitTests.ListTests
         {
             var jsonUtf8 = _convert.ToJsonUtf8(json); 
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override List<CustomClass> FromJson(List<CustomClass> value, string json)
+        {
+            return _convert.FromJson(value, Encoding.UTF8.GetBytes(json));
         }
     }
 
@@ -68,6 +78,9 @@ namespace UnitTests.ListTests
             Assert.That(new string(json), Is.EqualTo("null"));
         }
 
+        protected abstract List<CustomClass> FromJson(List<CustomClass> value, string json);
+
+
         [Test]
         public void FromJson_EmptyList_CorrectList() 
         {
@@ -75,7 +88,7 @@ namespace UnitTests.ListTests
             var list = new List<CustomClass>();
 
             //act
-            _convert.FromJson(list, ExpectedJson);
+            FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(3));
@@ -91,7 +104,7 @@ namespace UnitTests.ListTests
             var list = new List<CustomClass>(){new CustomClass(), new CustomClass(), new CustomClass()};
 
             //act
-            list =_convert.FromJson(list, ExpectedJson);
+            list =FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(3));
@@ -107,7 +120,7 @@ namespace UnitTests.ListTests
             var list = new List<CustomClass>(){new CustomClass(), new CustomClass(), new CustomClass()};
 
             //act
-            list = _convert.FromJson(list, "null");
+            list = FromJson(list, "null");
 
             //assert
             Assert.That(list, Is.Null);
@@ -118,7 +131,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var list = _convert.FromJson((List<CustomClass>)null, ExpectedJson);
+            var list = FromJson((List<CustomClass>)null, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(3));

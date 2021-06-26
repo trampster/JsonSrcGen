@@ -13,6 +13,11 @@ namespace UnitTests.ListTests
         {
             return _convert.ToJson(json).ToString();
         }
+
+        protected override List<bool> FromJson(List<bool> value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class Utf8BooleanListTests : BooleanListTestsBase
@@ -21,6 +26,11 @@ namespace UnitTests.ListTests
         {
             var jsonUtf8 = _convert.ToJsonUtf8(json); 
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override List<bool> FromJson(List<bool> value, string json)
+        {
+            return _convert.FromJson(value, Encoding.UTF8.GetBytes(json));
         }
     }
 
@@ -62,6 +72,8 @@ namespace UnitTests.ListTests
             Assert.That(json.ToString(), Is.EqualTo("null"));
         }
 
+        protected abstract List<bool> FromJson(List<bool> value, string json);
+
         [Test]
         public void FromJson_EmptyList_CorrectList()
         {
@@ -69,7 +81,7 @@ namespace UnitTests.ListTests
             var list = new List<bool>();
 
             //act
-            _convert.FromJson(list, ExpectedJson);
+            FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(2));
@@ -84,7 +96,7 @@ namespace UnitTests.ListTests
             var list = new List<bool>(){false, false, false};
 
             //act
-            list =_convert.FromJson(list, ExpectedJson);
+            list = FromJson(list, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(2));
@@ -99,7 +111,7 @@ namespace UnitTests.ListTests
             var list = new List<bool>(){false, false, false};
 
             //act
-            list = _convert.FromJson(list, "null");
+            list = FromJson(list, "null");
 
             //assert
             Assert.That(list, Is.Null);
@@ -110,7 +122,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var list = _convert.FromJson((List<bool>)null, ExpectedJson);
+            var list = FromJson((List<bool>)null, ExpectedJson);
 
             //assert
             Assert.That(list.Count, Is.EqualTo(2));
@@ -123,7 +135,7 @@ namespace UnitTests.ListTests
         {
             //arrange
             //act
-            var list = _convert.FromJson((List<bool>)null, "[]");
+            var list = FromJson((List<bool>)null, "[]");
 
             //assert
             Assert.That(list.Count, Is.EqualTo(0));

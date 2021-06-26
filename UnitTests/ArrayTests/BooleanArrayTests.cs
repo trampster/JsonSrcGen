@@ -12,7 +12,7 @@ namespace UnitTests.ListTests
         {
             return _convert.ToJson(json).ToString();
         }
-
+        
         protected override bool[] FromJson(bool[] value, string json)
         {
             return _convert.FromJson(value, json);
