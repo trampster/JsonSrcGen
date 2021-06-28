@@ -70,13 +70,13 @@ namespace CustomConverterTests
         }
 
         [Test]
-        public void FromJson_CorrectDateTime() 
+        public void FromJson_CorrectCase() 
         {
             //arrange
             var customClass = new CustomStringClass();
 
             //act
-            new JsonConverter().FromJson(customClass, "{\"DateTime\":\"UPERCASE\"}"); 
+            new JsonConverter().FromJson(customClass, "{\"Property\":\"UPERCASE\"}"); 
 
             //assert
             Assert.That(customClass.Property, Is.EqualTo("upercase"));
