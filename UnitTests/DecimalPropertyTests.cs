@@ -2,6 +2,7 @@ using NUnit.Framework;
 using JsonSrcGen;
 using System.Threading;
 using System.Text;
+using System;
 
 namespace UnitTests
 {
@@ -23,6 +24,11 @@ namespace UnitTests
         {
             return _convert.ToJson(jsonClass).ToString();
         }
+
+        protected override ReadOnlySpan<char> FromJson(JsonDecimal value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class Utf8DecimalPropertyTests : DecimalPropertyTestsBase
@@ -32,13 +38,18 @@ namespace UnitTests
             var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
             return Encoding.UTF8.GetString(jsonUtf8);
         }
+
+        protected override ReadOnlySpan<char> FromJson(JsonDecimal value, string json)
+        {
+            return Encoding.UTF8.GetString(_convert.FromJson(value, Encoding.UTF8.GetBytes(json)));
+        }
     }
 
     public abstract class DecimalPropertyTestsBase
     {
         const decimal MIN = decimal.MinValue;
 
-        protected JsonSrcGen.JsonConverter _convert;
+        protected JsonSrcGen.JsonConverter _convert; 
 
         const string ExpectedJson = "{\"DecNull\":null,\"Min\":-79228162514264337593543950335,\"Value\":-200000.01,\"Value2\":1.5}";
 
@@ -72,6 +83,7 @@ namespace UnitTests
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
         }
 
+        protected abstract ReadOnlySpan<char> FromJson(JsonDecimal value, string json);
 
         [Test]
         public void FromJson_CorrectJsonClass()
@@ -82,7 +94,7 @@ namespace UnitTests
             var jsonDec = new JsonDecimal();
 
             //act
-            _convert.FromJson(jsonDec, json);
+            FromJson(jsonDec, json);
 
             //assert
             Assert.That(jsonDec.DecNull, Is.Null);

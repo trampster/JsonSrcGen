@@ -11,12 +11,15 @@ namespace JsonSrcGen.PropertyHashing
         internal bool UseLength{get;set;}
         internal int ModValue{get;set;}
         internal int CollisionCount {get;set;}
+        internal bool Utf8 {get;set;}
 
         internal int Hash(string property)
         {
             if(UseLength) 
             {
-                return property.Length % ModValue;
+                return Utf8 ? 
+                    Encoding.UTF8.GetBytes(property).Length & ModValue :
+                    property.Length % ModValue;
             }
             return property[Column % property.Length] % ModValue;
         }

@@ -148,7 +148,7 @@ namespace JsonSrcGen
                 if (!CheckNumber(json, index, character))
                     break;
 
-                _sbNumber.Append(character);
+                _sbNumber.Append((char)character);
             }
 
             if (decimal.TryParse(_sbNumber.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out value))
@@ -944,15 +944,31 @@ namespace JsonSrcGen
             throw new InvalidJsonException($"Unexpected end of json while looking for '{to}'", Encoding.UTF8.GetString(json));
         }
 
+        public static bool EqualsBytes(this ReadOnlySpan<byte> json, ReadOnlySpan<byte> other)
+        {
+            if (json.Length != other.Length)
+            {
+                return false;
+            }
+            for (int index = 0; index < json.Length; index++)
+            {
+                if (json[index] != other[index])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public static bool EqualsString(this ReadOnlySpan<byte> json, string other)
         {
             if (json.Length != other.Length)
             {
                 return false;
             }
-            for (int index = 0; index < 0; index++)
+            for (int index = 0; index < json.Length; index++)
             {
-                if (json[0] != other[0])
+                if (json[index] != other[index])
                 {
                     return false;
                 }

@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Text;
+using System;
 
 namespace UnitTests
 {
@@ -10,7 +11,7 @@ namespace UnitTests
         [JsonName("age")]
         public int Age {get;set;}
         [JsonName("tallness")]
-        public int Height {get;set;}
+        public int Height {get;set;} 
         [JsonName("Needs\tEscaping")]
         public int Escaping {get;set;}
     }
@@ -21,6 +22,11 @@ namespace UnitTests
         {
             return _convert.ToJson(jsonClass).ToString();
         }
+
+        protected override ReadOnlySpan<char> FromJson(JsonNamedPropertyClass value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class Utf8NamedPropertyTests : NamedPropertyTestsBase
@@ -29,6 +35,11 @@ namespace UnitTests
         {
             var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override ReadOnlySpan<char> FromJson(JsonNamedPropertyClass value, string json)
+        {
+            return Encoding.UTF8.GetString(_convert.FromJson(value, Encoding.UTF8.GetBytes(json)));
         }
     }
 
@@ -63,6 +74,8 @@ namespace UnitTests
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
         }
 
+        protected abstract ReadOnlySpan<char> FromJson(JsonNamedPropertyClass value, string json);
+
         [Test] 
         public void FromJson_CorrectJsonClass()
         {
@@ -71,12 +84,12 @@ namespace UnitTests
             var jsonClass = new JsonNamedPropertyClass();
 
             //act 
-            _convert.FromJson(jsonClass, json);
+            FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Age, Is.EqualTo(42));
             Assert.That(jsonClass.Height, Is.EqualTo(176));
-            Assert.That(jsonClass.Escaping, Is.EqualTo(12));
+            Assert.That(jsonClass.Escaping, Is.EqualTo(12)); 
         }
     }
 }

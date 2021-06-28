@@ -2,6 +2,7 @@ using NUnit.Framework;
 using JsonSrcGen;
 using System.Text;
 using System.Threading;
+using System;
 
 namespace UnitTests
 {
@@ -21,6 +22,11 @@ namespace UnitTests
         {
             return _convert.ToJson(jsonClass).ToString();
         }
+
+        protected override ReadOnlySpan<char> FromJson(JsonDoubleClass value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class Utf8DoublePropertyTests : DoublePropertyTestsBase
@@ -29,6 +35,11 @@ namespace UnitTests
         {
             var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override ReadOnlySpan<char> FromJson(JsonDoubleClass value, string json)
+        {
+            return Encoding.UTF8.GetString(_convert.FromJson(value, Encoding.UTF8.GetBytes(json)));
         }
     }
 
@@ -68,6 +79,8 @@ namespace UnitTests
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
         }
 
+        protected abstract ReadOnlySpan<char> FromJson(JsonDoubleClass value, string json);
+
         [Test]
         public void FromJson_CorrectJsonClass()
         {
@@ -76,7 +89,7 @@ namespace UnitTests
             var jsonClass = new JsonDoubleClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+            FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Age, Is.EqualTo(42.21d));

@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Text;
+using System;
 
 namespace UnitTests
 {
@@ -16,6 +17,11 @@ namespace UnitTests
         {
             return _convert.ToJson(jsonClass).ToString();
         }
+
+        protected override ReadOnlySpan<char> FromJson(JsonArrayClass value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class Utf8ArrayPropertyTests : ArrayPropertyTestsBase
@@ -24,6 +30,11 @@ namespace UnitTests
         {
             var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override ReadOnlySpan<char> FromJson(JsonArrayClass value, string json)
+        {
+            return Encoding.UTF8.GetString(_convert.FromJson(value, Encoding.UTF8.GetBytes(json)));
         }
     }
 
@@ -73,6 +84,8 @@ namespace UnitTests
             Assert.That(json.ToString(), Is.EqualTo("{\"BooleanArray\":null}"));
         }
 
+        protected abstract ReadOnlySpan<char> FromJson(JsonArrayClass value, string json);
+
         [Test]
         public void FromJson_EmptyArray_CorrectArray()
         {
@@ -83,7 +96,7 @@ namespace UnitTests
             };
 
             //act
-            _convert.FromJson(jsonClass, ExpectedJson);
+            FromJson(jsonClass, ExpectedJson);
 
             //assert
             Assert.That(jsonClass.BooleanArray.Length, Is.EqualTo(2));
@@ -101,7 +114,7 @@ namespace UnitTests
             };
 
             //act
-            _convert.FromJson(jsonClass, ExpectedJson);
+            FromJson(jsonClass, ExpectedJson);
 
             //assert
             Assert.That(jsonClass.BooleanArray.Length, Is.EqualTo(2));
@@ -119,7 +132,7 @@ namespace UnitTests
             };
 
             //act
-            _convert.FromJson(jsonClass, ExpectedJson);
+            FromJson(jsonClass, ExpectedJson);
 
             //assert
             Assert.That(jsonClass.BooleanArray.Length, Is.EqualTo(2));

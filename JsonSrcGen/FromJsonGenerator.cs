@@ -10,10 +10,20 @@ namespace JsonSrcGen
     public class FromJsonGenerator
     {
         readonly Func<JsonType, IJsonGenerator> _getGeneratorForType;
+        readonly Utf8Literals _literals = new Utf8Literals();
+
 
         public FromJsonGenerator(Func<JsonType, IJsonGenerator> getGeneratorForType)
         {
             _getGeneratorForType = getGeneratorForType;
+        }
+
+        /// <summary>
+        /// Must be called after other generations, as they will define the literals
+        /// </summary>
+        public void GenerateUtf8Literals(CodeBuilder codeBuilder)
+        {
+            _literals.Generate(codeBuilder);
         }
 
         public void GenerateList(JsonType type, CodeBuilder codeBuilder)
@@ -201,7 +211,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(3, "}");
 
             codeBuilder.AppendLine(2, "}");
-        }
+        } 
 
         public void GenerateUtf8(JsonClass jsonClass, CodeBuilder codeBuilder)
         {
@@ -283,7 +293,7 @@ namespace JsonSrcGen
         public void GenerateProperties(IReadOnlyCollection<JsonPropertyInstance> properties, int indentLevel, CodeBuilder classBuilder, JsonFormat jsonFormat)
         {
             var propertyHashFactory = new PropertyHashFactory();
-            var propertyHash = propertyHashFactory.FindBestHash(properties.Select(p => p.JsonName).ToArray());
+            var propertyHash = propertyHashFactory.FindBestHash(properties.Select(p => p.JsonName).ToArray(), jsonFormat == JsonFormat.UTF8);
 
             var hashesQuery =
                 from property in properties
@@ -317,10 +327,22 @@ namespace JsonSrcGen
                     continue;
                 }
                 var property = subProperties[0];
-                var propertyNameBuilder = new StringBuilder();
-                propertyNameBuilder.AppendDoubleEscaped(property.JsonName);
-                string jsonName = propertyNameBuilder.ToString();
-                classBuilder.AppendLine(indentLevel+2, $"if(!propertyName.EqualsString(\"{jsonName}\"))");
+                
+                if(format == JsonFormat.UTF8)
+                {
+                    var propertyNameBuilder = new StringBuilder();
+                    propertyNameBuilder.AppendEscaped(property.JsonName);
+                    string jsonName = propertyNameBuilder.ToString();
+                    var literal = _literals.GetStringLiteral(jsonName);
+                    classBuilder.AppendLine(indentLevel+2, $"if(!propertyName.EqualsBytes({literal.CodeName}))");
+                }
+                else if(format == JsonFormat.String)
+                {
+                    var propertyNameBuilder = new StringBuilder();
+                    propertyNameBuilder.AppendDoubleEscaped(property.JsonName);
+                    string jsonName = propertyNameBuilder.ToString();
+                    classBuilder.AppendLine(indentLevel+2, $"if(!propertyName.EqualsString(\"{jsonName}\"))");
+                }
                 classBuilder.AppendLine(indentLevel+2, "{");
                 classBuilder.AppendLine(indentLevel+3, "json = json.SkipProperty();");
                 classBuilder.AppendLine(indentLevel+3, "break;"); 

@@ -1,5 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
+using System;
+using System.Text;
 
 namespace UnitTests
 {
@@ -11,9 +13,25 @@ namespace UnitTests
         public string NullProperty {get;set;}
     }
 
-    public class WhiteSpaceTests
+    public class WhiteSpaceTests : WhiteSpaceTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override ReadOnlySpan<char> FromJson(WhiteSpaceJsonClass value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
+    }
+
+    public class Utf8WhiteSpaceTests : WhiteSpaceTestsBase
+    {
+        protected override ReadOnlySpan<char> FromJson(WhiteSpaceJsonClass value, string json)
+        {
+            return Encoding.UTF8.GetString(_convert.FromJson(value, Encoding.UTF8.GetBytes(json)));
+        }
+    }
+
+    public abstract class WhiteSpaceTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
 
         [SetUp]
         public void Setup()
@@ -21,16 +39,17 @@ namespace UnitTests
             _convert = new JsonConverter();
         }
 
+        protected abstract ReadOnlySpan<char> FromJson(WhiteSpaceJsonClass value, string json);
 
         [Test]
         public void FromJson_CorrectJsonClass()
         {
             //arrange
             var json = "{\r\n\"FirstName\": \"Bob\",\r\n\t\"LastName\":\r   \"Marley\",\n\"NullProperty\": null\n}";
-            var jsonClass = new JsonClass();
+            var jsonClass = new WhiteSpaceJsonClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+            FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.FirstName, Is.EqualTo("Bob"));

@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Text;
+using System;
 
 [Json]
 public class GlobalJsonClass
@@ -15,18 +16,28 @@ namespace UnitTests
 {
     public class GlobalNamespaceTests : GlobalNamespaceTestsBase
     {
-        protected override string ToJson(MixedJsonClass jsonClass)
+        protected override string ToJson(GlobalJsonClass jsonClass)
         {
             return _convert.ToJson(jsonClass).ToString();
+        }
+
+        protected override ReadOnlySpan<char> FromJson(GlobalJsonClass value, string json)
+        {
+            return _convert.FromJson(value, json);
         }
     }
 
     public class Utf8GlobalNamespaceTestsTests : GlobalNamespaceTestsBase
     {
-        protected override string ToJson(MixedJsonClass jsonClass)
+        protected override string ToJson(GlobalJsonClass jsonClass)
         {
             var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override ReadOnlySpan<char> FromJson(GlobalJsonClass value, string json)
+        {
+            return Encoding.UTF8.GetString(_convert.FromJson(value, Encoding.UTF8.GetBytes(json)));
         }
     }
 
@@ -40,13 +51,13 @@ namespace UnitTests
             _convert = new JsonConverter();
         }
 
-        protected abstract string ToJson(MixedJsonClass jsonClass);
+        protected abstract string ToJson(GlobalJsonClass jsonClass);
 
         [Test]
         public void ToJson_CorrectString()
         {
             //arrange
-            var jsonClass = new MixedJsonClass()
+            var jsonClass = new GlobalJsonClass()
             {
                 Age = 97,
                 Name = "Jack",
@@ -61,16 +72,18 @@ namespace UnitTests
             Assert.That(json.ToString(), Is.EqualTo("{\"Age\":97,\"IsTrue\":true,\"Name\":\"Jack\",\"NullProperty\":null}"));
         }
 
+        protected abstract ReadOnlySpan<char> FromJson(GlobalJsonClass value, string json);
+
 
         [Test]
         public void FromJson_CorrectJsonClass()
         {
             //arrange
             var json = "{\"Age\":97,\"IsTrue\":true,\"Name\":\"Jack\",\"NullProperty\":null}";
-            var jsonClass = new MixedJsonClass();
+            var jsonClass = new GlobalJsonClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+            FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Age, Is.EqualTo(97));

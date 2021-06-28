@@ -257,6 +257,8 @@ namespace JsonSrcGen
                 }
             }
 
+            fromJsonGenerator.GenerateUtf8Literals(classBuilder);
+
             classBuilder.AppendLine(1, "}");
             classBuilder.AppendLine(0, "}");
             classBuilder.AppendLine(0, "#nullable restore");

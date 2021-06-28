@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using JsonSrcGen;
+using System.Text;
 using System;
 using System.Collections.Generic;
 
@@ -91,15 +92,33 @@ namespace UnitTests
         public String OptionalString {get;set;}
     }
 
-    public class OptionalPropertyTests
+    public class OptionalPropertyTests : OptionalPropertyTestsBase
     {
-        JsonSrcGen.JsonConverter _convert;
+        protected override ReadOnlySpan<char> FromJson(OptionalPropertyClass value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
+    }
+
+    public class Utf8OptionalPropertyTests : OptionalPropertyTestsBase
+    {
+        protected override ReadOnlySpan<char> FromJson(OptionalPropertyClass value, string json)
+        {
+            return Encoding.UTF8.GetString(_convert.FromJson(value, Encoding.UTF8.GetBytes(json)));
+        }
+    }
+
+    public abstract class OptionalPropertyTestsBase
+    {
+        protected JsonSrcGen.JsonConverter _convert;
 
         [SetUp]
         public void Setup()
         {
             _convert = new JsonConverter();
         }
+
+        protected abstract ReadOnlySpan<char> FromJson(OptionalPropertyClass value, string json);
 
         [Test]
         public void FromJson_CorrectJsonClass()
@@ -128,7 +147,7 @@ namespace UnitTests
             };
 
             //act
-            _convert.FromJson(jsonClass, json); 
+            FromJson(jsonClass, json); 
 
             //assert
             Assert.That(jsonClass.OptionalBool, Is.EqualTo(default(bool)));

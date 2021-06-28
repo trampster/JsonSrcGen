@@ -1,18 +1,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Text;
 
 namespace JsonSrcGen.PropertyHashing
 {
     internal class PropertyHashFactory
     {
-        internal PropertyHash FindBestHash(string[] properties)
+        internal PropertyHash FindBestHash(string[] stringProperties, bool utf8)
         {
+            var properties = stringProperties.Select(p => new Property(p,utf8)).ToArray();
+
             var bestHash = new PropertyHash()
             {
                 Column = 0,
                 ModValue = int.MaxValue,
-                CollisionCount = int.MaxValue
+                CollisionCount = int.MaxValue,
+                Utf8 = utf8
             };
 
             //try column values
@@ -48,7 +52,37 @@ namespace JsonSrcGen.PropertyHashing
             return bestHash;
         }
 
-        (int, int) FindBestMod(string[] properties, Func<string, int> getHash)
+        class Property
+        {
+            public Property(string value, bool utf8)
+            {
+                StringValue = value;
+                if(utf8)
+                {
+                    Utf8Value = Encoding.UTF8.GetBytes(value);
+                }
+                Length = utf8 ? Utf8Value.Length : value.Length;
+                Utf8 = utf8;
+            }
+
+            string StringValue {get;}
+
+            byte[] Utf8Value {get;}
+
+            public int Length {get;}
+
+            bool Utf8 {get;}
+
+            public char this[int i]
+            {
+                get 
+                { 
+                    return Utf8 ? (char)Utf8Value[i] : StringValue[i];
+                }
+            }
+        }
+
+        (int, int) FindBestMod(Property[] properties, Func<Property, int> getHash)
         {
             int[] primesToTry = new int[]
             {
@@ -86,7 +120,7 @@ namespace JsonSrcGen.PropertyHashing
             return (bestMod, numberOfCollisions);
         }
 
-        int CollisionsForMod(string[] properties, Func<string, int> getHash, int mod)
+        int CollisionsForMod(Property[] properties, Func<Property, int> getHash, int mod)
         {
             var hashes = new HashSet<int>();
             int collisionsFound = 0;
@@ -101,7 +135,7 @@ namespace JsonSrcGen.PropertyHashing
             return collisionsFound;
         }
 
-        ColumnCollisions[] FindColumnCollisions(string[] properties)
+        ColumnCollisions[] FindColumnCollisions(Property[] properties)
         {
             int longestProperty = properties.Max(property => property.Length);
             var collisions = new ColumnCollisions[longestProperty];

@@ -2,6 +2,7 @@ using NUnit.Framework;
 using JsonSrcGen;
 using System.Collections;
 using System.Text;
+using System;
 
 namespace UnitTests
 {
@@ -36,6 +37,11 @@ namespace UnitTests
         {
             return _convert.ToJson(jsonClass).ToString();
         }
+
+        protected override ReadOnlySpan<char> FromJson(JsonCharClass value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class Utf8CharPropertyTests : CharPropertyTestsBase
@@ -44,6 +50,11 @@ namespace UnitTests
         {
             var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override ReadOnlySpan<char> FromJson(JsonCharClass value, string json)
+        {
+            return Encoding.UTF8.GetString(_convert.FromJson(value, Encoding.UTF8.GetBytes(json)));
         }
     }
 
@@ -74,7 +85,10 @@ namespace UnitTests
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo($"{{\"Property\":{expectedPropertyValue}}}"));
-        } 
+        }
+
+        protected abstract ReadOnlySpan<char> FromJson(JsonCharClass value, string json);
+
 
         [Test, TestCaseSource(typeof(CharTestCaseData), "TestCases")]
         public void FromJson_CorrectJsonClass(char expectedCharacter, string property)
@@ -84,7 +98,7 @@ namespace UnitTests
             var jsonClass = new JsonCharClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+            FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Property, Is.EqualTo(expectedCharacter));
@@ -98,7 +112,7 @@ namespace UnitTests
             var jsonClass = new JsonCharClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+            FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Property, Is.EqualTo('\u1F4A'));

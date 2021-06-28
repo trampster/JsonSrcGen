@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Text;
+using System;
 
 namespace UnitTests
 {
@@ -13,20 +14,30 @@ namespace UnitTests
         public ushort Max {get;set;}
     }
 
-    public class UShortPropertyTests : ShortPropertyTestsBase
+    public class UShortPropertyTests : UShortPropertyTestsBase
     {
-        protected override string ToJson(JsonShortClass jsonClass)
+        protected override string ToJson(JsonUShortClass jsonClass)
         {
             return _convert.ToJson(jsonClass).ToString();
         }
+
+        protected override ReadOnlySpan<char> FromJson(JsonUShortClass value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
-    public class Utf8UShortPropertyTests : ShortPropertyTestsBase
+    public class Utf8UShortPropertyTests : UShortPropertyTestsBase
     {
-        protected override string ToJson(JsonShortClass jsonClass)
+        protected override string ToJson(JsonUShortClass jsonClass)
         {
             var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+        
+        protected override ReadOnlySpan<char> FromJson(JsonUShortClass value, string json)
+        {
+            return Encoding.UTF8.GetString(_convert.FromJson(value, Encoding.UTF8.GetBytes(json)));
         }
     }
 
@@ -62,6 +73,8 @@ namespace UnitTests
             Assert.That(json.ToString(), Is.EqualTo(ExpectedJson));
         }
 
+        protected abstract ReadOnlySpan<char> FromJson(JsonUShortClass value, string json);
+
         [Test]
         public void FromJson_CorrectJsonClass()
         {
@@ -70,7 +83,7 @@ namespace UnitTests
             var jsonClass = new JsonUShortClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+            FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Age, Is.EqualTo(42));

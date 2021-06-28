@@ -47,12 +47,25 @@ namespace JsonSrcGen
         	
             classBuilder.AppendLine(2, "{");
             classBuilder.AppendLine(0, BuilderText);
-            classBuilder.AppendLine(3, "ToJson(value, builder);");
+            if (jsonClass.StructRef)
+        	{
+                classBuilder.AppendLine(3, "ToJson(ref value, builder);");
+        	}
+        	else
+        	{
+                classBuilder.AppendLine(3, "ToJson(value, builder);");
+        	}
             classBuilder.AppendLine(3, "return builder.AsSpan();");
             classBuilder.AppendLine(2, "}"); 
 
-
-            classBuilder.AppendLine(2, $"public void ToJson({jsonClass.FullName} value, JsonStringBuilder builder)");
+            if (jsonClass.StructRef)
+        	{
+                classBuilder.AppendLine(2, $"public void ToJson(ref {jsonClass.FullName} value, JsonStringBuilder builder)");
+        	}
+        	else
+        	{
+                classBuilder.AppendLine(2, $"public void ToJson({jsonClass.FullName} value, JsonStringBuilder builder)");
+        	}
             classBuilder.AppendLine(2, "{");
 
             var appendBuilder = new StringBuilder();

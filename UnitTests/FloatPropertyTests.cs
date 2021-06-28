@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using JsonSrcGen;
 using System.Text;
+using System;
 
 namespace UnitTests
 {
@@ -20,6 +21,11 @@ namespace UnitTests
         {
             return _convert.ToJson(jsonClass).ToString();
         }
+
+        protected override ReadOnlySpan<char> FromJson(JsonFloatClass value, string json)
+        {
+            return _convert.FromJson(value, json);
+        }
     }
 
     public class Utf8FloatPropertyTests : FloatPropertyTestsBase
@@ -28,6 +34,11 @@ namespace UnitTests
         {
             var jsonUtf8 = _convert.ToJsonUtf8(jsonClass);
             return Encoding.UTF8.GetString(jsonUtf8);
+        }
+
+        protected override ReadOnlySpan<char> FromJson(JsonFloatClass value, string json)
+        {
+            return Encoding.UTF8.GetString(_convert.FromJson(value, Encoding.UTF8.GetBytes(json)));
         }
     }
 
@@ -72,6 +83,8 @@ namespace UnitTests
             Assert.That(resultClass.Zero, Is.EqualTo(jsonClass.Zero));
         }
 
+        protected abstract ReadOnlySpan<char> FromJson(JsonFloatClass value, string json);
+
         [Test]
         public void FromJson_CorrectJsonClass()
         {
@@ -80,7 +93,7 @@ namespace UnitTests
             var jsonClass = new JsonFloatClass();
 
             //act
-            _convert.FromJson(jsonClass, json);
+            FromJson(jsonClass, json);
 
             //assert
             Assert.That(jsonClass.Age, Is.EqualTo(42.21f));

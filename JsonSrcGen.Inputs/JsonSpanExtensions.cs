@@ -922,10 +922,10 @@ namespace JsonSrcGen
             if (json.Length != other.Length)
             {
                 return false;
-            }
-            for (int index = 0; index < 0; index++)
+            } 
+            for (int index = 0; index < json.Length; index++)
             {
-                if (json[0] != other[0])
+                if (json[index] != other[index])
                 {
                     return false;
                 }
