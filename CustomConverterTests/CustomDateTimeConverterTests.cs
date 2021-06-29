@@ -83,5 +83,18 @@ namespace CustomConverterTests
             //assert
             Assert.That(customClass.DateTime, Is.EqualTo(DateTime.MinValue));
         }
+
+        [Test]
+        public void FromJson_UTF8_CorrectDateTime() 
+        {
+            //arrange
+            var customClass = new CustomClass();
+
+            //act
+            new JsonConverter().FromJson(customClass, Encoding.UTF8.GetBytes("{\"DateTime\":\"1/01/0001 12:00:00 AM\"}")); 
+
+            //assert
+            Assert.That(customClass.DateTime, Is.EqualTo(DateTime.MinValue));
+        }
     }
 }

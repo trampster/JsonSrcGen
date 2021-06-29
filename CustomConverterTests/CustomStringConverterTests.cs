@@ -42,7 +42,7 @@ namespace CustomConverterTests
 
             var upercase = json.ReadTo('\"');
 
-            value = upercase.ToString().ToLower();
+            value = Encoding.UTF8.GetString(upercase).ToLower();
 
             return json.Slice(upercase.Length + 1); 
         }
@@ -77,6 +77,19 @@ namespace CustomConverterTests
 
             //act
             new JsonConverter().FromJson(customClass, "{\"Property\":\"UPERCASE\"}"); 
+
+            //assert
+            Assert.That(customClass.Property, Is.EqualTo("upercase"));
+        }
+
+        [Test]
+        public void FromJson_UTF8_CorrectCase() 
+        {
+            //arrange
+            var customClass = new CustomStringClass();
+
+            //act
+            new JsonConverter().FromJson(customClass, Encoding.UTF8.GetBytes("{\"Property\":\"UPERCASE\"}")); 
 
             //assert
             Assert.That(customClass.Property, Is.EqualTo("upercase"));
