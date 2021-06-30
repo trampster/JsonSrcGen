@@ -43,6 +43,7 @@
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonUtf8SpanExtensions.cs" Link="JsonUtf8SpanExtensions.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\ICustomConverter.cs" Link="ICustomConverter.cs" />
     <EmbeddedResource Include="..\JsonSrcGen.Inputs\CustomConverterAttribute.cs" Link="CustomConverterAttribute.cs" />
+    <EmbeddedResource Include="..\JsonSrcGen.Inputs\JsonUtf8Builder.cs" Link="JsonUtf8Builder.cs" />
 
     <None Include="icon.png" Pack="true" PackagePath="" />
   </ItemGroup>

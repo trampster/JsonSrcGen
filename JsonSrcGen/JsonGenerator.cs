@@ -114,8 +114,11 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("JsonUtf8SpanExtensions.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("ICustomConverter.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("CustomConverterAttribute.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonUtf8Builder.cs", context, compilation, GenerationFolder);
         
-            var classBuilder = new CodeBuilder();
+            var utf8Literals = new Utf8Literals();
+
+            var classBuilder = new CodeBuilder(utf8Literals);
 
             classBuilder.Append(@"
 using System;
@@ -168,7 +171,7 @@ namespace JsonSrcGen
                 new NullableBoolGenerator(),
                 new StringGenerator(),
                 new ListGenerator(type => GetGeneratorForType(type)),
-                new ArrayGenerator(type => GetGeneratorForType(type), new CodeBuilder()),
+                new ArrayGenerator(type => GetGeneratorForType(type), new CodeBuilder(utf8Literals)),
                 new DictionaryGenerator(type => GetGeneratorForType(type)),
                 new CharGenerator()
             };
@@ -184,7 +187,7 @@ namespace JsonSrcGen
                 _generators.Add(customClass.FullName, new CustomTypeGenerator(customClass.FullName));
             }
 
-            var customTypeConverters = GetCustomTypeConverters(receiver.Targets, compilation);
+            var customTypeConverters = GetCustomTypeConverters(receiver.Targets, compilation, utf8Literals);
             foreach (var customTypeConverter in customTypeConverters)
             {
                 LogLine($"Adding customTypeConverter GeneratorId: {customTypeConverter.GeneratorId}");
@@ -201,8 +204,8 @@ namespace JsonSrcGen
                 }
             }
 
-            var toJsonGenerator = new ToJsonGenerator(GetGeneratorForType);
-            var fromJsonGenerator = new FromJsonGenerator(GetGeneratorForType);
+            var toJsonGenerator = new ToJsonGenerator(GetGeneratorForType, utf8Literals);
+            var fromJsonGenerator = new FromJsonGenerator(GetGeneratorForType ,utf8Literals);
 
             var listTypes = GetListAttributesInfo(receiver.CandidateAttributes, compilation);
             foreach(var listType in listTypes) 
@@ -257,9 +260,15 @@ namespace JsonSrcGen
                 }
             }
 
-            fromJsonGenerator.GenerateUtf8Literals(classBuilder);
+            utf8Literals.Generate(classBuilder);
 
             classBuilder.AppendLine(1, "}");
+
+            classBuilder.AppendLine(1, "public partial class JsonUtf8Builder");
+            classBuilder.AppendLine(1, "{");
+            utf8Literals.GenerateCopy(classBuilder);
+            classBuilder.AppendLine(1, "}");
+
             classBuilder.AppendLine(0, "}");
             classBuilder.AppendLine(0, "#nullable restore");
             
@@ -512,7 +521,7 @@ namespace JsonSrcGen
             return jsonClasses;
         }
         static string GenerationFolder;
-        IReadOnlyCollection<IJsonGenerator> GetCustomTypeConverters(List<TypeDeclarationSyntax> classDeclarations, Compilation compilation)
+        IReadOnlyCollection<IJsonGenerator> GetCustomTypeConverters(List<TypeDeclarationSyntax> classDeclarations, Compilation compilation, Utf8Literals utf8Literals)
         {
             var customTypeConverters = new List<IJsonGenerator>();
 
@@ -535,7 +544,7 @@ namespace JsonSrcGen
                             targetType.GeneratorId, 
                             targetType.FullName, 
                             $"{converterNamespace}.{converterClassName}", 
-                            new CodeBuilder()));
+                            new CodeBuilder(utf8Literals)));
                     }
                 }
             }

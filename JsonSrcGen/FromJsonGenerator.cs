@@ -10,20 +10,13 @@ namespace JsonSrcGen
     public class FromJsonGenerator
     {
         readonly Func<JsonType, IJsonGenerator> _getGeneratorForType;
-        readonly Utf8Literals _literals = new Utf8Literals();
+        readonly Utf8Literals _literals;
 
-
-        public FromJsonGenerator(Func<JsonType, IJsonGenerator> getGeneratorForType)
+        public FromJsonGenerator(Func<JsonType, IJsonGenerator> getGeneratorForType, Utf8Literals utf8Literals)
         {
             _getGeneratorForType = getGeneratorForType;
-        }
+            _literals = utf8Literals;
 
-        /// <summary>
-        /// Must be called after other generations, as they will define the literals
-        /// </summary>
-        public void GenerateUtf8Literals(CodeBuilder codeBuilder)
-        {
-            _literals.Generate(codeBuilder);
         }
 
         public void GenerateList(JsonType type, CodeBuilder codeBuilder)

@@ -479,5 +479,10 @@ namespace JsonSrcGen
             _index++;
             return this;
         }
+
+        public IJsonBuilder AppendBytes(ReadOnlySpan<byte> input)
+        {
+            throw new NotImplementedException("AppendBytes is only required for the UTF8 vesion");
+        }
     }
 }

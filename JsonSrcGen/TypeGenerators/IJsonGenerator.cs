@@ -14,9 +14,9 @@ namespace JsonSrcGen.TypeGenerators
     {
         string GeneratorId {get; }
 
-        void GenerateFromJson(CodeBuilder codeBuilder, int inputLevel, JsonType type, Func<string, string> valueSetter, string valueGetter, JsonFormat jsonFormat);
+        void GenerateFromJson(CodeBuilder codeBuilder, int inputLevel, JsonType type, Func<string, string> valueSetter, string valueGetter, JsonFormat format);
 
-        void GenerateToJson(CodeBuilder codeBuilder, int inputLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull);
+        void GenerateToJson(CodeBuilder codeBuilder, int inputLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull, JsonFormat format);
 
         CodeBuilder ClassLevelBuilder {get;}
 

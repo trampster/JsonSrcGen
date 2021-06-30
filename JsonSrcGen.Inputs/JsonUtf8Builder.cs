@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace JsonSrcGen
 {
-    public class JsonUtf8Builder : IJsonBuilder
+    public partial class JsonUtf8Builder : IJsonBuilder
     {
         byte[] _buffer = new byte[5];
         int _index = 0;
@@ -1211,6 +1211,48 @@ namespace JsonSrcGen
             int ones = left;
             _buffer[_index] = (byte)('0' + ones);
             _index++;
+            return this;
+        }
+
+        public IJsonBuilder AppendBytes(ReadOnlySpan<byte> input)
+        {
+            if (_index + input.Length > _buffer.Length)
+            {
+                ResizeBuffer(input.Length );
+            }
+
+            for(int index = 0; index < input.Length; index++)
+            {
+                _buffer[index + _index] = input[index];
+            }
+
+            _index += input.Length;
+            return this;
+        }
+
+        public IJsonBuilder AppendPreset()
+        {
+            if (_index + 10 > _buffer.Length)
+            {
+                ResizeBuffer(10);
+            }
+
+            var span = _buffer.AsSpan();
+
+            { _ = span[9]; }
+
+            span[0] = 0;
+            span[1] = 1;
+            span[2] = 2;
+            span[3] = 3;
+            span[4] = 4;
+            span[5] = 5;
+            span[6] = 6;
+            span[7] = 7;
+            span[8] = 8;
+            span[9] = 9;
+
+            _index += 10;
             return this;
         }
     }

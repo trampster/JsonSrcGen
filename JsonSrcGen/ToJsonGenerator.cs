@@ -28,10 +28,12 @@ namespace JsonSrcGen
             builder.Clear();";
 
         readonly Func<JsonType, IJsonGenerator> _getGeneratorForType;
+        readonly Utf8Literals _utf8Literals;
 
-        public ToJsonGenerator(Func<JsonType, IJsonGenerator> getGeneratorForType)
+        public ToJsonGenerator(Func<JsonType, IJsonGenerator> getGeneratorForType, Utf8Literals utf8Literals)
         {
             _getGeneratorForType = getGeneratorForType;
+            _utf8Literals = utf8Literals;
         }
 
         public void Generate(JsonClass jsonClass, CodeBuilder classBuilder)
@@ -78,7 +80,7 @@ namespace JsonSrcGen
 
                 if(jsonClass.IgnoreNull && property.Type.CanBeNull)
                 {
-                    classBuilder.MakeAppend(indent, appendBuilder);
+                    classBuilder.MakeAppend(indent, appendBuilder, JsonFormat.String);
                     classBuilder.AppendLine(indent, $"if(value.{property.CodeName} != null)");
                     classBuilder.AppendLine(indent, "{");
                     indent++;
@@ -96,7 +98,7 @@ namespace JsonSrcGen
 
                 var generator = GetGeneratorForType(property.Type);
                 bool canBeNull = jsonClass.IgnoreNull ? false : property.Type.CanBeNull;
-                generator.GenerateToJson(classBuilder, indent, appendBuilder, property.Type, $"value.{property.CodeName}", canBeNull);
+                generator.GenerateToJson(classBuilder, indent, appendBuilder, property.Type, $"value.{property.CodeName}", canBeNull, JsonFormat.String);
 
                 if(jsonClass.IgnoreNull && property.Type.CanBeNull)
                 {
@@ -107,7 +109,7 @@ namespace JsonSrcGen
                 if(isFirst) isFirst = false;
             }
             appendBuilder.Append("}"); 
-            classBuilder.MakeAppend(3, appendBuilder);
+            classBuilder.MakeAppend(3, appendBuilder, JsonFormat.String);
             classBuilder.AppendLine(2, "}");
         }
 
@@ -142,7 +144,7 @@ namespace JsonSrcGen
 
                 if(jsonClass.IgnoreNull && property.Type.CanBeNull)
                 {
-                    classBuilder.MakeAppend(indent, appendBuilder);
+                    classBuilder.MakeAppend(indent, appendBuilder, JsonFormat.UTF8);
                     classBuilder.AppendLine(indent, $"if(value.{property.CodeName} != null)");
                     classBuilder.AppendLine(indent, "{");
                     indent++;
@@ -160,7 +162,7 @@ namespace JsonSrcGen
 
                 var generator = GetGeneratorForType(property.Type);
                 bool canBeNull = jsonClass.IgnoreNull ? false : property.Type.CanBeNull;
-                generator.GenerateToJson(classBuilder, indent, appendBuilder, property.Type, $"value.{property.CodeName}", canBeNull);
+                generator.GenerateToJson(classBuilder, indent, appendBuilder, property.Type, $"value.{property.CodeName}", canBeNull, JsonFormat.UTF8);
 
                 if(jsonClass.IgnoreNull && property.Type.CanBeNull)
                 {
@@ -171,7 +173,7 @@ namespace JsonSrcGen
                 if(isFirst) isFirst = false;
             }
             appendBuilder.Append("}"); 
-            classBuilder.MakeAppend(3, appendBuilder);
+            classBuilder.MakeAppend(3, appendBuilder, JsonFormat.UTF8);
             classBuilder.AppendLine(2, "}");
         }
 
@@ -183,7 +185,7 @@ namespace JsonSrcGen
 
             var listJsonType = new JsonType("List", "List", "System.Collection.Generic", false, new List<JsonType>(){type}, true, true);
             var generator = _getGeneratorForType(listJsonType);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), listJsonType, "value", listJsonType.CanBeNull);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), listJsonType, "value", listJsonType.CanBeNull, JsonFormat.String);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 
@@ -197,7 +199,7 @@ namespace JsonSrcGen
 
             var listJsonType = new JsonType("List", "List", "System.Collection.Generic", false, new List<JsonType>(){type}, true, true);
             var generator = _getGeneratorForType(listJsonType);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), listJsonType, "value", listJsonType.CanBeNull);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), listJsonType, "value", listJsonType.CanBeNull, JsonFormat.UTF8);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 
@@ -211,7 +213,7 @@ namespace JsonSrcGen
 
             var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true, true);
             var generator = _getGeneratorForType(arrayJsonType);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull, JsonFormat.String);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 
@@ -225,7 +227,7 @@ namespace JsonSrcGen
 
             var arrayJsonType = new JsonType("Array", "Array", "NA", false, new List<JsonType>(){type}, true, true);
             var generator = _getGeneratorForType(arrayJsonType);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull, JsonFormat.UTF8);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 
@@ -238,7 +240,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(0, BuilderText);
 
             var generator = _getGeneratorForType(type);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), type, "value", type.CanBeNull);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), type, "value", type.CanBeNull, JsonFormat.String);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 
@@ -251,7 +253,7 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(0, Utf8BuilderText);
 
             var generator = _getGeneratorForType(type);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), type, "value", type.CanBeNull);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), type, "value", type.CanBeNull, JsonFormat.UTF8);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 
@@ -265,7 +267,7 @@ namespace JsonSrcGen
 
             var arrayJsonType = new JsonType("Dictionary", "Dictionary", "NA", false, new List<JsonType>(){keyType, valueType}, true, true);
             var generator = _getGeneratorForType(arrayJsonType);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull, JsonFormat.String);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 
@@ -279,7 +281,7 @@ namespace JsonSrcGen
 
             var arrayJsonType = new JsonType("Dictionary", "Dictionary", "NA", false, new List<JsonType>(){keyType, valueType}, true, true);
             var generator = _getGeneratorForType(arrayJsonType);
-            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull);
+            generator.GenerateToJson(codeBuilder, 3, new StringBuilder(), arrayJsonType, "value", arrayJsonType.CanBeNull, JsonFormat.UTF8);
 
             codeBuilder.AppendLine(3, "return builder.AsSpan();");
             codeBuilder.AppendLine(2, "}"); 

@@ -91,9 +91,11 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, "}");
         }
 
-        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull)
+        public void GenerateToJson(
+            CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, 
+            JsonType type, string valueGetter, bool canBeNull, JsonFormat format)
         {
-           codeBuilder.MakeAppend(indentLevel, appendBuilder);
+           codeBuilder.MakeAppend(indentLevel, appendBuilder, format);
 
             string dictionaryName = $"list{UniqueNumberGenerator.UniqueNumber}"; 
 
@@ -104,7 +106,7 @@ namespace JsonSrcGen.TypeGenerators
                 codeBuilder.AppendLine(indentLevel, $"if({dictionaryName} == null)");
                 codeBuilder.AppendLine(indentLevel, "{");
                 appendBuilder.Append("null");
-                codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
+                codeBuilder.MakeAppend(indentLevel+1, appendBuilder, format);
                 codeBuilder.AppendLine(indentLevel, "}");
                 codeBuilder.AppendLine(indentLevel, "else");
                 codeBuilder.AppendLine(indentLevel, "{");
@@ -113,7 +115,7 @@ namespace JsonSrcGen.TypeGenerators
             var dictionaryValueType = type.GenericArguments[1];
             var generator = _getGeneratorForType(dictionaryValueType);
             appendBuilder.Append("{");
-            codeBuilder.MakeAppend(indentLevel, appendBuilder);
+            codeBuilder.MakeAppend(indentLevel, appendBuilder, format);
 
             codeBuilder.AppendLine(indentLevel, "bool isFirst = true;");
 
@@ -123,24 +125,24 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, "if(!isFirst)");
             codeBuilder.AppendLine(indentLevel+1, "{");
             appendBuilder.Append(",");
-            codeBuilder.MakeAppend(indentLevel+2, appendBuilder);
+            codeBuilder.MakeAppend(indentLevel+2, appendBuilder, format);
             codeBuilder.AppendLine(indentLevel+1, "}");
 
             codeBuilder.AppendLine(indentLevel+1, "isFirst = false;");
 
 
             appendBuilder.Append("\\\"");
-            codeBuilder.MakeAppend(indentLevel+1, appendBuilder);
+            codeBuilder.MakeAppend(indentLevel+1, appendBuilder, format);
 
             codeBuilder.AppendLine(indentLevel+1, $"builder.Append(pair.Key);");
             appendBuilder.Append("\\\":");
 
-            generator.GenerateToJson(codeBuilder, indentLevel+1, appendBuilder, dictionaryValueType, $"pair.Value", dictionaryValueType.CanBeNull);
+            generator.GenerateToJson(codeBuilder, indentLevel+1, appendBuilder, dictionaryValueType, $"pair.Value", dictionaryValueType.CanBeNull, format);
 
             codeBuilder.AppendLine(indentLevel, "}");
 
             appendBuilder.Append("}");
-            codeBuilder.MakeAppend(indentLevel, appendBuilder);
+            codeBuilder.MakeAppend(indentLevel, appendBuilder, format);
             if(canBeNull)
             {
                 indentLevel--;

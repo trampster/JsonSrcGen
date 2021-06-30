@@ -49,7 +49,7 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, "}");
         }
 
-        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull)
+        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull, JsonFormat format)
         {
             if(canBeNull)
             {
@@ -57,14 +57,14 @@ namespace JsonSrcGen.TypeGenerators
                 codeBuilder.AppendLine(indentLevel, "{");
                 var nullAppendBuilder = new StringBuilder(appendBuilder.ToString());
                 nullAppendBuilder.Append("null");
-                codeBuilder.MakeAppend(indentLevel+1, nullAppendBuilder);
+                codeBuilder.MakeAppend(indentLevel+1, nullAppendBuilder, format);
                 codeBuilder.AppendLine(indentLevel, "}");
                 codeBuilder.AppendLine(indentLevel, "else"); 
                 codeBuilder.AppendLine(indentLevel, "{");
                 indentLevel++;
             }
 
-            codeBuilder.MakeAppend(indentLevel, appendBuilder);
+            codeBuilder.MakeAppend(indentLevel, appendBuilder, format);
             codeBuilder.AppendLine(indentLevel, $"ToJson({valueGetter}, builder);");
 
             if(canBeNull)

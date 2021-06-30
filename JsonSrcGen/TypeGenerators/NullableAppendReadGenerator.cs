@@ -31,9 +31,9 @@ namespace JsonSrcGen.TypeGenerators
             }
         }
 
-        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull)
+        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull, JsonFormat format)
         {
-            codeBuilder.MakeAppend(indentLevel, appendBuilder);
+            codeBuilder.MakeAppend(indentLevel, appendBuilder, format);
             
             string valueName = $"listValue{UniqueNumberGenerator.UniqueNumber}";
             codeBuilder.AppendLine(indentLevel, $"var {valueName} = {valueGetter};");

@@ -18,6 +18,8 @@ namespace JsonSrcGen
         IJsonBuilder AppendDate(DateTime date);
         IJsonBuilder AppendEscaped(char input);
         IJsonBuilder AppendEscaped(string input);
+        IJsonBuilder AppendBytes(ReadOnlySpan<byte> input);
+        
         void Clear();
         string ToString();
     }

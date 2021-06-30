@@ -15,9 +15,9 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, valueSetter(propertyValueName));
         }
 
-        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull)
+        public void GenerateToJson(CodeBuilder codeBuilder, int indentLevel, StringBuilder appendBuilder, JsonType type, string valueGetter, bool canBeNull, JsonFormat format)
         {
-            codeBuilder.MakeAppend(indentLevel, appendBuilder);
+            codeBuilder.MakeAppend(indentLevel, appendBuilder, format);
 
             if(canBeNull)
             {

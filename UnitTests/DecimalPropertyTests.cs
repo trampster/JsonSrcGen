@@ -49,7 +49,7 @@ namespace UnitTests
     {
         const decimal MIN = decimal.MinValue;
 
-        protected JsonSrcGen.JsonConverter _convert; 
+        protected JsonSrcGen.JsonConverter _convert;
 
         const string ExpectedJson = "{\"DecNull\":null,\"Min\":-79228162514264337593543950335,\"Value\":-200000.01,\"Value2\":1.5}";
 
