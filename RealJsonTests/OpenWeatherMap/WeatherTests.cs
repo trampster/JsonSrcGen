@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Linq;
 using System;
+using System.Text;
 
 namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
 {
@@ -19,16 +20,24 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             _converter = new JsonConverter();
         }
 
-        [TestCase("Weather.json")]
-        [TestCase("WeatherFormatted.json")]
-        public void FromJson_CorrectTopLevel(string jsonFile)
+        ReadOnlySpan<char> FromJson(Weather weather, string json, bool utf8)
+        {
+            if(utf8)
+            {
+                return Encoding.UTF8.GetString(_converter.FromJson(weather, Encoding.UTF8.GetBytes(json)));
+            }
+            return _converter.FromJson(weather, json);
+        }
+
+        [Test]
+        public void FromJson_CorrectTopLevel([Values("Weather.json", "WeatherFormatted.json")] string jsonFile, [Values(true, false)]bool utf8)
         {
             // arrange
             Weather weather = new Weather();
             var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, json);
+            FromJson(weather, json, utf8);
 
             // assert
             Assert.That(weather.Latitude, Is.EqualTo(33.44f));
@@ -37,16 +46,15 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             Assert.That(weather.TimezoneOffset, Is.EqualTo(-18000));
         }
 
-        [TestCase("Weather.json")]
-        [TestCase("WeatherFormatted.json")]
-        public void FromJson_CorrectCurrent(string jsonFile)
+        [Test]
+        public void FromJson_CorrectCurrent([Values("Weather.json", "WeatherFormatted.json")]string jsonFile, [Values(true, false)]bool utf8)
         {
             // arrange
             Weather weather = new Weather();
             var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, json);
+            FromJson(weather, json, utf8);
 
             // assert
             var current = weather.Current;
@@ -69,16 +77,15 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             Assert.That(current.Weather[0].Icon, Is.EqualTo("02n"));
         }
 
-        [TestCase("Weather.json")]
-        [TestCase("WeatherFormatted.json")]
-        public void FromJson_MinutelyCorrect(string jsonFile)
+        [Test]
+        public void FromJson_MinutelyCorrect([Values("Weather.json", "WeatherFormatted.json")]string jsonFile, [Values(true, false)]bool utf8)
         {
             // arrange
             Weather weather = new Weather();
             var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, json);
+            FromJson(weather, json, utf8);
 
             // assert
             var minutely = weather.Minutely;
@@ -97,16 +104,15 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             Assert.That(minutely[60].Precipitation, Is.EqualTo(0));
         }
 
-        [TestCase("Weather.json")]
-        [TestCase("WeatherFormatted.json")]
-        public void FromJson_HourlyCorrect(string jsonFile)
+        [Test]
+        public void FromJson_HourlyCorrect([Values("Weather.json", "WeatherFormatted.json")]string jsonFile, [Values(true, false)]bool utf8)
         {
             // arrange
             Weather weather = new Weather();
             var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, json);
+            FromJson(weather, json, utf8);
 
             // assert
             var hourly = weather.Hourly;
@@ -152,16 +158,15 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             Assert.That(hourly[47].Rain, Is.Null);
         }
 
-        [TestCase("Weather.json")]
-        [TestCase("WeatherFormatted.json")]
-        public void FromJson_DailyCorrect(string jsonFile)
+        [Test]
+        public void FromJson_DailyCorrect([Values("Weather.json", "WeatherFormatted.json")]string jsonFile, [Values(true, false)]bool utf8)
         {
             // arrange
             Weather weather = new Weather();
             var json = File.ReadAllText(Path.Combine("OpenWeatherMap", jsonFile));
             
             // act
-            _converter.FromJson(weather, json);
+            FromJson(weather, json, utf8);
 
             // assert
             var daily = weather.Daily;
@@ -197,6 +202,15 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
             Assert.That(daily[1].Uvi, Is.EqualTo(4.92f));
         }
 
+        ReadOnlySpan<char> ToJson(Weather weather, bool utf8)
+        {
+            if(utf8)
+            {
+                return Encoding.UTF8.GetString(_converter.ToJsonUtf8(weather));
+            }
+            return _converter.ToJson(weather);
+        }
+
         /// <summary>
         /// This has been reduce for the orignal by removing most of the entries
         /// in the arrays, also reordered because JsonSrcGen produces alphabetically
@@ -204,7 +218,7 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
         /// nulls
         /// </summary>
         [Test]
-        public void ToJsonReduced_CorrectJson()
+        public void ToJsonReduced_CorrectJson([Values(true, false)]bool utf8)
         {
             System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-us");
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
@@ -332,9 +346,8 @@ namespace JsonSrcGen.RealJsonTests.OpenWeatherMap
                 }
             };
 
-
             // act
-            var json = _converter.ToJson(weather);
+            var json = ToJson(weather, utf8);
 
             // assert
             var jsonExpected = File.ReadAllText(Path.Combine("OpenWeatherMap", "WeatherToJson.json"));

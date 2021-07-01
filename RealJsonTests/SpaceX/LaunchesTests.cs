@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Linq;
 using System;
+using System.Text;
 
 [assembly: JsonArray(typeof(JsonSrcGen.RealJsonTests.SpaceX.Launch))]
 [assembly: GenerationOutputFolder("/home/daniel/Work/JsonSrcGen/Generated")]
@@ -24,23 +25,32 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
             _converter = new JsonConverter();
         }
 
+        Launch[] FromJson(Launch[] launch, string json, bool utf8)
+        {
+            if(utf8)
+            {
+                return _converter.FromJson(launch, Encoding.UTF8.GetBytes(json));
+            }
+            return _converter.FromJson(launch, json);
+        }
+
         [Test]
-        public void FromJson_CorrectCount()
+        public void FromJson_CorrectCount([Values(true, false)]bool utf8)
         {
             // arrange
             // act
-            var launches = _converter.FromJson((Launch[])null, _json);
+            var launches = FromJson((Launch[])null, _json, utf8);
 
             // assert
             Assert.That(launches.Length, Is.EqualTo(113));
         }
 
         [Test]
-        public void FromJson_CorrectFirstItem()
+        public void FromJson_CorrectFirstItem([Values(true, false)]bool utf8)
         {
             // arrange
             // act
-            var launches = _converter.FromJson((Launch[])null, _json);
+            var launches = FromJson((Launch[])null, _json, utf8);
 
             // assert
             Launch launch = launches[0];
@@ -101,11 +111,11 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
         }
 
          [Test]
-        public void FromJson_CorrectLastItem()
+        public void FromJson_CorrectLastItem([Values(true, false)]bool utf8)
         {
             // arrange
             // act
-            var launches = _converter.FromJson((Launch[])null, _json);
+            var launches = FromJson((Launch[])null, _json, utf8);
 
             // assert
             Launch launch = launches.Last();
@@ -162,8 +172,17 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
             Assert.That(launch.Id, Is.EqualTo("5f8399fb818d8b59f5740d43"));
         }
 
+        ReadOnlySpan<char> ToJson(Launch launch, bool utf8)
+        {
+            if(utf8)
+            {
+                return Encoding.UTF8.GetString(_converter.ToJsonUtf8(launch));
+            }
+            return _converter.ToJson(launch);
+        }
+
         [Test]
-        public void ToJson_CorrectJson()
+        public void ToJson_CorrectJson([Values(true, false)]bool utf8)
         {
             // arrange
             Launch launch = new Launch()
@@ -252,7 +271,7 @@ namespace JsonSrcGen.RealJsonTests.SpaceX
             };
 
             // act
-            var json = _converter.ToJson(launch);
+            var json = ToJson(launch, utf8);
 
             // assert
             Assert.That(json.ToString(), Is.EqualTo(File.ReadAllText(Path.Combine("SpaceX","Launch.json"))));
