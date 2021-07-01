@@ -40,7 +40,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\JsonSrcGen.Runtime\JsonSrcGen.Runtime.csproj" />
 	  <ProjectReference Include="..\JsonSrcGen\JsonSrcGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 

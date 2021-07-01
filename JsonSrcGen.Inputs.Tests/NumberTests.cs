@@ -2,7 +2,7 @@ using NUnit.Framework;
 using System.Text;
 using System.Globalization;
 
-namespace JsonSrcGen.Runtime.Tests
+namespace JsonSrcGen.Inputs.Tests
 {
     public class NumberTests
     {

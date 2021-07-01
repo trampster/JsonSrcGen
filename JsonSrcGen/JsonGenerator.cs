@@ -115,6 +115,8 @@ namespace JsonSrcGen
             compilation = GenerateFromResource("ICustomConverter.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("CustomConverterAttribute.cs", context, compilation, GenerationFolder);
             compilation = GenerateFromResource("JsonUtf8Builder.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("IJsonBuilder.cs", context, compilation, GenerationFolder);
+            compilation = GenerateFromResource("JsonStringBuilder.cs", context, compilation, GenerationFolder);
         
             var utf8Literals = new Utf8Literals();
 

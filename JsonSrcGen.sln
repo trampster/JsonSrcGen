@@ -13,9 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomConverterTests", "Cus
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{F01CB4D7-000D-4C44-897A-61A5430A29C5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonSrcGen.Runtime", "JsonSrcGen.Runtime\JsonSrcGen.Runtime.csproj", "{48A1BD06-AD19-47C8-AB58-4A4ECC6C130C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonSrcGen.Runtime.Tests", "JsonSrcGen.Runtime.Tests\JsonSrcGen.Runtime.Tests.csproj", "{332729C6-174B-4C44-873A-488C9572D337}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonSrcGen.Inputs.Tests", "JsonSrcGen.Inputs.Tests\JsonSrcGen.Inputs.Tests.csproj", "{332729C6-174B-4C44-873A-488C9572D337}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

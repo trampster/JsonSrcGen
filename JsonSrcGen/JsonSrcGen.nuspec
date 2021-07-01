@@ -12,11 +12,6 @@
     <copyright>Copyright © Daniel Hughes 2020</copyright>
     <tags>JSON SourceGenerator</tags>
     <repository type="git" url="https://github.com/trampster/JsonSrcGen" />
-    <dependencies>
-      <group>
-        <dependency id="JsonSrcGen.Runtime" version="1.1.0.0-alpha.1" />
-      </group>
-    </dependencies>
   </metadata>
 
   <files>
