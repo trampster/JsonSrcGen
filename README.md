@@ -120,6 +120,23 @@ public class MyJsonType
 }
 ```
 
+**UTF8 Support**
+
+JsonSrcGen supports UTF8 via ReadOnlySpan<byte>.
+
+To Json looks is the same as string ToJson byte with Utf8 at the end of the name
+
+```csharp
+ReadOnlySpan<byte> json = convert.ToJsonUtf8(new MyType(){MyProperty = "Some value"});
+```
+
+From Json is even easier as the method name is the same as string FromJson but takes a ReadOnlySpan<byte> instead of ReadOnlySpan<char>
+
+```
+ReadOnlySpan<byte> utf8Json = Encoding.Utf8.GetBytes("{\"MyProperty\:\"Some value\"}");
+convert.FromJson(utf8Json, myType);
+```
+
 **Nuget Packages**
 
 JsonSrcGen is available as a nuget package:
