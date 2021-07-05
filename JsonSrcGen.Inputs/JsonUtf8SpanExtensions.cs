@@ -659,7 +659,7 @@ namespace JsonSrcGen
                         json = ReadEscapedString(json, index, out value);
                         return json;
                     case (byte)'\"':
-                        value = Encoding.UTF8.GetString(json.Slice(0, index));
+                        value = Encoding.UTF8.GetString(json.Slice(1, index));
                         return json.Slice(index + 1);
                 }
             }
