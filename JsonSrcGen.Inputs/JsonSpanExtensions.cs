@@ -649,17 +649,17 @@ namespace JsonSrcGen
             if (json[0] == 'n')
             {
                 value = null;
-                return json.Slice(3);
+                return json.Slice(4);
             }
             for (int index = 1; index < json.Length; index++)
             {
                 switch (json[index])
                 {
                     case '\\':
-                        json = ReadEscapedString(json, index, out value);
+                        json = ReadEscapedString(json.Slice(1), index - 1, out value);
                         return json;
                     case '\"':
-                        value = new string(json.Slice(1, index));
+                        value = new string(json.Slice(1, index - 1));
                         return json.Slice(index + 1);
                 }
             }
