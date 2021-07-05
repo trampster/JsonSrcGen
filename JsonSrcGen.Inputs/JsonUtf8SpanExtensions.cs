@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 #nullable enable
 namespace JsonSrcGen
@@ -644,13 +645,13 @@ namespace JsonSrcGen
 
         public static ReadOnlySpan<byte> Read(this ReadOnlySpan<byte> json, out string? value)
         {
-            json = json.SkipWhitespaceTo('\"', 'n', out char found);
-            if (found == 'n')
+            json = json.SkipWhitespace();
+            if (json[0] == 'n')
             {
                 value = null;
                 return json.Slice(3);
             }
-            for (int index = 0; index < json.Length; index++)
+            for (int index = 1; index < json.Length; index++)
             {
                 switch (json[index])
                 {
@@ -824,6 +825,7 @@ namespace JsonSrcGen
             return (char)value;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<byte> SkipWhitespace(this ReadOnlySpan<byte> json)
         {
             for (int index = 0; index < json.Length; index++)
