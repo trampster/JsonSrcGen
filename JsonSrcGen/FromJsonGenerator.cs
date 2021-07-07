@@ -147,7 +147,7 @@ namespace JsonSrcGen
 
             codeBuilder.AppendLine(2, "{");
 
-            codeBuilder.AppendLine(3, "json = json.SkipWhitespaceTo('{');");
+            codeBuilder.AppendLine(3, "json = json.SkipToOpenCurlyBracket();");
 
             var properties = new List<JsonPropertyInstance>();
             foreach(var property in jsonClass.Properties)
@@ -191,7 +191,7 @@ namespace JsonSrcGen
 
             codeBuilder.AppendLine(4, "var propertyName = json.ReadTo('\\\"');");
             codeBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
-            codeBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(':');");
+            codeBuilder.AppendLine(4, "json = json.SkipToColon();");
             
             GenerateProperties(properties, 4, codeBuilder, JsonFormat.String);
 
@@ -224,7 +224,7 @@ namespace JsonSrcGen
 
             codeBuilder.AppendLine(2, "{");
 
-            codeBuilder.AppendLine(3, "json = json.SkipWhitespaceTo('{');");
+            codeBuilder.AppendLine(3, "json = json.SkipToOpenCurlyBracket();");
 
             var properties = new List<JsonPropertyInstance>();
             foreach(var property in jsonClass.Properties)
@@ -268,7 +268,7 @@ namespace JsonSrcGen
 
             codeBuilder.AppendLine(4, "var propertyName = json.ReadTo('\\\"');");
             codeBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
-            codeBuilder.AppendLine(4, "json = json.SkipWhitespaceTo(':');");
+            codeBuilder.AppendLine(4, "json = json.SkipToColon();");
             
             GenerateProperties(properties, 4, codeBuilder, JsonFormat.UTF8);
 

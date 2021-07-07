@@ -817,27 +817,32 @@ namespace JsonSrcGen
             throw new InvalidJsonException($"Unexpected end of json while skipping whitespace", json);
         }
 
-        public static ReadOnlySpan<char> SkipWhitespaceTo(this ReadOnlySpan<char> json, char to)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<char> SkipToOpenCurlyBracket(this ReadOnlySpan<char> json)
         {
             for (int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                switch (value)
+                if( value == '{')
                 {
-                    case ' ':
-                    case '\t':
-                    case '\n':
-                    case '\r':
-                        continue;
+                    return json.Slice(index + 1);
                 }
-                if (value == to)
-                {
-                    index++;
-                    return json.Slice(index);
-                }
-                throw new InvalidJsonException($"Unexpected character! expected '{to}' but got '{value}'", json);
             }
-            throw new InvalidJsonException($"Unexpected end of json while looking for '{to}'", json);
+            throw new InvalidJsonException($"Unexpected end of json while looking for '{{'", json);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<char> SkipToColon(this ReadOnlySpan<char> json)
+        {
+            for (int index = 0; index < json.Length; index++)
+            {
+                var value = json[index];
+                if( value == (byte)':')
+                {
+                    return json.Slice(index + 1);
+                }
+            }
+            throw new InvalidJsonException($"Unexpected end of json while looking for ':'", json);
         }
 
         public static ReadOnlySpan<char> SkipWhitespaceTo(this ReadOnlySpan<char> json, char to1, char to2, out char found)

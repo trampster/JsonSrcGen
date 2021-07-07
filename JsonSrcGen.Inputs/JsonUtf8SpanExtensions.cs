@@ -844,27 +844,32 @@ namespace JsonSrcGen
             throw new InvalidJsonException($"Unexpected end of json while skipping whitespace", Encoding.UTF8.GetString(json));
         }
 
-        public static ReadOnlySpan<byte> SkipWhitespaceTo(this ReadOnlySpan<byte> json, char to)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<byte> SkipToOpenCurlyBracket(this ReadOnlySpan<byte> json)
         {
             for (int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                switch (value)
+                if( value == (byte)'{')
                 {
-                    case (byte)' ':
-                    case (byte)'\t':
-                    case (byte)'\n':
-                    case (byte)'\r':
-                        continue;
+                    return json.Slice(index + 1);
                 }
-                if (value == to)
-                {
-                    index++;
-                    return json.Slice(index);
-                }
-                throw new InvalidJsonException($"Unexpected character! expected '{to}' but got '{value}'", Encoding.UTF8.GetString(json));
             }
-            throw new InvalidJsonException($"Unexpected end of json while looking for '{to}'", Encoding.UTF8.GetString(json));
+            throw new InvalidJsonException($"Unexpected end of json while looking for '{{'", Encoding.UTF8.GetString(json));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<byte> SkipToColon(this ReadOnlySpan<byte> json)
+        {
+            for (int index = 0; index < json.Length; index++)
+            {
+                var value = json[index];
+                if( value == (byte)':')
+                {
+                    return json.Slice(index + 1);
+                }
+            }
+            throw new InvalidJsonException($"Unexpected end of json while looking for ':'", Encoding.UTF8.GetString(json));
         }
 
         public static ReadOnlySpan<byte> SkipWhitespaceTo(this ReadOnlySpan<byte> json, char to1, char to2, out char found)

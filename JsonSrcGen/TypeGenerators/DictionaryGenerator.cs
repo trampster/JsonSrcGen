@@ -63,7 +63,7 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel+2, $"throw new InvalidJsonException(\"Dictionary key cannot be null\", {jsonStringGetter});");
             codeBuilder.AppendLine(indentLevel+1, "}");
 
-            codeBuilder.AppendLine(indentLevel+1, "json = json.SkipWhitespaceTo(':');");
+            codeBuilder.AppendLine(indentLevel+1, "json = json.SkipToColon();");
 
             //value
             var dictionary = new Dictionary<string, int>();
