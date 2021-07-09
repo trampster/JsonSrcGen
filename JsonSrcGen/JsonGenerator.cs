@@ -126,7 +126,7 @@ namespace JsonSrcGen
 using System;
 using System.Text;
 using System.Collections.Generic;
-
+using System.Runtime.CompilerServices;
 
 namespace JsonSrcGen
 {
@@ -262,9 +262,9 @@ namespace JsonSrcGen
                 }
             }
 
-            utf8Literals.Generate(classBuilder);
-
             classBuilder.AppendLine(1, "}");
+
+            utf8Literals.GenerateMatches(classBuilder);
 
             classBuilder.AppendLine(1, "public partial class JsonUtf8Builder");
             classBuilder.AppendLine(1, "{");

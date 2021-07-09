@@ -326,8 +326,8 @@ namespace JsonSrcGen
                     var propertyNameBuilder = new StringBuilder();
                     propertyNameBuilder.AppendEscaped(property.JsonName);
                     string jsonName = propertyNameBuilder.ToString();
-                    var literal = _literals.GetStringLiteral(jsonName);
-                    classBuilder.AppendLine(indentLevel+2, $"if(!propertyName.EqualsBytes({literal.CodeName}))");
+                    var literal = _literals.GetMatchesLiteral(jsonName);
+                    classBuilder.AppendLine(indentLevel+2, $"if(!propertyName.{literal.CodeName}())");
                 }
                 else if(format == JsonFormat.String)
                 {
