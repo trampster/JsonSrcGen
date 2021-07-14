@@ -301,37 +301,41 @@ namespace JsonSrcGen
 
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out int value)
         {
-            json = json.SkipWhitespace();
-            int sign = 1;
-            int startIndex = 0;
-            if (json[0] == '-')
-            {
-                sign = -1;
-                startIndex = 1;
-            }
-            int afterIntIndex = 0;
-            int soFar = 0;
+            int pos = 0;
+            bool neg = false;
 
-            for (int index = startIndex; index < json.Length; index++)
+            for (pos = 0; pos < json.Length; pos++)
             {
-                var character = json[index];
-
-                if (character >= '0' && character <= '9')
+                var testChar = json[pos];
+                switch (testChar)
                 {
-                    int digit = ((int)character) - 48;
-                    soFar *= 10;
-                    soFar += digit;
+                    case ' ':
+                    case '\t':
+                    case '\n':
+                    case '\r':
+                        continue;
+                    case '-':
+                        neg = true;
+                        pos++;
+                        break;
+                    default:
+                        break;
                 }
-                else
-                {
-                    afterIntIndex = index;
-                    break;
-                }
+                break;
             }
 
-            value = sign * soFar;
+            uint soFar =  json[pos] - 48U;
+            pos++;
+            uint val = 0;
 
-            return json.Slice(afterIntIndex);
+            while (pos < json.Length && (val = json[pos] - 48U) <= 9)
+            {
+                soFar = soFar * 10 + val;
+                pos++;
+            }
+
+            value = neg ? unchecked(-(int) soFar) : checked((int) soFar);
+            return json.Slice(pos);
         }
 
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out double? value)
