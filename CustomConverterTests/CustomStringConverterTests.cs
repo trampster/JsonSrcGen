@@ -24,7 +24,7 @@ namespace CustomConverterTests
             }
             json = json.Slice(1);
 
-            var upercase = json.ReadTo('\"');
+            var upercase = json.ReadToQuote();
 
             value = upercase.ToString().ToLower();
 
@@ -40,7 +40,7 @@ namespace CustomConverterTests
             }
             json = json.Slice(1);
 
-            var upercase = json.ReadTo('\"');
+            var upercase = json.ReadToQuote();
 
             value = Encoding.UTF8.GetString(upercase).ToLower();
 

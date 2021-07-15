@@ -26,7 +26,7 @@ namespace CustomConverterTests
             }
             json = json.Slice(1);
 
-            var dateTimeSpan = json.ReadTo('\"');
+            var dateTimeSpan = json.ReadToQuote();
 
             value = DateTime.Parse(dateTimeSpan);
 
@@ -42,7 +42,7 @@ namespace CustomConverterTests
             }
             json = json.Slice(1);
 
-            var dateTimeSpan = json.ReadTo('\"');
+            var dateTimeSpan = json.ReadToQuote();
 
             value = DateTime.Parse(Encoding.UTF8.GetString(dateTimeSpan));
 
