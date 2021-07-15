@@ -649,21 +649,33 @@ namespace JsonSrcGen
 
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out string? value)
         {
-            json = json.SkipWhitespace();
-            if (json[0] == 'n')
+            int index = 0;
+            for (; index < json.Length; index++)
             {
-                value = null;
-                return json.Slice(4);
+                var part = json[index];
+                switch (part)
+                {
+                    case 'n':
+                        value = null;
+                        return json.Slice(index + 4);
+                    case '\"':
+                        index++;
+                        goto Parse;
+                }
             }
-            for (int index = 1; index < json.Length; index++)
+
+            Parse:
+
+            int start = index;
+            for (; index < json.Length; index++)
             {
                 switch (json[index])
                 {
                     case '\\':
-                        json = ReadEscapedString(json.Slice(1), index - 1, out value);
+                        json = ReadEscapedString(json.Slice(start), index - 1, out value);
                         return json;
                     case '\"':
-                        value = new string(json.Slice(1, index - 1));
+                        value = new string(json.Slice(start, index - start));
                         return json.Slice(index + 1);
                 }
             }
@@ -841,7 +853,7 @@ namespace JsonSrcGen
             for (int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                if( value == (byte)':')
+                if( value == ':')
                 {
                     return json.Slice(index + 1);
                 }
@@ -915,17 +927,17 @@ namespace JsonSrcGen
             throw new InvalidJsonException("Failed to find end of property", json);
         }
 
-        public static ReadOnlySpan<char> ReadTo(this ReadOnlySpan<char> json, char to)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<char> ReadToQuote(this ReadOnlySpan<char> json) 
         {
             for (int index = 0; index < json.Length; index++)
             {
-                var value = json[index];
-                if (value == to)
+                if (json[index] == '\"')
                 {
                     return json.Slice(0, index);
                 }
             }
-            throw new InvalidJsonException($"Unexpected end of json while looking for '{to}'", json);
+            throw new InvalidJsonException($"Unexpected end of json while looking for '\"'", json);
         }
 
         public static bool EqualsString(this ReadOnlySpan<char> json, string other)

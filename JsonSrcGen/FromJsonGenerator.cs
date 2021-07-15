@@ -164,42 +164,37 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(3, "while(true)");
             codeBuilder.AppendLine(3, "{");
             
-            codeBuilder.AppendLine(4, "json = json.SkipWhitespace();");
-
-            string valueVariable = $"value{UniqueNumberGenerator.UniqueNumber}";
-            codeBuilder.AppendLine(4, $"char {valueVariable} = json[0];");
-            codeBuilder.AppendLine(4, $"if({valueVariable} == '\\\"')");
+            codeBuilder.AppendLine(4, "int jsonIndex = 0;");
+            codeBuilder.AppendLine(4, "for (; jsonIndex < json.Length; jsonIndex++)");
             codeBuilder.AppendLine(4, "{");
-            codeBuilder.AppendLine(5, "json = json.Slice(1);");
-            codeBuilder.AppendLine(4, "}");
-            codeBuilder.AppendLine(4, $"else if({valueVariable} == '}}')");
-            codeBuilder.AppendLine(4, "{");
+            codeBuilder.AppendLine(4, "    switch (json[jsonIndex])");
+            codeBuilder.AppendLine(4, "    {");
+            codeBuilder.AppendLine(4, "        case '\"':");
+            codeBuilder.AppendLine(4, "            jsonIndex++;");
+            codeBuilder.AppendLine(4, "            goto after;");
+            codeBuilder.AppendLine(4, "        case '}':");
             foreach(var property in properties)
             {
                 if(property.Optional)
                 {
                     var generator = _getGeneratorForType(property.Type);
-                    generator.OnObjectFinished(codeBuilder, 5, propertyValue => $"value.{property.CodeName} = {propertyValue};", property.WasSetVariable);
+                    generator.OnObjectFinished(codeBuilder, 7, propertyValue => $"value.{property.CodeName} = {propertyValue};", property.WasSetVariable);
                 }
             }
-            codeBuilder.AppendLine(5, "return json.Slice(1);");
+            codeBuilder.AppendLine(4, "            return json.Slice(jsonIndex + 1);");
+            codeBuilder.AppendLine(4, "        default:");
+            codeBuilder.AppendLine(4, "            continue;");
+            codeBuilder.AppendLine(4, "    }");
             codeBuilder.AppendLine(4, "}");
-            codeBuilder.AppendLine(4, "else");
-            codeBuilder.AppendLine(4, "{");
-            codeBuilder.AppendLine(5, $"throw new InvalidJsonException($\"Unexpected character! expected '}}}}' or '\\\"' but got '{{{valueVariable}}}'\", json);");
-            codeBuilder.AppendLine(4, "}");
+            codeBuilder.AppendLine(4, "throw new InvalidJsonException($\"Unexpected character! expected '}}' or '\\\"' but got '{json[jsonIndex]}'\", json);");
+            codeBuilder.AppendLine(4, "after:");
 
-            codeBuilder.AppendLine(4, "var propertyName = json.ReadTo('\\\"');");
+            codeBuilder.AppendLine(4, "json = json.Slice(jsonIndex);");
+            codeBuilder.AppendLine(4, "var propertyName = json.ReadToQuote();");
             codeBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
             codeBuilder.AppendLine(4, "json = json.SkipToColon();");
             
             GenerateProperties(properties, 4, codeBuilder, JsonFormat.String);
-
-            codeBuilder.AppendLine(4, "json = json.SkipWhitespace();");
-            codeBuilder.AppendLine(4, "if(json[0] == ',')");
-            codeBuilder.AppendLine(4, "{");
-            codeBuilder.AppendLine(5, "json = json.Slice(1);");
-            codeBuilder.AppendLine(4, "}");
 
             codeBuilder.AppendLine(3, "}");
 
@@ -241,42 +236,37 @@ namespace JsonSrcGen
             codeBuilder.AppendLine(3, "while(true)");
             codeBuilder.AppendLine(3, "{");
             
-            codeBuilder.AppendLine(4, "json = json.SkipWhitespace();");
-
-            string valueVariable = $"value{UniqueNumberGenerator.UniqueNumber}";
-            codeBuilder.AppendLine(4, $"byte {valueVariable} = json[0];");
-            codeBuilder.AppendLine(4, $"if({valueVariable} == '\\\"')");
+            codeBuilder.AppendLine(4, "int jsonIndex = 0;");
+            codeBuilder.AppendLine(4, "for (; jsonIndex < json.Length; jsonIndex++)");
             codeBuilder.AppendLine(4, "{");
-            codeBuilder.AppendLine(5, "json = json.Slice(1);");
-            codeBuilder.AppendLine(4, "}");
-            codeBuilder.AppendLine(4, $"else if({valueVariable} == '}}')");
-            codeBuilder.AppendLine(4, "{");
+            codeBuilder.AppendLine(4, "    switch (json[jsonIndex])");
+            codeBuilder.AppendLine(4, "    {");
+            codeBuilder.AppendLine(4, "        case (byte)'\"':");
+            codeBuilder.AppendLine(4, "            jsonIndex++;");
+            codeBuilder.AppendLine(4, "            goto after;");
+            codeBuilder.AppendLine(4, "        case (byte)'}':");
             foreach(var property in properties)
             {
                 if(property.Optional)
                 {
                     var generator = _getGeneratorForType(property.Type);
-                    generator.OnObjectFinished(codeBuilder, 5, propertyValue => $"value.{property.CodeName} = {propertyValue};", property.WasSetVariable);
+                    generator.OnObjectFinished(codeBuilder, 7, propertyValue => $"value.{property.CodeName} = {propertyValue};", property.WasSetVariable);
                 }
             }
-            codeBuilder.AppendLine(5, "return json.Slice(1);");
+            codeBuilder.AppendLine(4, "            return json.Slice(jsonIndex + 1);");
+            codeBuilder.AppendLine(4, "        default:");
+            codeBuilder.AppendLine(4, "            continue;");
+            codeBuilder.AppendLine(4, "    }");
             codeBuilder.AppendLine(4, "}");
-            codeBuilder.AppendLine(4, "else");
-            codeBuilder.AppendLine(4, "{");
-            codeBuilder.AppendLine(5, $"throw new InvalidJsonException($\"Unexpected character! expected '}}}}' or '\\\"' but got '{{(byte){valueVariable}}}'\", Encoding.UTF8.GetString(json));");
-            codeBuilder.AppendLine(4, "}");
+            codeBuilder.AppendLine(4, "throw new InvalidJsonException($\"Unexpected character! expected '}}' or '\\\"' but got '{(char)json[jsonIndex]}'\", Encoding.UTF8.GetString(json));");
+            codeBuilder.AppendLine(4, "after:");
 
-            codeBuilder.AppendLine(4, "var propertyName = json.ReadTo('\\\"');");
+            codeBuilder.AppendLine(4, "json = json.Slice(jsonIndex);");
+            codeBuilder.AppendLine(4, "var propertyName = json.ReadToQuote();");
             codeBuilder.AppendLine(4, "json = json.Slice(propertyName.Length + 1);");
             codeBuilder.AppendLine(4, "json = json.SkipToColon();");
             
             GenerateProperties(properties, 4, codeBuilder, JsonFormat.UTF8);
-
-            codeBuilder.AppendLine(4, "json = json.SkipWhitespace();");
-            codeBuilder.AppendLine(4, "if(json[0] == ',')");
-            codeBuilder.AppendLine(4, "{");
-            codeBuilder.AppendLine(5, "json = json.Slice(1);");
-            codeBuilder.AppendLine(4, "}");
 
             codeBuilder.AppendLine(3, "}");
 

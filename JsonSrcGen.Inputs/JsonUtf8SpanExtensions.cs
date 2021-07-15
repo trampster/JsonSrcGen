@@ -649,21 +649,33 @@ namespace JsonSrcGen
 
         public static ReadOnlySpan<byte> Read(this ReadOnlySpan<byte> json, out string? value)
         {
-            json = json.SkipWhitespace();
-            if (json[0] == 'n')
+            int index = 0;
+            for (; index < json.Length; index++)
             {
-                value = null;
-                return json.Slice(4);
+                var part = json[index];
+                switch (part)
+                {
+                    case (byte)'n':
+                        value = null;
+                        return json.Slice(index + 4);
+                    case (byte)'\"':
+                        index++;
+                        goto Parse;
+                }
             }
-            for (int index = 1; index < json.Length; index++)
+
+            Parse:
+
+            int start = index;
+            for (; index < json.Length; index++)
             {
                 switch (json[index])
                 {
                     case (byte)'\\':
-                        json = ReadEscapedString(json.Slice(1), index - 1, out value);
+                        json = ReadEscapedString(json.Slice(start), index - 1, out value);
                         return json;
                     case (byte)'\"':
-                        value = Encoding.UTF8.GetString(json.Slice(1, index - 1));
+                        value = Encoding.UTF8.GetString(json.Slice(start, index - start));
                         return json.Slice(index + 1);
                 }
             }
@@ -942,17 +954,17 @@ namespace JsonSrcGen
             throw new InvalidJsonException("Failed to find end of property", Encoding.UTF8.GetString(json));
         }
 
-        public static ReadOnlySpan<byte> ReadTo(this ReadOnlySpan<byte> json, char to)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<byte> ReadToQuote(this ReadOnlySpan<byte> json) 
         {
             for (int index = 0; index < json.Length; index++)
             {
-                var value = json[index];
-                if (value == to)
+                if (json[index] == '\"')
                 {
                     return json.Slice(0, index);
                 }
             }
-            throw new InvalidJsonException($"Unexpected end of json while looking for '{to}'", Encoding.UTF8.GetString(json));
+            throw new InvalidJsonException($"Unexpected end of json while looking for '\"'", Encoding.UTF8.GetString(json));
         }
 
         public static bool EqualsBytes(this ReadOnlySpan<byte> json, ReadOnlySpan<byte> other)
