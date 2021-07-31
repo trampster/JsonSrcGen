@@ -1,0 +1,255 @@
+{
+    "Abstract": "New Zealand is an island country in the southwestern Pacific Ocean. It consists of two main landmasses\u2014the North Island and the South Island\u2014and more than 700 smaller islands, covering a total area of 268,021 square kilometres. New Zealand is about 2,000 kilometres east of Australia across the Tasman Sea and 1,000 kilometres south of the islands of New Caledonia, Fiji, and Tonga. The country's varied topography and sharp mountain peaks, including the Southern Alps, owe much to tectonic uplift and volcanic eruptions. New Zealand's capital city is Wellington, and its most populous city is Auckland. Owing to their remoteness, the islands of New Zealand were the last large habitable lands to be settled by humans. Between about 1280 and 1350, Polynesians began to settle in the islands and then developed a distinctive M\u0101ori culture. In 1642, the Dutch explorer Abel Tasman became the first European to sight New Zealand.",
+    "AbstractSource": "Wikipedia",
+    "AbstractText": "New Zealand is an island country in the southwestern Pacific Ocean. It consists of two main landmasses\u2014the North Island and the South Island\u2014and more than 700 smaller islands, covering a total area of 268,021 square kilometres. New Zealand is about 2,000 kilometres east of Australia across the Tasman Sea and 1,000 kilometres south of the islands of New Caledonia, Fiji, and Tonga. The country's varied topography and sharp mountain peaks, including the Southern Alps, owe much to tectonic uplift and volcanic eruptions. New Zealand's capital city is Wellington, and its most populous city is Auckland. Owing to their remoteness, the islands of New Zealand were the last large habitable lands to be settled by humans. Between about 1280 and 1350, Polynesians began to settle in the islands and then developed a distinctive M\u0101ori culture. In 1642, the Dutch explorer Abel Tasman became the first European to sight New Zealand.",
+    "AbstractURL": "https://en.wikipedia.org/wiki/New_Zealand",
+    "Answer": "",
+    "AnswerType": "",
+    "Definition": "",
+    "DefinitionSource": "",
+    "DefinitionURL": "",
+    "Entity": "infobox",
+    "Heading": "New Zealand",
+    "Image": "/i/2523dee7.png",
+    "ImageHeight": 200,
+    "ImageIsLogo": 0,
+    "ImageWidth": 400,
+    "Infobox": {
+        "content": [
+            {
+                "data_type": "string",
+                "label": "Capital",
+                "value": "Wellington",
+                "wiki_order": 0
+            },
+            {
+                "data_type": "string",
+                "label": "Demonym",
+                "value": "New Zealander, Kiwi (informal)",
+                "wiki_order": 1
+            },
+            {
+                "data_type": "string",
+                "label": "Currency",
+                "value": "New Zealand dollar ($)",
+                "wiki_order": 2
+            },
+            {
+                "data_type": "string",
+                "label": "Legislature",
+                "value": "Parliament, (House of Representatives)",
+                "wiki_order": 3
+            },
+            {
+                "data_type": "coordinates",
+                "label": "Coordinates",
+                "value": {
+                    "altitude": null,
+                    "globe": "http://www.wikidata.org/entity/Q2",
+                    "latitude": -41.2,
+                    "longitude": 174,
+                    "precision": 0.1
+                },
+                "wiki_order": "205"
+            },
+            {
+                "data_type": "area",
+                "label": "Area",
+                "value": {
+                    "amount": "+268021.0",
+                    "unit": "http://www.wikidata.org/entity/Q712226"
+                },
+                "wiki_order": "206"
+            },
+            {
+                "data_type": "instance",
+                "label": "Instance of",
+                "value": {
+                    "entity-type": "item",
+                    "id": "Q202686",
+                    "numeric-id": 202686
+                },
+                "wiki_order": "207"
+            },
+            {
+                "data_type": "wiki_maps_trigger",
+                "value": "/local.js?&ha=1&lla=174,-41.2:1000000&heading=New%20Zealand&q=NewZealand",
+                "wiki_order": 999
+            }
+        ],
+        "meta": [
+            {
+                "data_type": "string",
+                "label": "article_title",
+                "value": "New Zealand"
+            },
+            {
+                "data_type": "string",
+                "label": "template_name",
+                "value": "infobox"
+            }
+        ]
+    },
+    "Redirect": "",
+    "RelatedTopics": [
+        {
+            "FirstURL": "https://duckduckgo.com/c/New_Zealand",
+            "Icon": {
+                "Height": "",
+                "URL": "",
+                "Width": ""
+            },
+            "Result": "<a href=\"https://duckduckgo.com/c/New_Zealand\">New Zealand Category</a>",
+            "Text": "New Zealand Category"
+        },
+        {
+            "FirstURL": "https://duckduckgo.com/Outline_of_New_Zealand",
+            "Icon": {
+                "Height": "",
+                "URL": "",
+                "Width": ""
+            },
+            "Result": "<a href=\"https://duckduckgo.com/Outline_of_New_Zealand\">Outline of New Zealand</a> - The following outline is provided as an overview of and topical guide to New Zealand: New Zealand is an island nation located in the western South Pacific Ocean comprising two large islands, the North Island and the South Island, and numerous smaller islands, most notably Stewart Island / Rakiura...",
+            "Text": "Outline of New Zealand - The following outline is provided as an overview of and topical guide to New Zealand: New Zealand is an island nation located in the western South Pacific Ocean comprising two large islands, the North Island and the South Island, and numerous smaller islands, most notably Stewart Island / Rakiura..."
+        },
+        {
+            "FirstURL": "https://duckduckgo.com/c/Countries_in_Oceania",
+            "Icon": {
+                "Height": "",
+                "URL": "",
+                "Width": ""
+            },
+            "Result": "<a href=\"https://duckduckgo.com/c/Countries_in_Oceania\">Countries in Oceania</a>",
+            "Text": "Countries in Oceania"
+        },
+        {
+            "FirstURL": "https://duckduckgo.com/c/Countries_in_Polynesia",
+            "Icon": {
+                "Height": "",
+                "URL": "",
+                "Width": ""
+            },
+            "Result": "<a href=\"https://duckduckgo.com/c/Countries_in_Polynesia\">Countries in Polynesia</a>",
+            "Text": "Countries in Polynesia"
+        },
+        {
+            "FirstURL": "https://duckduckgo.com/c/Member_states_of_the_Commonwealth_of_Nations",
+            "Icon": {
+                "Height": "",
+                "URL": "",
+                "Width": ""
+            },
+            "Result": "<a href=\"https://duckduckgo.com/c/Member_states_of_the_Commonwealth_of_Nations\">Member states of the Commonwealth of Nations</a>",
+            "Text": "Member states of the Commonwealth of Nations"
+        },
+        {
+            "FirstURL": "https://duckduckgo.com/c/English-speaking_countries_and_territories",
+            "Icon": {
+                "Height": "",
+                "URL": "",
+                "Width": ""
+            },
+            "Result": "<a href=\"https://duckduckgo.com/c/English-speaking_countries_and_territories\">English-speaking countries and territories</a>",
+            "Text": "English-speaking countries and territories"
+        },
+        {
+            "FirstURL": "https://duckduckgo.com/c/Island_countries",
+            "Icon": {
+                "Height": "",
+                "URL": "",
+                "Width": ""
+            },
+            "Result": "<a href=\"https://duckduckgo.com/c/Island_countries\">Island countries</a>",
+            "Text": "Island countries"
+        },
+        {
+            "FirstURL": "https://duckduckgo.com/c/Archipelagoes_of_the_Pacific_Ocean",
+            "Icon": {
+                "Height": "",
+                "URL": "",
+                "Width": ""
+            },
+            "Result": "<a href=\"https://duckduckgo.com/c/Archipelagoes_of_the_Pacific_Ocean\">Archipelagoes of the Pacific Ocean</a>",
+            "Text": "Archipelagoes of the Pacific Ocean"
+        },
+        {
+            "FirstURL": "https://duckduckgo.com/c/Member_states_of_the_United_Nations",
+            "Icon": {
+                "Height": "",
+                "URL": "",
+                "Width": ""
+            },
+            "Result": "<a href=\"https://duckduckgo.com/c/Member_states_of_the_United_Nations\">Member states of the United Nations</a>",
+            "Text": "Member states of the United Nations"
+        }
+    ],
+    "Results": [
+        {
+            "FirstURL": "https://www.newzealand.com/int/",
+            "Icon": {
+                "Height": 16,
+                "URL": "/i/newzealand.com.ico",
+                "Width": 16
+            },
+            "Result": "<a href=\"https://www.newzealand.com/int/\"><b>Official site</b></a><a href=\"https://www.newzealand.com/int/\"></a>",
+            "Text": "Official site"
+        }
+    ],
+    "Type": "A",
+    "meta": {
+        "attribution": null,
+        "blockgroup": null,
+        "created_date": null,
+        "description": "Wikipedia",
+        "designer": null,
+        "dev_date": null,
+        "dev_milestone": "live",
+        "developer": [
+            {
+                "name": "DDG Team",
+                "type": "ddg",
+                "url": "http://www.duckduckhack.com"
+            }
+        ],
+        "example_query": "nikola tesla",
+        "id": "wikipedia_fathead",
+        "is_stackexchange": null,
+        "js_callback_name": "wikipedia",
+        "live_date": null,
+        "maintainer": {
+            "github": "duckduckgo"
+        },
+        "name": "Wikipedia",
+        "perl_module": "DDG::Fathead::Wikipedia",
+        "producer": null,
+        "production_state": "online",
+        "repo": "fathead",
+        "signal_from": "wikipedia_fathead",
+        "src_domain": "en.wikipedia.org",
+        "src_id": 1,
+        "src_name": "Wikipedia",
+        "src_options": {
+            "directory": "",
+            "is_fanon": 0,
+            "is_mediawiki": 1,
+            "is_wikipedia": 1,
+            "language": "en",
+            "min_abstract_length": "20",
+            "skip_abstract": 0,
+            "skip_abstract_paren": 0,
+            "skip_end": "0",
+            "skip_icon": 0,
+            "skip_image_name": 0,
+            "skip_qr": "",
+            "source_skip": "",
+            "src_info": ""
+        },
+        "src_url": null,
+        "status": "live",
+        "tab": "About",
+        "topic": [
+            "productivity"
+        ],
+        "unsafe": 0
+    }
+}
