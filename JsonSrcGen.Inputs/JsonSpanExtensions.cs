@@ -672,7 +672,7 @@ namespace JsonSrcGen
                 switch (json[index])
                 {
                     case '\\':
-                        json = ReadEscapedString(json.Slice(start), index - 1, out value);
+                        json = ReadEscapedString(json.Slice(start), index - start, out value);
                         return json;
                     case '\"':
                         value = new string(json.Slice(start, index - start));

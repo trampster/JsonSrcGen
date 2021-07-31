@@ -95,5 +95,18 @@ namespace UnitTests
             Assert.That(jsonClass.LastName, Is.EqualTo("Marley"));
             Assert.That(jsonClass.NullProperty, Is.EqualTo(null));
         }
+
+        [Test]
+        public void FromJson_MultipleUtf8EscapingNeeded()
+        {
+            var json = "{\"FirstName\":\"Before\\u2014Between\\u2014After\"}";
+            var jsonClass = new JsonClass();
+
+            //act
+            FromJson(jsonClass, json);
+
+            //assert
+            Assert.That(jsonClass.FirstName, Is.EqualTo("Before\u2014Between\u2014After"));
+        }
     }
 }

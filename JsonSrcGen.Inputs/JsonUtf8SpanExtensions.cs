@@ -672,7 +672,7 @@ namespace JsonSrcGen
                 switch (json[index])
                 {
                     case (byte)'\\':
-                        json = ReadEscapedString(json.Slice(start), index - 1, out value);
+                        json = ReadEscapedString(json.Slice(start), index - start, out value);
                         return json;
                     case (byte)'\"':
                         value = Encoding.UTF8.GetString(json.Slice(start, index - start));
