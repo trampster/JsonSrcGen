@@ -286,12 +286,9 @@ namespace JsonSrcGen
                 select hashGroup;
 
             var hashes = hashesQuery.ToArray();
-            var switchGroups = FindSwitchGroups(hashes);
+            var switchGroup = GetSwitchGroups(hashes);
 
-            foreach(var switchGroup in switchGroups)
-            {
-                GenerateSwitchGroup(switchGroup, classBuilder, indentLevel, propertyHash, jsonFormat);
-            }
+            GenerateSwitchGroup(switchGroup, classBuilder, indentLevel, propertyHash, jsonFormat);
         }
 
         void GenerateSwitchGroup(SwitchGroup switchGroup, CodeBuilder classBuilder, int indentLevel, PropertyHash propertyHash, JsonFormat format)
@@ -347,30 +344,26 @@ namespace JsonSrcGen
                 classBuilder.AppendLine(indentLevel+2, "break;"); 
             }
 
+            // default to handle unmapped properties
+            classBuilder.AppendLine(indentLevel + 1, "default:");
+            classBuilder.AppendLine(indentLevel + 2, "json = json.SkipProperty();");
+            classBuilder.AppendLine(indentLevel + 2, "break;");
+            
             classBuilder.AppendLine(indentLevel, "}"); // end of switch
         }
 
         class SwitchGroup : List<IGrouping<int, JsonPropertyInstance>>{}
 
-        IEnumerable<SwitchGroup> FindSwitchGroups(IGrouping<int, JsonPropertyInstance>[] hashes) 
+        SwitchGroup GetSwitchGroups(IGrouping<int, JsonPropertyInstance>[] hashes) 
         {
-            int last = 0;
-            int gaps = 0;
             var switchGroup = new SwitchGroup();
+
             foreach(var grouping in hashes)
             {
-                int hash = grouping.Key;
-                gaps += hash - last -1;
-                if(gaps > 8)
-                {
-                    //to many gaps this switch group is finished
-                    yield return switchGroup;
-                    switchGroup = new SwitchGroup();
-                    gaps = 0;
-                }
                 switchGroup.Add(grouping);
             }
-            yield return switchGroup;
+
+            return switchGroup;
         }
     }
 }

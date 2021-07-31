@@ -43,9 +43,10 @@ namespace UnitTests
     public abstract class ExtraPropertyTestsBase
     {
         protected JsonSrcGen.JsonConverter _convert;
-        // because the properties are only distinwhichable by length Bbb will match Aaa's
+        // Because the properties are only distinguishable by length Bbb will match Aaa's
         // property and will have to be checked via a full comparison
-        const string ExtraJson = "{\"Aaa\":42,\"Aaaa\":12,\"Aaaaa\":176,\"Bbb\":56}"; 
+        // Aaaaaa is a different length so will be skipped by the default case
+        const string ExtraJson = "{\"Aaa\":42,\"Aaaa\":12,\"Aaaaa\":176,\"Bbb\":56,\"Aaaaaa\":13}"; 
         const string ExpectedJson = "{\"Aaa\":42,\"Aaaa\":12,\"Aaaaa\":176}";
 
         [SetUp]
