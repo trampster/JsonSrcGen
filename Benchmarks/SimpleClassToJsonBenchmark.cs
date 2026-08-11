@@ -1,12 +1,19 @@
 using JsonSrcGen;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
+using System;
+using System.Text.Json.Serialization;
 
 namespace Benchmarks
 {
+    [JsonSerializable(typeof(SimpleClass))]
+    internal partial class MyJsonContext : JsonSerializerContext
+    {
+    }
+
     public class SimpleClassToJsonBenchmark
     {
-        readonly JsonSrcGenConvert _jsonSrcGenConvert;
+        readonly JsonSrcGen.JsonConverter _jsonSrcGenConvert;
         SimpleClass _simpleClass = new SimpleClass()
         {
             Age = 42,
@@ -16,12 +23,12 @@ namespace Benchmarks
 
         public SimpleClassToJsonBenchmark()
         {
-            _jsonSrcGenConvert = new JsonSrcGenConvert();
+            _jsonSrcGenConvert = new JsonSrcGen.JsonConverter();
         }
 
 
         [Benchmark]
-        public string JsonSrcGen_ToJson()
+        public ReadOnlySpan<char> JsonSrcGen_ToJson()
         {
             return _jsonSrcGenConvert.ToJson(_simpleClass);
         }
@@ -30,6 +37,12 @@ namespace Benchmarks
         public string SystemTextJson_ToJson()
         {
             return System.Text.Json.JsonSerializer.Serialize(_simpleClass);
+        }
+
+        [Benchmark]
+        public string SystemTextJsonSourceGen_ToJson()
+        {
+            return System.Text.Json.JsonSerializer.Serialize(_simpleClass, MyJsonContext.Default.SimpleClass);
         }
 
         [Benchmark]

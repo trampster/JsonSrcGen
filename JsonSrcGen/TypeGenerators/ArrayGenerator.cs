@@ -9,7 +9,7 @@ namespace JsonSrcGen.TypeGenerators
     {
         readonly Func<JsonType, IJsonGenerator> _getGeneratorForType;
         readonly CodeBuilder _classLevelBuilder;
-        public string GeneratorId => "Array"; 
+        public string GeneratorId => "Array";
 
         readonly Dictionary<string, string> _listLookup = new Dictionary<string, string>();
 
@@ -23,7 +23,7 @@ namespace JsonSrcGen.TypeGenerators
 
         string GenerateThreadStaticList(JsonType type)
         {
-            if(_listLookup.TryGetValue(type.FullName, out string listFieldName))
+            if (_listLookup.TryGetValue(type.FullName, out string listFieldName))
             {
                 return listFieldName;
             }
@@ -31,8 +31,8 @@ namespace JsonSrcGen.TypeGenerators
             listFieldName = $"_listBuilder{UniqueNumberGenerator.UniqueNumber}";
 
             _classLevelBuilder.AppendLine(2, "[ThreadStatic]");
-            _classLevelBuilder.AppendLine(2, $"List<{type.FullNameWithNullableAnnotation}>? {listFieldName};");
-            
+            _classLevelBuilder.AppendLine(2, $"static List<{type.FullNameWithNullableAnnotation}>? {listFieldName};");
+
             _listLookup.Add(type.FullName, listFieldName);
             return listFieldName;
         }
@@ -48,8 +48,8 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, $"var {builderFieldName} = {staticBuilderField};");
             codeBuilder.AppendLine(indentLevel, $"if({builderFieldName} == null)");
             codeBuilder.AppendLine(indentLevel, "{");
-            codeBuilder.AppendLine(indentLevel+1, $"{builderFieldName} = new List<{type.GenericArguments[0].FullNameWithNullableAnnotation}>();");
-            codeBuilder.AppendLine(indentLevel+1, $"{staticBuilderField} = {builderFieldName};");
+            codeBuilder.AppendLine(indentLevel + 1, $"{builderFieldName} = new List<{type.GenericArguments[0].FullNameWithNullableAnnotation}>();");
+            codeBuilder.AppendLine(indentLevel + 1, $"{staticBuilderField} = {builderFieldName};");
             codeBuilder.AppendLine(indentLevel, "}");
             codeBuilder.AppendLine(indentLevel, $"{builderFieldName}.Clear();");
 
@@ -58,8 +58,8 @@ namespace JsonSrcGen.TypeGenerators
 
             codeBuilder.AppendLine(indentLevel, $"if({foundVariable} == 'n')");
             codeBuilder.AppendLine(indentLevel, "{");
-            codeBuilder.AppendLine(indentLevel+1, "json = json.Slice(3);");
-            codeBuilder.AppendLine(indentLevel+1, $"{builderFieldName} = null;");
+            codeBuilder.AppendLine(indentLevel + 1, "json = json.Slice(3);");
+            codeBuilder.AppendLine(indentLevel + 1, $"{builderFieldName} = null;");
             codeBuilder.AppendLine(indentLevel, "}");
             codeBuilder.AppendLine(indentLevel, "else");
             codeBuilder.AppendLine(indentLevel, "{");
@@ -73,59 +73,59 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.AppendLine(indentLevel, "while(true)");
             codeBuilder.AppendLine(indentLevel, "{");
 
-            codeBuilder.AppendLine(indentLevel+1, "if(json[0] == ']')");
-            codeBuilder.AppendLine(indentLevel+1, "{");
-            codeBuilder.AppendLine(indentLevel+2, "json = json.Slice(1);");
-            codeBuilder.AppendLine(indentLevel+2, "break;");
-            codeBuilder.AppendLine(indentLevel+1, "}");
+            codeBuilder.AppendLine(indentLevel + 1, "if(json[0] == ']')");
+            codeBuilder.AppendLine(indentLevel + 1, "{");
+            codeBuilder.AppendLine(indentLevel + 2, "json = json.Slice(1);");
+            codeBuilder.AppendLine(indentLevel + 2, "break;");
+            codeBuilder.AppendLine(indentLevel + 1, "}");
 
-            generator.GenerateFromJson(codeBuilder, indentLevel+1, listElementType, listAdder, null, format);
-            codeBuilder.AppendLine(indentLevel+1, "json = json.SkipWhitespace();");
-            codeBuilder.AppendLine(indentLevel+1, "switch (json[0])");
-            codeBuilder.AppendLine(indentLevel+1, "{");
+            generator.GenerateFromJson(codeBuilder, indentLevel + 1, listElementType, listAdder, null, format);
+            codeBuilder.AppendLine(indentLevel + 1, "json = json.SkipWhitespace();");
+            codeBuilder.AppendLine(indentLevel + 1, "switch (json[0])");
+            codeBuilder.AppendLine(indentLevel + 1, "{");
             string cast = format == JsonFormat.UTF8 ? "(byte)" : "";
-            codeBuilder.AppendLine(indentLevel+2, $"case {cast}',':");
-            codeBuilder.AppendLine(indentLevel+3, "json = json.Slice(1);");
-            codeBuilder.AppendLine(indentLevel+3, "continue;");
-            codeBuilder.AppendLine(indentLevel+2, $"case {cast}']':");
-            codeBuilder.AppendLine(indentLevel+3, "json = json.Slice(1);");
-            codeBuilder.AppendLine(indentLevel+3, "break;");
-            codeBuilder.AppendLine(indentLevel+2, "default:");
+            codeBuilder.AppendLine(indentLevel + 2, $"case {cast}',':");
+            codeBuilder.AppendLine(indentLevel + 3, "json = json.Slice(1);");
+            codeBuilder.AppendLine(indentLevel + 3, "continue;");
+            codeBuilder.AppendLine(indentLevel + 2, $"case {cast}']':");
+            codeBuilder.AppendLine(indentLevel + 3, "json = json.Slice(1);");
+            codeBuilder.AppendLine(indentLevel + 3, "break;");
+            codeBuilder.AppendLine(indentLevel + 2, "default:");
             string getJsonString = format == JsonFormat.String ? "json" : "Encoding.UTF8.GetString(json)";
-            codeBuilder.AppendLine(indentLevel+3, $"throw new InvalidJsonException($\"Unexpected character while parsing array Expected ',' or ']' but got '{{{cast}json[0]}}'\", {getJsonString});");
-            codeBuilder.AppendLine(indentLevel+1, "}");
-            codeBuilder.AppendLine(indentLevel+1, "break;");
+            codeBuilder.AppendLine(indentLevel + 3, $"throw new InvalidJsonException($\"Unexpected character while parsing array Expected ',' or ']' but got '{{{cast}json[0]}}'\", {getJsonString});");
+            codeBuilder.AppendLine(indentLevel + 1, "}");
+            codeBuilder.AppendLine(indentLevel + 1, "break;");
             codeBuilder.AppendLine(indentLevel, "}");
             indentLevel--;
             codeBuilder.AppendLine(indentLevel, "}");
 
             string arrayName = $"array{UniqueNumberGenerator.UniqueNumber}";
 
-            
+
             codeBuilder.AppendLine(indentLevel, $"if({builderFieldName} == null)");
             codeBuilder.AppendLine(indentLevel, "{");
-            codeBuilder.AppendLine(indentLevel+1, valueSetter("null"));
+            codeBuilder.AppendLine(indentLevel + 1, valueSetter("null"));
             codeBuilder.AppendLine(indentLevel, "}");
             codeBuilder.AppendLine(indentLevel, "else");
             codeBuilder.AppendLine(indentLevel, "{");
-            
 
-            codeBuilder.AppendLine(indentLevel+1, $"{type.GenericArguments[0].FullNameWithNullableAnnotation}[] {arrayName};");
 
-            codeBuilder.AppendLine(indentLevel+1, $"if({builderFieldName}.Count == {valueGetter}?.Length)");
-            codeBuilder.AppendLine(indentLevel+1, "{");
-            codeBuilder.AppendLine(indentLevel+2, $"{arrayName} = {valueGetter};");
-            codeBuilder.AppendLine(indentLevel+1, "}");
-            codeBuilder.AppendLine(indentLevel+1, "else");
-            codeBuilder.AppendLine(indentLevel+1, "{");
-            codeBuilder.AppendLine(indentLevel+2, $"{arrayName} = new {type.GenericArguments[0].FullName}[{builderFieldName}.Count];");
-            codeBuilder.AppendLine(indentLevel+1, "}");
+            codeBuilder.AppendLine(indentLevel + 1, $"{type.GenericArguments[0].FullNameWithNullableAnnotation}[] {arrayName};");
 
-            codeBuilder.AppendLine(indentLevel+1, $"for(int index = 0; index < {arrayName}.Length; index++)");
-            codeBuilder.AppendLine(indentLevel+1, "{");
-            codeBuilder.AppendLine(indentLevel+2, $"{arrayName}[index] = {builderFieldName}[index];");
-            codeBuilder.AppendLine(indentLevel+1, "}");
-            codeBuilder.AppendLine(indentLevel+1, valueSetter(arrayName));
+            codeBuilder.AppendLine(indentLevel + 1, $"if({builderFieldName}.Count == {valueGetter}?.Length)");
+            codeBuilder.AppendLine(indentLevel + 1, "{");
+            codeBuilder.AppendLine(indentLevel + 2, $"{arrayName} = {valueGetter};");
+            codeBuilder.AppendLine(indentLevel + 1, "}");
+            codeBuilder.AppendLine(indentLevel + 1, "else");
+            codeBuilder.AppendLine(indentLevel + 1, "{");
+            codeBuilder.AppendLine(indentLevel + 2, $"{arrayName} = new {type.GenericArguments[0].FullName}[{builderFieldName}.Count];");
+            codeBuilder.AppendLine(indentLevel + 1, "}");
+
+            codeBuilder.AppendLine(indentLevel + 1, $"for(int index = 0; index < {arrayName}.Length; index++)");
+            codeBuilder.AppendLine(indentLevel + 1, "{");
+            codeBuilder.AppendLine(indentLevel + 2, $"{arrayName}[index] = {builderFieldName}[index];");
+            codeBuilder.AppendLine(indentLevel + 1, "}");
+            codeBuilder.AppendLine(indentLevel + 1, valueSetter(arrayName));
 
             codeBuilder.AppendLine(indentLevel, "}");
         }
@@ -136,17 +136,17 @@ namespace JsonSrcGen.TypeGenerators
         {
             codeBuilder.MakeAppend(indentLevel, appendBuilder, format);
 
-            string listName = $"list{_listNumber}"; 
+            string listName = $"list{_listNumber}";
             _listNumber++;
 
             codeBuilder.AppendLine(indentLevel, $"var {listName} = {valueGetter};");
 
-            if(canBeNull)
+            if (canBeNull)
             {
                 codeBuilder.AppendLine(indentLevel, $"if({listName} == null)");
                 codeBuilder.AppendLine(indentLevel, "{");
                 appendBuilder.Append("null");
-                codeBuilder.MakeAppend(indentLevel+1, appendBuilder, format);
+                codeBuilder.MakeAppend(indentLevel + 1, appendBuilder, format);
                 codeBuilder.AppendLine(indentLevel, "}");
                 codeBuilder.AppendLine(indentLevel, "else");
                 codeBuilder.AppendLine(indentLevel, "{");
@@ -159,26 +159,26 @@ namespace JsonSrcGen.TypeGenerators
             codeBuilder.MakeAppend(indentLevel, appendBuilder, format);
 
 
-            
+
             codeBuilder.AppendLine(indentLevel, $"for(int index = 0; index < {valueGetter}.Length-1; index++)");
             codeBuilder.AppendLine(indentLevel, "{");
-            
-            generator.GenerateToJson(codeBuilder, indentLevel+2, appendBuilder, listElementType, $"{listName}[index]", listElementType.CanBeNull, format);
+
+            generator.GenerateToJson(codeBuilder, indentLevel + 2, appendBuilder, listElementType, $"{listName}[index]", listElementType.CanBeNull, format);
 
             appendBuilder.Append(",");
-            codeBuilder.MakeAppend(indentLevel+1, appendBuilder, format);
+            codeBuilder.MakeAppend(indentLevel + 1, appendBuilder, format);
 
 
             codeBuilder.AppendLine(indentLevel, "}");
 
             codeBuilder.AppendLine(indentLevel, $"if({valueGetter}.Length > 0)");
             codeBuilder.AppendLine(indentLevel, "{");
-            generator.GenerateToJson(codeBuilder, indentLevel+1, appendBuilder, listElementType, $"{listName}[{valueGetter}.Length-1]", listElementType.CanBeNull, format);
+            generator.GenerateToJson(codeBuilder, indentLevel + 1, appendBuilder, listElementType, $"{listName}[{valueGetter}.Length-1]", listElementType.CanBeNull, format);
             codeBuilder.AppendLine(indentLevel, "}");
 
             appendBuilder.Append("]");
             codeBuilder.MakeAppend(indentLevel, appendBuilder, format);
-            if(canBeNull)
+            if (canBeNull)
             {
                 indentLevel--;
                 codeBuilder.AppendLine(indentLevel, "}");
@@ -193,7 +193,7 @@ namespace JsonSrcGen.TypeGenerators
 
         public void OnObjectFinished(CodeBuilder codeBuilder, int indentLevel, Func<string, string> valueSetter, string wasSetVariable)
         {
-            
-        } 
+
+        }
     }
 }

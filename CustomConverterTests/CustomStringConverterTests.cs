@@ -12,13 +12,13 @@ namespace CustomConverterTests
         {
             builder.Append("\"");
             builder.Append(target.ToUpper());
-            builder.Append("\""); 
+            builder.Append("\"");
         }
 
-        public ReadOnlySpan<char> FromJson(ReadOnlySpan<char> json, ref string value)
+        public ReadOnlySpan<char> FromJson(ReadOnlySpan<char> json, scoped ref string value)
         {
             json = json.SkipWhitespace();
-            if(json[0] != '\"')
+            if (json[0] != '\"')
             {
                 throw new InvalidJsonException("String should start with a quote", json);
             }
@@ -28,13 +28,13 @@ namespace CustomConverterTests
 
             value = upercase.ToString().ToLower();
 
-            return json.Slice(upercase.Length + 1); 
+            return json.Slice(upercase.Length + 1);
         }
 
-        public ReadOnlySpan<byte> FromJson(ReadOnlySpan<byte> json, ref string value)
+        public ReadOnlySpan<byte> FromJson(ReadOnlySpan<byte> json, scoped ref string value)
         {
             json = json.SkipWhitespace();
-            if(json[0] != '\"')
+            if (json[0] != '\"')
             {
                 throw new InvalidJsonException("String should start with a quote", Encoding.UTF8.GetString(json));
             }
@@ -44,52 +44,52 @@ namespace CustomConverterTests
 
             value = Encoding.UTF8.GetString(upercase).ToLower();
 
-            return json.Slice(upercase.Length + 1); 
+            return json.Slice(upercase.Length + 1);
         }
     }
 
     [Json]
-    public class CustomStringClass 
+    public class CustomStringClass
     {
-        public string Property{get;set;}
+        public string Property { get; set; }
     }
 
     public class CustomStringConverterTests
     {
         [Test]
-        public void ToJson_CorrectJson() 
+        public void ToJson_CorrectJson()
         {
             //arrange
             var dateTime = DateTime.MinValue;
 
             //act
-            var json = new JsonConverter().ToJson(new CustomStringClass(){Property="upercase"}); 
+            var json = new JsonConverter().ToJson(new CustomStringClass() { Property = "upercase" });
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo("{\"Property\":\"UPERCASE\"}"));
         }
 
         [Test]
-        public void FromJson_CorrectCase() 
+        public void FromJson_CorrectCase()
         {
             //arrange
             var customClass = new CustomStringClass();
 
             //act
-            new JsonConverter().FromJson(customClass, "{\"Property\":\"UPERCASE\"}"); 
+            new JsonConverter().FromJson(customClass, "{\"Property\":\"UPERCASE\"}");
 
             //assert
             Assert.That(customClass.Property, Is.EqualTo("upercase"));
         }
 
         [Test]
-        public void FromJson_UTF8_CorrectCase() 
+        public void FromJson_UTF8_CorrectCase()
         {
             //arrange
             var customClass = new CustomStringClass();
 
             //act
-            new JsonConverter().FromJson(customClass, Encoding.UTF8.GetBytes("{\"Property\":\"UPERCASE\"}")); 
+            new JsonConverter().FromJson(customClass, Encoding.UTF8.GetBytes("{\"Property\":\"UPERCASE\"}"));
 
             //assert
             Assert.That(customClass.Property, Is.EqualTo("upercase"));

@@ -14,13 +14,13 @@ namespace CustomConverterTests
         {
             builder.Append("\"");
             builder.Append(target.ToString());
-            builder.Append("\""); 
+            builder.Append("\"");
         }
 
-        public ReadOnlySpan<char> FromJson(ReadOnlySpan<char> json, ref DateTime value)
+        public ReadOnlySpan<char> FromJson(ReadOnlySpan<char> json, scoped ref DateTime value)
         {
             json = json.SkipWhitespace();
-            if(json[0] != '\"')
+            if (json[0] != '\"')
             {
                 throw new InvalidJsonException("DateTime should start with a quote", json);
             }
@@ -30,13 +30,13 @@ namespace CustomConverterTests
 
             value = DateTime.Parse(dateTimeSpan);
 
-            return json.Slice(dateTimeSpan.Length + 1); 
+            return json.Slice(dateTimeSpan.Length + 1);
         }
 
-        public ReadOnlySpan<byte> FromJson(ReadOnlySpan<byte> json, ref DateTime value)
+        public ReadOnlySpan<byte> FromJson(ReadOnlySpan<byte> json, scoped ref DateTime value)
         {
             json = json.SkipWhitespace();
-            if(json[0] != (byte)'\"')
+            if (json[0] != (byte)'\"')
             {
                 throw new InvalidJsonException("DateTime should start with a quote", Encoding.UTF8.GetString(json));
             }
@@ -46,52 +46,52 @@ namespace CustomConverterTests
 
             value = DateTime.Parse(Encoding.UTF8.GetString(dateTimeSpan));
 
-            return json.Slice(dateTimeSpan.Length + 1); 
+            return json.Slice(dateTimeSpan.Length + 1);
         }
     }
 
     [Json]
-    public class CustomClass 
+    public class CustomClass
     {
-        public DateTime DateTime{get;set;}
+        public DateTime DateTime { get; set; }
     }
 
     public class CustomDateTimeConverterTests
     {
         [Test]
-        public void ToJson_CorrectJson() 
+        public void ToJson_CorrectJson()
         {
             //arrange
             var dateTime = DateTime.MinValue;
 
             //act
-            var json = new JsonConverter().ToJson(new CustomClass(){DateTime=dateTime}); 
+            var json = new JsonConverter().ToJson(new CustomClass() { DateTime = dateTime });
 
             //assert
             Assert.That(json.ToString(), Is.EqualTo($"{{\"DateTime\":\"{dateTime}\"}}"));
         }
 
         [Test]
-        public void FromJson_CorrectDateTime() 
+        public void FromJson_CorrectDateTime()
         {
             //arrange
             var customClass = new CustomClass();
 
             //act
-            new JsonConverter().FromJson(customClass, "{\"DateTime\":\"1/01/0001 12:00:00 AM\"}"); 
+            new JsonConverter().FromJson(customClass, "{\"DateTime\":\"1/01/0001 12:00:00 AM\"}");
 
             //assert
             Assert.That(customClass.DateTime, Is.EqualTo(DateTime.MinValue));
         }
 
         [Test]
-        public void FromJson_UTF8_CorrectDateTime() 
+        public void FromJson_UTF8_CorrectDateTime()
         {
             //arrange
             var customClass = new CustomClass();
 
             //act
-            new JsonConverter().FromJson(customClass, Encoding.UTF8.GetBytes("{\"DateTime\":\"1/01/0001 12:00:00 AM\"}")); 
+            new JsonConverter().FromJson(customClass, Encoding.UTF8.GetBytes("{\"DateTime\":\"1/01/0001 12:00:00 AM\"}"));
 
             //assert
             Assert.That(customClass.DateTime, Is.EqualTo(DateTime.MinValue));

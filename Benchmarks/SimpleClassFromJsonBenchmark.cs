@@ -6,13 +6,13 @@ namespace Benchmarks
 {
     public class SimpleClassFromJsonBenchmark
     {
-        readonly JsonSrcGenConvert _jsonSrcGenConvert;
+        readonly JsonConverter _jsonSrcGenConvert;
         const string Json = "{\"Age\":24,\"Height\":178.54,\"Name\":\"John Smith\"}";
         SimpleClass _simpleClass = new SimpleClass();
 
         public SimpleClassFromJsonBenchmark()
         {
-            _jsonSrcGenConvert = new JsonSrcGenConvert();
+            _jsonSrcGenConvert = new JsonConverter();
         }
 
 
