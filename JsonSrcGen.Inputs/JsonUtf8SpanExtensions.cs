@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 #nullable enable
 namespace JsonSrcGen
 {
-    internal static class JsonUtf8SpanExtensions 
+    internal static class JsonUtf8SpanExtensions
     {
         public static ReadOnlySpan<byte> Read(this ReadOnlySpan<byte> json, out bool value)
         {
@@ -57,9 +57,9 @@ namespace JsonSrcGen
                 var character = json[index];
                 if (character >= '0' && character <= '9')
                 {
-         				int digit = character - '0';
-                        soFar *= 10;
-                        soFar += digit; 
+                    int digit = character - '0';
+                    soFar *= 10;
+                    soFar += digit;
                 }
                 else
                 {
@@ -273,6 +273,8 @@ namespace JsonSrcGen
                 case (byte)'n':
                     value = null;
                     return json.Slice(4);
+                case (byte)'\"':
+                    throw new InvalidJsonException("Expected int property but found string");
             }
 
             int afterIntIndex = 0;
@@ -314,6 +316,8 @@ namespace JsonSrcGen
                     case (byte)'\n':
                     case (byte)'\r':
                         continue;
+                    case (byte)'\"':
+                        throw new InvalidJsonException("Expected int property but found string");
                     case (byte)'-':
                         neg = true;
                         pos++;
@@ -324,7 +328,7 @@ namespace JsonSrcGen
                 break;
             }
 
-            uint soFar =  json[pos] - 48U;
+            uint soFar = json[pos] - 48U;
             pos++;
             uint val = 0;
 
@@ -334,7 +338,7 @@ namespace JsonSrcGen
                 pos++;
             }
 
-            value = neg ? unchecked(-(int) soFar) : checked((int) soFar);
+            value = neg ? unchecked(-(int)soFar) : checked((int)soFar);
             return json.Slice(pos);
         }
 
@@ -664,7 +668,7 @@ namespace JsonSrcGen
                 }
             }
 
-            Parse:
+        Parse:
 
             int start = index;
             for (; index < json.Length; index++)
@@ -719,7 +723,7 @@ namespace JsonSrcGen
 
             Span<char> twoCharSpan = stackalloc char[2];
             int length = enc.GetChars(json.Slice(0, remainingBytes + 1), twoCharSpan);
-            if(length > 1)
+            if (length > 1)
             {
                 throw new InvalidJsonException("Tried to deserialize to a char but value requires two chars");
             }
@@ -866,7 +870,7 @@ namespace JsonSrcGen
             for (int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                if( value == (byte)'{')
+                if (value == (byte)'{')
                 {
                     return json.Slice(index + 1);
                 }
@@ -880,7 +884,7 @@ namespace JsonSrcGen
             for (int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                if( value == (byte)':')
+                if (value == (byte)':')
                 {
                     return json.Slice(index + 1);
                 }
@@ -955,7 +959,7 @@ namespace JsonSrcGen
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<byte> ReadToQuote(this ReadOnlySpan<byte> json) 
+        public static ReadOnlySpan<byte> ReadToQuote(this ReadOnlySpan<byte> json)
         {
             for (int index = 0; index < json.Length; index++)
             {

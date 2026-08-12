@@ -273,6 +273,8 @@ namespace JsonSrcGen
                 case 'n':
                     value = null;
                     return json.Slice(4);
+                case '\"':
+                    throw new InvalidJsonException("Expected int property but found string");
             }
 
             int afterIntIndex = 0;
@@ -314,6 +316,8 @@ namespace JsonSrcGen
                     case '\n':
                     case '\r':
                         continue;
+                    case '\"':
+                        throw new InvalidJsonException("Expected int property but found string");
                     case '-':
                         neg = true;
                         pos++;

@@ -8,12 +8,12 @@ namespace UnitTests
     [Json]
     public class JsonNullableIntClass
     {
-        public int? Age {get;set;}
-        public int? Height {get;set;}
-        public int? Min {get;set;}
-        public int? Max {get;set;}
-        public int? Zero {get;set;}
-        public int? Null {get;set;}
+        public int? Age { get; set; }
+        public int? Height { get; set; }
+        public int? Min { get; set; }
+        public int? Max { get; set; }
+        public int? Zero { get; set; }
+        public int? Null { get; set; }
     }
 
     public class NullableIntPropertyTests : NullableIntPropertyTestsBase
@@ -95,6 +95,18 @@ namespace UnitTests
             Assert.That(jsonClass.Max, Is.EqualTo(int.MaxValue));
             Assert.That(jsonClass.Zero, Is.EqualTo(0));
             Assert.That(jsonClass.Null, Is.Null);
+        }
+
+        [Test]
+        public void FromJson_InvalidStringInsteadOfInt_InvalidJsonException()
+        {
+            //arrange
+            var json = "{\"Age\":42,\"Height\":\"176\" ,\"Max\":2147483647,\"Min\":-2147483648,\"Null\":null,\"Zero\":0}";
+            var jsonClass = new JsonNullableIntClass();
+
+            //act
+            //assert
+            Assert.Throws<InvalidJsonException>(() => FromJson(jsonClass, json));
         }
     }
 }
