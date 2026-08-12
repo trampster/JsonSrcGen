@@ -8,11 +8,11 @@ namespace UnitTests
     [Json]
     public class JsonIntClass
     {
-        public int Age {get;set;}
-        public int Height {get;set;}
-        public int Min {get;set;}
-        public int Max {get;set;}
-        public int Zero {get;set;}
+        public int Age { get; set; }
+        public int Height { get; set; }
+        public int Min { get; set; }
+        public int Max { get; set; }
+        public int Zero { get; set; }
     }
 
     public class IntPropertyTests : IntPropertyTestsBase
@@ -77,7 +77,7 @@ namespace UnitTests
 
         protected abstract ReadOnlySpan<char> FromJson(JsonIntClass value, string json);
 
-        [Test] 
+        [Test]
         public void FromJson_CorrectJsonClass()
         {
             //arrange
@@ -93,6 +93,18 @@ namespace UnitTests
             Assert.That(jsonClass.Min, Is.EqualTo(int.MinValue));
             Assert.That(jsonClass.Max, Is.EqualTo(int.MaxValue));
             Assert.That(jsonClass.Zero, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void FromJson_InvalidStringInsteadOfInt_InvalidJsonException()
+        {
+            //arrange
+            var json = "{\"Age\":42,\"Height\":\"176\",\"Max\":2147483647,\"Min\":-2147483648,\"Zero\":0}";
+            var jsonClass = new JsonIntClass();
+
+            //act
+            //assert
+            Assert.Throws<InvalidJsonException>(() => FromJson(jsonClass, json));
         }
     }
 }
