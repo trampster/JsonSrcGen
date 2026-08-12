@@ -57,9 +57,9 @@ namespace JsonSrcGen
                 var character = json[index];
                 if (character >= '0' && character <= '9')
                 {
-         				int digit = character - '0';
-                        soFar *= 10;
-                        soFar += digit; 
+                    int digit = character - '0';
+                    soFar *= 10;
+                    soFar += digit;
                 }
                 else
                 {
@@ -324,7 +324,7 @@ namespace JsonSrcGen
                 break;
             }
 
-            uint soFar =  json[pos] - 48U;
+            uint soFar = json[pos] - 48U;
             pos++;
             uint val = 0;
 
@@ -334,7 +334,7 @@ namespace JsonSrcGen
                 pos++;
             }
 
-            value = neg ? unchecked(-(int) soFar) : checked((int) soFar);
+            value = neg ? unchecked(-(int)soFar) : checked((int)soFar);
             return json.Slice(pos);
         }
 
@@ -664,7 +664,7 @@ namespace JsonSrcGen
                 }
             }
 
-            Parse:
+        Parse:
 
             int start = index;
             for (; index < json.Length; index++)
@@ -839,7 +839,7 @@ namespace JsonSrcGen
             for (int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                if( value == '{')
+                if (value == '{')
                 {
                     return json.Slice(index + 1);
                 }
@@ -853,7 +853,7 @@ namespace JsonSrcGen
             for (int index = 0; index < json.Length; index++)
             {
                 var value = json[index];
-                if( value == ':')
+                if (value == ':')
                 {
                     return json.Slice(index + 1);
                 }
@@ -928,7 +928,7 @@ namespace JsonSrcGen
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<char> ReadToQuote(this ReadOnlySpan<char> json) 
+        public static ReadOnlySpan<char> ReadToQuote(this ReadOnlySpan<char> json)
         {
             for (int index = 0; index < json.Length; index++)
             {
@@ -945,7 +945,7 @@ namespace JsonSrcGen
             if (json.Length != other.Length)
             {
                 return false;
-            } 
+            }
             for (int index = 0; index < json.Length; index++)
             {
                 if (json[index] != other[index])
