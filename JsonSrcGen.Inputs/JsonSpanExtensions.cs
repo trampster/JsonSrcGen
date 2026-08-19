@@ -1,7 +1,7 @@
-using System;
 using System.Text;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 #nullable enable
 namespace JsonSrcGen
@@ -303,42 +303,49 @@ namespace JsonSrcGen
 
         public static ReadOnlySpan<char> Read(this ReadOnlySpan<char> json, out int value)
         {
-            int pos = 0;
-            bool neg = false;
-
-            for (pos = 0; pos < json.Length; pos++)
+            int length = json.Length;
+            ref char start = ref MemoryMarshal.GetReference(json);
+            int pos = 0; // Skip whitespace 
+            while (pos < length)
             {
-                var testChar = json[pos];
-                switch (testChar)
+                char c = Unsafe.Add(ref start, pos);
+                if (c != ' ' && c != '\t' && c != '\n' && c != '\r')
                 {
-                    case ' ':
-                    case '\t':
-                    case '\n':
-                    case '\r':
-                        continue;
-                    case '\"':
-                        throw new InvalidJsonException("Expected int property but found string");
-                    case '-':
-                        neg = true;
-                        pos++;
-                        break;
-                    default:
-                        break;
+                    break;
                 }
-                break;
-            }
-
-            uint soFar = json[pos] - 48U;
-            pos++;
-            uint val = 0;
-
-            while (pos < json.Length && (val = json[pos] - 48U) <= 9)
-            {
-                soFar = soFar * 10 + val;
                 pos++;
             }
 
-            value = neg ? unchecked(-(int)soFar) : checked((int)soFar);
+            if (pos >= length)
+                throw new InvalidJsonException("Expected int property but reached end of input");
+            int neg = 1;
+            char first = Unsafe.Add(ref start, pos);
+            if (first == '-')
+            {
+                neg = -1;
+                pos++;
+            }
+            else if (first == '\"')
+            {
+                throw new InvalidJsonException("Expected int property but found string");
+            }
+
+            if (pos >= length)
+                throw new InvalidJsonException("Expected int property but reached end of input");
+
+            uint digit = (uint)(Unsafe.Add(ref start, pos) - '0');
+
+            if (digit > 9)
+                throw new InvalidJsonException("Expected digit");
+
+            uint soFar = digit;
+            pos++;
+            while (pos < length && (digit = (uint)(Unsafe.Add(ref start, pos) - '0')) <= 9)
+            {
+                soFar = soFar * 10 + digit;
+                pos++;
+            }
+            value = (int)(neg * soFar);
             return json.Slice(pos);
         }
 
