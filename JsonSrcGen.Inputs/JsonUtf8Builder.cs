@@ -25,7 +25,7 @@ namespace JsonSrcGen
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public IJsonBuilder Append(string value)
         {
-            if (_index + value.Length > _buffer.Length)
+            if (_index + (value.Length * 3) > _buffer.Length)
             {
                 ResizeBuffer(value.Length);
             }
@@ -37,7 +37,7 @@ namespace JsonSrcGen
 
         public IJsonBuilder Append(ReadOnlySpan<char> value)
         {
-            if (_index + value.Length > _buffer.Length)
+            if (_index + (value.Length * 3) > _buffer.Length)
             {
                 ResizeBuffer(value.Length);
             }
@@ -65,20 +65,20 @@ namespace JsonSrcGen
                 ResizeBuffer(3);
             }
             int intValue = value;
-            
-            if(intValue > 99) goto hundreds;
-            if(intValue > 9) goto tens;
+
+            if (intValue > 99) goto hundreds;
+            if (intValue > 9) goto tens;
             else goto ones;
 
             hundreds:
             _buffer[_index++] = (byte)((intValue / 100) + '0');
             intValue = (intValue % 100);
 
-            tens:
-            _buffer[_index++] = (byte)((intValue / 10)  + '0');
+        tens:
+            _buffer[_index++] = (byte)((intValue / 10) + '0');
             intValue = intValue % 10;
 
-            ones:
+        ones:
             _buffer[_index++] = (byte)(intValue + '0');
             return this;
         }
@@ -109,7 +109,7 @@ namespace JsonSrcGen
 
             int intValue = value;
 
-            if(intValue < 0)
+            if (intValue < 0)
             {
                 buffer[index++] = (byte)'-';
                 intValue = intValue * -1;
@@ -117,41 +117,41 @@ namespace JsonSrcGen
 
             int decimalIndex = 0;
 
-            if(intValue > 9999) 
+            if (intValue > 9999)
             {
                 buffer[index++] = (byte)((intValue / 10000) + '0');
                 intValue = (intValue % 10000);
                 goto thousands;
             }
-            if(intValue > 999) goto thousands;
-            if(intValue > 99) 
+            if (intValue > 999) goto thousands;
+            if (intValue > 99)
             {
                 buffer[index++] = (byte)((intValue / 100) + '0');
                 intValue = (intValue % 100);
                 goto tens;
             }
-            if(intValue > 9) goto tens;
+            if (intValue > 9) goto tens;
 
             buffer[index++] = (byte)(intValue + '0');
             goto end;
 
-            thousands:
+        thousands:
             int pair = intValue / 100;
-            decimalIndex = pair*2;
+            decimalIndex = pair * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             intValue = (intValue % 100);
 
-            tens:
-            decimalIndex = intValue*2;
+        tens:
+            decimalIndex = intValue * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             _index = index;
             return this;
 
-            end:
+        end:
             _index = index;
-            
+
             return this;
         }
 
@@ -168,41 +168,41 @@ namespace JsonSrcGen
             int intValue = value;
             int decimalIndex = 0;
 
-            if(intValue > 9999) 
+            if (intValue > 9999)
             {
                 buffer[index++] = (byte)((intValue / 10000) + '0');
                 intValue = (intValue % 10000);
                 goto thousands;
             }
-            if(intValue > 999) goto thousands;
-            if(intValue > 99) 
+            if (intValue > 999) goto thousands;
+            if (intValue > 99)
             {
                 buffer[index++] = (byte)((intValue / 100) + '0');
                 intValue = (intValue % 100);
                 goto tens;
             }
-            if(intValue > 9) goto tens;
+            if (intValue > 9) goto tens;
 
             buffer[index++] = (byte)(intValue + '0');
             goto end;
 
-            thousands:
+        thousands:
             int pair = intValue / 100;
-            decimalIndex = pair*2;
+            decimalIndex = pair * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             intValue = (intValue % 100);
 
-            tens:
-            decimalIndex = intValue*2;
+        tens:
+            decimalIndex = intValue * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             _index = index;
             return this;
 
-            end:
+        end:
             _index = index;
-            
+
             return this;
         }
         public IJsonBuilder Append(int value)
@@ -217,7 +217,7 @@ namespace JsonSrcGen
 
             uint intValue = 0;
 
-            if(value < 0)
+            if (value < 0)
             {
                 buffer[index++] = (byte)'-';
                 intValue = (uint)(value * -1);
@@ -228,73 +228,73 @@ namespace JsonSrcGen
             }
 
             uint decimalIndex = 0;
-            if(intValue > 999_999_999) goto billions;
-            if(intValue > 99_999_999) 
+            if (intValue > 999_999_999) goto billions;
+            if (intValue > 99_999_999)
             {
                 buffer[index++] = (byte)((intValue / 100_000_000) + '0');
                 intValue = (intValue % 100_000_000);
                 goto tenMillions;
             }
-            if(intValue > 99_99_999) goto tenMillions;
-            if(intValue > 999_999) 
+            if (intValue > 99_99_999) goto tenMillions;
+            if (intValue > 999_999)
             {
                 buffer[index++] = (byte)((intValue / 1_000_000) + '0');
                 intValue = (intValue % 1_000_000);
                 goto hundredThousands;
             }
-            if(intValue > 99_999) goto hundredThousands;
-            if(intValue > 9_999) 
+            if (intValue > 99_999) goto hundredThousands;
+            if (intValue > 9_999)
             {
                 buffer[index++] = (byte)((intValue / 10_000) + '0');
                 intValue = (intValue % 10_000);
                 goto thousands;
             }
-            if(intValue > 999) goto thousands;
-            if(intValue > 99) 
+            if (intValue > 999) goto thousands;
+            if (intValue > 99)
             {
                 buffer[index++] = (byte)((intValue / 100) + '0');
                 intValue = (intValue % 100);
                 goto tens;
             }
-            if(intValue > 9) goto tens;
+            if (intValue > 9) goto tens;
 
             buffer[index++] = (byte)(intValue + '0');
             goto end;
 
-            billions:
-            decimalIndex = (intValue / 100_000_000)*2;
+        billions:
+            decimalIndex = (intValue / 100_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             intValue = (intValue % 100_000_000);
 
-            tenMillions:
-            decimalIndex = (intValue / 1_000_000)*2;
+        tenMillions:
+            decimalIndex = (intValue / 1_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             intValue = (intValue % 1_000_000);
 
-            hundredThousands:
-            decimalIndex = (intValue / 10_000)*2;
+        hundredThousands:
+            decimalIndex = (intValue / 10_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             intValue = (intValue % 10_000);
 
-            thousands:
-            decimalIndex = (intValue / 100)*2;
+        thousands:
+            decimalIndex = (intValue / 100) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             intValue = (intValue % 100);
 
-            tens:
-            decimalIndex = intValue*2;
+        tens:
+            decimalIndex = intValue * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             _index = index;
             return this;
 
-            end:
+        end:
             _index = index;
-            
+
             return this;
         }
 
@@ -311,73 +311,73 @@ namespace JsonSrcGen
             uint intValue = value;
 
             uint decimalIndex = 0;
-            if(intValue > 999_999_999) goto billions;
-            if(intValue > 99_999_999) 
+            if (intValue > 999_999_999) goto billions;
+            if (intValue > 99_999_999)
             {
                 buffer[index++] = (byte)((intValue / 100_000_000) + '0');
                 intValue = (intValue % 100_000_000);
                 goto tenMillions;
             }
-            if(intValue > 99_99_999) goto tenMillions;
-            if(intValue > 999_999) 
+            if (intValue > 99_99_999) goto tenMillions;
+            if (intValue > 999_999)
             {
                 buffer[index++] = (byte)((intValue / 1_000_000) + '0');
                 intValue = (intValue % 1_000_000);
                 goto hundredThousands;
             }
-            if(intValue > 99_999) goto hundredThousands;
-            if(intValue > 9_999) 
+            if (intValue > 99_999) goto hundredThousands;
+            if (intValue > 9_999)
             {
                 buffer[index++] = (byte)((intValue / 10_000) + '0');
                 intValue = (intValue % 10_000);
                 goto thousands;
             }
-            if(intValue > 999) goto thousands;
-            if(intValue > 99) 
+            if (intValue > 999) goto thousands;
+            if (intValue > 99)
             {
                 buffer[index++] = (byte)((intValue / 100) + '0');
                 intValue = (intValue % 100);
                 goto tens;
             }
-            if(intValue > 9) goto tens;
+            if (intValue > 9) goto tens;
 
             buffer[index++] = (byte)(intValue + '0');
             goto end;
 
-            billions:
-            decimalIndex = (intValue / 100_000_000)*2;
+        billions:
+            decimalIndex = (intValue / 100_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             intValue = (intValue % 100_000_000);
 
-            tenMillions:
-            decimalIndex = (intValue / 1_000_000)*2;
+        tenMillions:
+            decimalIndex = (intValue / 1_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             intValue = (intValue % 1_000_000);
 
-            hundredThousands:
-            decimalIndex = (intValue / 10_000)*2;
+        hundredThousands:
+            decimalIndex = (intValue / 10_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             intValue = (intValue % 10_000);
 
-            thousands:
-            decimalIndex = (intValue / 100)*2;
+        thousands:
+            decimalIndex = (intValue / 100) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             intValue = (intValue % 100);
 
-            tens:
-            decimalIndex = intValue*2;
+        tens:
+            decimalIndex = intValue * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             _index = index;
             return this;
 
-            end:
+        end:
             _index = index;
-            
+
             return this;
         }
 
@@ -393,7 +393,7 @@ namespace JsonSrcGen
 
             ulong longValue = 0;
 
-            if(value < 0)
+            if (value < 0)
             {
                 buffer[index++] = (byte)'-';
                 longValue = (ulong)(value * -1);
@@ -404,131 +404,131 @@ namespace JsonSrcGen
             }
 
             ulong decimalIndex = 0;
-            if(longValue > 999_999_999_999_999_999)
+            if (longValue > 999_999_999_999_999_999)
             {
                 buffer[index++] = (byte)((longValue / 1_000_000_000_000_000_000) + '0');
                 longValue = longValue % 1_000_000_000_000_000_000;
                 goto tenQuadtrillions;
             }
-            if(longValue > 99_999_999_999_999_999) goto tenQuadtrillions;
-            if(longValue > 9_999_999_999_999_999)
+            if (longValue > 99_999_999_999_999_999) goto tenQuadtrillions;
+            if (longValue > 9_999_999_999_999_999)
             {
                 buffer[index++] = (byte)((longValue / 10_000_000_000_000_000) + '0');
                 longValue = longValue % 10_000_000_000_000_000;
                 goto quadtrillions;
             }
-            if(longValue > 999_999_999_999_999) goto quadtrillions;
-            if(longValue > 99_999_999_999_999) 
+            if (longValue > 999_999_999_999_999) goto quadtrillions;
+            if (longValue > 99_999_999_999_999)
             {
                 buffer[index++] = (byte)((longValue / 100_000_000_000_000) + '0');
                 longValue = longValue % 100_000_000_000_000;
                 goto tenTrillions;
             }
-            if(longValue > 9_999_999_999_999) goto tenTrillions;
-            if(longValue > 999_999_999_999) 
+            if (longValue > 9_999_999_999_999) goto tenTrillions;
+            if (longValue > 999_999_999_999)
             {
                 buffer[index++] = (byte)((longValue / 1_000_000_000_000) + '0');
                 longValue = longValue % 1_000_000_000_000;
                 goto hundredBillions;
             }
-            if(longValue > 99_999_999_999) goto hundredBillions;
-            if(longValue > 9_999_999_999) 
+            if (longValue > 99_999_999_999) goto hundredBillions;
+            if (longValue > 9_999_999_999)
             {
                 buffer[index++] = (byte)((longValue / 10_000_000_000) + '0');
                 longValue = longValue % 10_000_000_000;
                 goto billions;
             }
-            if(longValue > 999_999_999) goto billions;
-            if(longValue > 99_999_999)
+            if (longValue > 999_999_999) goto billions;
+            if (longValue > 99_999_999)
             {
                 buffer[index++] = (byte)((longValue / 100_000_000) + '0');
                 longValue = (longValue % 100_000_000);
                 goto tenMillions;
             }
-            if(longValue > 9_999_999) goto tenMillions;
-            if(longValue > 999_999) 
+            if (longValue > 9_999_999) goto tenMillions;
+            if (longValue > 999_999)
             {
                 buffer[index++] = (byte)((longValue / 1_000_000) + '0');
                 longValue = (longValue % 1_000_000);
                 goto hundredThousands;
             }
-            if(longValue > 99_999) goto hundredThousands;
-            if(longValue > 9_999) 
+            if (longValue > 99_999) goto hundredThousands;
+            if (longValue > 9_999)
             {
                 buffer[index++] = (byte)((longValue / 10_000) + '0');
                 longValue = (longValue % 10_000);
                 goto thousands;
             }
-            if(longValue > 999) goto thousands;
-            if(longValue > 99) 
+            if (longValue > 999) goto thousands;
+            if (longValue > 99)
             {
                 buffer[index++] = (byte)((longValue / 100) + '0');
                 longValue = (longValue % 100);
                 goto tens;
             }
-            if(longValue > 9) goto tens;
+            if (longValue > 9) goto tens;
 
             buffer[index++] = (byte)(longValue + '0');
             goto end;
 
-            tenQuadtrillions:
-            decimalIndex = (longValue / 10_000_000_000_000_000)*2;
+        tenQuadtrillions:
+            decimalIndex = (longValue / 10_000_000_000_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = longValue % 10_000_000_000_000_000;
 
-            quadtrillions:
-            decimalIndex = (longValue / 100_000_000_000_000)*2;
+        quadtrillions:
+            decimalIndex = (longValue / 100_000_000_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = longValue % 100_000_000_000_000;
 
-            tenTrillions:
-            decimalIndex = (longValue / 1_000_000_000_000)*2;
+        tenTrillions:
+            decimalIndex = (longValue / 1_000_000_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = longValue % 1_000_000_000_000;
 
-            hundredBillions:
-            decimalIndex = (longValue / 10_000_000_000)*2;
+        hundredBillions:
+            decimalIndex = (longValue / 10_000_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = longValue % 10_000_000_000;
 
-            billions:
-            decimalIndex = (longValue / 100_000_000)*2;
+        billions:
+            decimalIndex = (longValue / 100_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = (longValue % 100_000_000);
 
-            tenMillions:
-            decimalIndex = (longValue / 1_000_000)*2;
+        tenMillions:
+            decimalIndex = (longValue / 1_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = (longValue % 1_000_000);
 
-            hundredThousands:
-            decimalIndex = (longValue / 10_000)*2;
+        hundredThousands:
+            decimalIndex = (longValue / 10_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = (longValue % 10_000);
 
-            thousands:
-            decimalIndex = (longValue / 100)*2;
+        thousands:
+            decimalIndex = (longValue / 100) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = (longValue % 100);
 
-            tens:
-            decimalIndex = longValue*2;
+        tens:
+            decimalIndex = longValue * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             _index = index;
             return this;
 
-            end:
+        end:
             _index = index;
-            
+
             return this;
         }
 
@@ -545,138 +545,138 @@ namespace JsonSrcGen
             //18_446_744_073_709_551_615
 
             ulong decimalIndex = 0;
-            if(longValue > 9_999_999_999_999_999_999) goto quintrillion;
-            if(longValue > 999_999_999_999_999_999)
+            if (longValue > 9_999_999_999_999_999_999) goto quintrillion;
+            if (longValue > 999_999_999_999_999_999)
             {
                 buffer[index++] = (byte)((longValue / 1_000_000_000_000_000_000) + '0');
                 longValue = longValue % 1_000_000_000_000_000_000;
                 goto tenQuadtrillions;
             }
-            if(longValue > 99_999_999_999_999_999) goto tenQuadtrillions;
-            if(longValue > 9_999_999_999_999_999)
+            if (longValue > 99_999_999_999_999_999) goto tenQuadtrillions;
+            if (longValue > 9_999_999_999_999_999)
             {
                 buffer[index++] = (byte)((longValue / 10_000_000_000_000_000) + '0');
                 longValue = longValue % 10_000_000_000_000_000;
                 goto quadtrillions;
             }
-            if(longValue > 999_999_999_999_999) goto quadtrillions;
-            if(longValue > 99_999_999_999_999) 
+            if (longValue > 999_999_999_999_999) goto quadtrillions;
+            if (longValue > 99_999_999_999_999)
             {
                 buffer[index++] = (byte)((longValue / 100_000_000_000_000) + '0');
                 longValue = longValue % 100_000_000_000_000;
                 goto tenTrillions;
             }
-            if(longValue > 9_999_999_999_999) goto tenTrillions;
-            if(longValue > 999_999_999_999) 
+            if (longValue > 9_999_999_999_999) goto tenTrillions;
+            if (longValue > 999_999_999_999)
             {
                 buffer[index++] = (byte)((longValue / 1_000_000_000_000) + '0');
                 longValue = longValue % 1_000_000_000_000;
                 goto hundredBillions;
             }
-            if(longValue > 99_999_999_999) goto hundredBillions;
-            if(longValue > 9_999_999_999) 
+            if (longValue > 99_999_999_999) goto hundredBillions;
+            if (longValue > 9_999_999_999)
             {
                 buffer[index++] = (byte)((longValue / 10_000_000_000) + '0');
                 longValue = longValue % 10_000_000_000;
                 goto billions;
             }
-            if(longValue > 999_999_999) goto billions;
-            if(longValue > 99_999_999)
+            if (longValue > 999_999_999) goto billions;
+            if (longValue > 99_999_999)
             {
                 buffer[index++] = (byte)((longValue / 100_000_000) + '0');
                 longValue = (longValue % 100_000_000);
                 goto tenMillions;
             }
-            if(longValue > 9_999_999) goto tenMillions;
-            if(longValue > 999_999) 
+            if (longValue > 9_999_999) goto tenMillions;
+            if (longValue > 999_999)
             {
                 buffer[index++] = (byte)((longValue / 1_000_000) + '0');
                 longValue = (longValue % 1_000_000);
                 goto hundredThousands;
             }
-            if(longValue > 99_999) goto hundredThousands;
-            if(longValue > 9_999) 
+            if (longValue > 99_999) goto hundredThousands;
+            if (longValue > 9_999)
             {
                 buffer[index++] = (byte)((longValue / 10_000) + '0');
                 longValue = (longValue % 10_000);
                 goto thousands;
             }
-            if(longValue > 999) goto thousands;
-            if(longValue > 99) 
+            if (longValue > 999) goto thousands;
+            if (longValue > 99)
             {
                 buffer[index++] = (byte)((longValue / 100) + '0');
                 longValue = (longValue % 100);
                 goto tens;
             }
-            if(longValue > 9) goto tens;
+            if (longValue > 9) goto tens;
 
             buffer[index++] = (byte)(longValue + '0');
             goto end;
 
-            quintrillion:
-            decimalIndex = (longValue / 1_000_000_000_000_000_000)*2;
+        quintrillion:
+            decimalIndex = (longValue / 1_000_000_000_000_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = longValue % 1_000_000_000_000_000_000;
 
-            tenQuadtrillions:
-            decimalIndex = (longValue / 10_000_000_000_000_000)*2;
+        tenQuadtrillions:
+            decimalIndex = (longValue / 10_000_000_000_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = longValue % 10_000_000_000_000_000;
 
-            quadtrillions:
-            decimalIndex = (longValue / 100_000_000_000_000)*2;
+        quadtrillions:
+            decimalIndex = (longValue / 100_000_000_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = longValue % 100_000_000_000_000;
 
-            tenTrillions:
-            decimalIndex = (longValue / 1_000_000_000_000)*2;
+        tenTrillions:
+            decimalIndex = (longValue / 1_000_000_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = longValue % 1_000_000_000_000;
 
-            hundredBillions:
-            decimalIndex = (longValue / 10_000_000_000)*2;
+        hundredBillions:
+            decimalIndex = (longValue / 10_000_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = longValue % 10_000_000_000;
 
-            billions:
-            decimalIndex = (longValue / 100_000_000)*2;
+        billions:
+            decimalIndex = (longValue / 100_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = (longValue % 100_000_000);
 
-            tenMillions:
-            decimalIndex = (longValue / 1_000_000)*2;
+        tenMillions:
+            decimalIndex = (longValue / 1_000_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = (longValue % 1_000_000);
 
-            hundredThousands:
-            decimalIndex = (longValue / 10_000)*2;
+        hundredThousands:
+            decimalIndex = (longValue / 10_000) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = (longValue % 10_000);
 
-            thousands:
-            decimalIndex = (longValue / 100)*2;
+        thousands:
+            decimalIndex = (longValue / 100) * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             longValue = (longValue % 100);
 
-            tens:
-            decimalIndex = longValue*2;
+        tens:
+            decimalIndex = longValue * 2;
             buffer[index++] = _decimalPairs[decimalIndex++];
             buffer[index++] = _decimalPairs[decimalIndex];
             _index = index;
             return this;
 
-            end:
+        end:
             _index = index;
-            
+
             return this;
         }
 
@@ -785,7 +785,7 @@ namespace JsonSrcGen
             var destination = _buffer.AsSpan(_index);
 
             ///nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn
-            
+
             // this forces a jit bounds check (lookup get optimzed away) which means
             // the rest of the lookups don't need to be bounds checked
             { _ = destination[35]; }
@@ -873,7 +873,7 @@ namespace JsonSrcGen
             return this;
         }
 
-                /// <summary>
+        /// <summary>
         /// Used to provide access to the individual bytes of a GUID.
         /// </summary>
         [StructLayout(LayoutKind.Explicit)]
@@ -919,7 +919,7 @@ namespace JsonSrcGen
 
         void InitializeEscapingLookups()
         {
-            for(int index = 0; index < 32; index++)
+            for (int index = 0; index < 32; index++)
             {
                 _needsEscaping[index] = true;
             }
@@ -933,13 +933,13 @@ namespace JsonSrcGen
             _needsEscaping['\r'] = true;
             _needsEscaping['\t'] = true;
 
-            for(int index = 0; index < 32; index++)
+            for (int index = 0; index < 32; index++)
             {
                 var hex = index.ToString("X4");
                 _escapeLookup[index] = "\\u" + hex;
             }
             _escapeLookup['\"'] = "\\\"";
-            _escapeLookup ['\\'] = "\\\\";
+            _escapeLookup['\\'] = "\\\\";
             _escapeLookup['/'] = "\\/";
             _escapeLookup['\b'] = "\\b";
             _escapeLookup['\f'] = "\\f";
@@ -950,7 +950,7 @@ namespace JsonSrcGen
 
         public IJsonBuilder AppendEscaped(char input)
         {
-            if(input < 93 && _needsEscaping[input])
+            if (input < 93 && _needsEscaping[input])
             {
                 return Append(_escapeLookup[input]);
             }
@@ -960,11 +960,11 @@ namespace JsonSrcGen
         public IJsonBuilder AppendEscaped(string input)
         {
             int start = 0;
-            for(int index = 0; index < input.Length; index++)
+            for (int index = 0; index < input.Length; index++)
             {
                 char character = input[index];
 
-                if(character < 93 && _needsEscaping[character])
+                if (character < 93 && _needsEscaping[character])
                 {
                     this.Append(input.AsSpan(start, index - start));
                     this.Append(_escapeLookup[character]);
@@ -981,18 +981,18 @@ namespace JsonSrcGen
         byte[] GetOffset()
         {
             int tickCount = Environment.TickCount;
-            if(_offsetCacheTime + 1000 < tickCount)
+            if (_offsetCacheTime + 1000 < tickCount)
             {
                 _offsetCacheTime = tickCount;
                 var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
                 var builder = new JsonUtf8Builder();
-                if(offset.TotalMinutes > 0) builder.AppendAscii('+');
+                if (offset.TotalMinutes > 0) builder.AppendAscii('+');
                 else builder.AppendAscii('-');
                 builder.AppendIntTwo(Math.Abs(offset.Hours));
                 builder.AppendAscii(':');
                 builder.AppendIntTwo(offset.Minutes);
                 var offsetSpan = builder.AsSpan();
-                for(int index = 0; index < 6; index++)
+                for (int index = 0; index < 6; index++)
                 {
                     _offset[index] = offsetSpan[index];
                 }
@@ -1006,7 +1006,7 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(6);
             }
-            if(offset.TotalMinutes >= 0) _buffer[_index++] = (byte)'+';
+            if (offset.TotalMinutes >= 0) _buffer[_index++] = (byte)'+';
             else _buffer[_index++] = (byte)'-';
             AppendIntTwo(Math.Abs(offset.Hours));
             _buffer[_index++] = (byte)':';
@@ -1021,42 +1021,42 @@ namespace JsonSrcGen
                 ResizeBuffer(38);
             }
             var buffer = _buffer;
-            buffer[_index++] = (byte)'\"'; 
+            buffer[_index++] = (byte)'\"';
             AppendIntFour(date.Year);
-            buffer[_index++] = (byte)'-'; 
+            buffer[_index++] = (byte)'-';
             AppendIntTwo(date.Month);
-            buffer[_index++] = (byte)'-'; 
+            buffer[_index++] = (byte)'-';
             AppendIntTwo(date.Day);
-            buffer[_index++] = (byte)'T'; 
+            buffer[_index++] = (byte)'T';
             AppendIntTwo(date.Hour);
             buffer[_index++] = (byte)':';
             AppendIntTwo(date.Minute);
             buffer[_index++] = (byte)':';
             AppendIntTwo(date.Second);
             var fractions = date.Ticks % TimeSpan.TicksPerSecond * TimeSpan.TicksPerMillisecond;
-            if(fractions != 0)
+            if (fractions != 0)
             {
                 buffer[_index++] = (byte)'.';
                 AppendDateTimeFraction(fractions);
             }
 
             //offset
-            if(date.Kind == DateTimeKind.Utc)
+            if (date.Kind == DateTimeKind.Utc)
             {
                 return Append("Z\"");
             }
-            else if(date.Kind == DateTimeKind.Unspecified)
+            else if (date.Kind == DateTimeKind.Unspecified)
             {
                 buffer[_index++] = (byte)'\"';
                 return this;
             }
             var offset = GetOffset();
-            for(int index = 0; index < offset.Length; index++)
+            for (int index = 0; index < offset.Length; index++)
             {
                 buffer[_index++] = offset[index];
             }
             buffer[_index++] = (byte)'\"';
-            
+
             return this;
         }
 
@@ -1067,20 +1067,20 @@ namespace JsonSrcGen
                 ResizeBuffer(38);
             }
             var buffer = _buffer;
-            buffer[_index++] = (byte)'\"'; 
+            buffer[_index++] = (byte)'\"';
             AppendIntFour(date.Year);
-            buffer[_index++] = (byte)'-'; 
+            buffer[_index++] = (byte)'-';
             AppendIntTwo(date.Month);
-            buffer[_index++] = (byte)'-'; 
+            buffer[_index++] = (byte)'-';
             AppendIntTwo(date.Day);
-            buffer[_index++] = (byte)'T'; 
+            buffer[_index++] = (byte)'T';
             AppendIntTwo(date.Hour);
             buffer[_index++] = (byte)':';
             AppendIntTwo(date.Minute);
             buffer[_index++] = (byte)':';
             AppendIntTwo(date.Second);
             var fractions = date.Ticks % TimeSpan.TicksPerSecond * TimeSpan.TicksPerMillisecond;
-            if(fractions != 0)
+            if (fractions != 0)
             {
                 buffer[_index++] = (byte)'.';
                 AppendDateTimeFraction(fractions);
@@ -1089,7 +1089,7 @@ namespace JsonSrcGen
             //offset
             AppendOffset(date.Offset);
             buffer[_index++] = (byte)'\"';
-            
+
             return this;
         }
 
@@ -1099,8 +1099,8 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(2);
             }
-            int tens = number/10;
-            int soFar = tens*10;
+            int tens = number / 10;
+            int soFar = tens * 10;
             _buffer[_index] = (byte)('0' + tens);
             _index++;
 
@@ -1116,18 +1116,18 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(4);
             }
-            int thousands = (number)/1000;
-            int soFar = thousands*1000;
+            int thousands = (number) / 1000;
+            int soFar = thousands * 1000;
             _buffer[_index] = (byte)('0' + thousands);
             _index++;
 
-            int hundreds = (number-soFar)/100;
-            soFar += hundreds*100;
+            int hundreds = (number - soFar) / 100;
+            soFar += hundreds * 100;
             _buffer[_index] = (byte)('0' + hundreds);
             _index++;
-            
-            int tens = (number - soFar)/10;
-            soFar += tens*10;
+
+            int tens = (number - soFar) / 10;
+            soFar += tens * 10;
             _buffer[_index] = (byte)('0' + tens);
             _index++;
 
@@ -1147,66 +1147,66 @@ namespace JsonSrcGen
             //24 973 300 000
             long soFar = 0;
 
-            long tenBillions = (number)/10000000000;
-            soFar += tenBillions*10000000000;
+            long tenBillions = (number) / 10000000000;
+            soFar += tenBillions * 10000000000;
             _buffer[_index] = (byte)('0' + tenBillions);
             _index++;
-            long leftLong = number-soFar;
-            if(leftLong == 0) return this;
+            long leftLong = number - soFar;
+            if (leftLong == 0) return this;
 
-            long billions = leftLong/1000000000;
+            long billions = leftLong / 1000000000;
             _buffer[_index] = (byte)('0' + billions);
             _index++;
-            int left = (int)(leftLong-(billions*1000000000));
-            if(left == 0) return this;
+            int left = (int)(leftLong - (billions * 1000000000));
+            if (left == 0) return this;
 
-            int hundredMillions = left/100000000;
+            int hundredMillions = left / 100000000;
             _buffer[_index] = (byte)('0' + hundredMillions);
             _index++;
-            left = left-(hundredMillions*100000000);
-            if(left == 0) return this;
+            left = left - (hundredMillions * 100000000);
+            if (left == 0) return this;
 
-            int tenMillions = left/10000000;
+            int tenMillions = left / 10000000;
             _buffer[_index] = (byte)('0' + tenMillions);
             _index++;
-            left = left-(tenMillions*10000000);
-            if(left == 0) return this;
+            left = left - (tenMillions * 10000000);
+            if (left == 0) return this;
 
-            int millions = left/1000000;
+            int millions = left / 1000000;
             _buffer[_index] = (byte)('0' + millions);
             _index++;
-            left = left-(millions*1000000);
-            if(left == 0) return this;
+            left = left - (millions * 1000000);
+            if (left == 0) return this;
 
-            int hundredThousands = left/100000;
+            int hundredThousands = left / 100000;
             _buffer[_index] = (byte)('0' + hundredThousands);
             _index++;
-            left = left-(hundredThousands*100000);
-            if(left == 0) return this;
+            left = left - (hundredThousands * 100000);
+            if (left == 0) return this;
 
-            int tenThousands = left/10000;
+            int tenThousands = left / 10000;
             _buffer[_index] = (byte)('0' + tenThousands);
             _index++;
-            left = left-(tenThousands*10000);
-            if(left == 0) return this;
+            left = left - (tenThousands * 10000);
+            if (left == 0) return this;
 
-            int thousands = left/1000;
+            int thousands = left / 1000;
             _buffer[_index] = (byte)('0' + thousands);
             _index++;
-            left = left-(thousands*1000);
-            if(left == 0) return this;
+            left = left - (thousands * 1000);
+            if (left == 0) return this;
 
-            int hundreds = left/100;
+            int hundreds = left / 100;
             _buffer[_index] = (byte)('0' + hundreds);
             _index++;
-            left = left-(hundreds*100);
-            if(left == 0) return this;
+            left = left - (hundreds * 100);
+            if (left == 0) return this;
 
-            int tens = left/10;
+            int tens = left / 10;
             _buffer[_index] = (byte)('0' + tens);
             _index++;
-            left = left-(tens*10);
-            if(left == 0) return this;
+            left = left - (tens * 10);
+            if (left == 0) return this;
 
             int ones = left;
             _buffer[_index] = (byte)('0' + ones);
@@ -1218,10 +1218,10 @@ namespace JsonSrcGen
         {
             if (_index + input.Length > _buffer.Length)
             {
-                ResizeBuffer(input.Length );
+                ResizeBuffer(input.Length);
             }
 
-            for(int index = 0; index < input.Length; index++)
+            for (int index = 0; index < input.Length; index++)
             {
                 _buffer[index + _index] = input[index];
             }
