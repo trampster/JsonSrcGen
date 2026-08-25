@@ -1,25 +1,53 @@
 using System;
+using System.Buffers;
 using System.Buffers.Text;
+using System.IO.Pipelines;
 using System.Runtime.InteropServices;
+using System.Text.Json;
+using System.Text.Unicode;
+using System.Threading.Tasks;
 
 namespace JsonSrcGen
 {
-    public partial class JsonUtf8Builder : IJsonBuilder
+    public partial class JsonBufferWriterBuilder : IJsonBuilder
     {
-        byte[] _buffer = new byte[5];
+        PipeWriter _writer;
+        Memory<byte> _buffer = new byte[0];
         int _index = 0;
+        int _writtenSinceFlush = 0;
 
-        public JsonUtf8Builder()
+        const int ChunkSize = 4096;
+        const int SyncSize = 32768;
+
+        public JsonBufferWriterBuilder()
         {
             InitializeEscapingLookups();
         }
 
+        public void Complete()
+        {
+            _writer.Advance(_index);
+        }
+
+        public PipeWriter Writer
+        {
+            set
+            {
+                _writer = value;
+                _buffer = _writer.GetMemory(ChunkSize);
+            }
+        }
+
         void ResizeBuffer(int added)
         {
-            var newSize = Math.Max(_buffer.Length * 2, _buffer.Length + added);
-            var newArray = new byte[newSize];
-            Array.Copy(_buffer, newArray, _buffer.Length);
-            _buffer = newArray;
+            _writer.Advance(_index);
+
+            var newSize = Math.Min(ChunkSize, added);
+
+            _buffer = _writer.GetMemory(newSize);
+            _writtenSinceFlush += _index;
+            _index = 0;
+
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -30,21 +58,57 @@ namespace JsonSrcGen
                 ResizeBuffer(value.Length * 3);
             }
 
-            _index += System.Text.Encoding.UTF8.GetBytes(value, _buffer.AsSpan(_index));
+            _index += System.Text.Encoding.UTF8.GetBytes(value, _buffer.Span.Slice(_index));
 
             return this;
         }
 
         public IJsonBuilder Append(ReadOnlySpan<char> value)
         {
-            if (_index + (value.Length * 3) > _buffer.Length)
+            throw new InvalidOperationException("Arbitrary length strings must call AppendAsync so they are chunked correctly");
+        }
+
+        /// <summary>
+        /// This append is for use use when string could be long enough to require
+        /// chunking when writing to a buffer writer
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public async ValueTask AppendAsync(ReadOnlyMemory<char> value)
+        {
+            while (true)
             {
-                ResizeBuffer(value.Length * 3);
+                var operationStatus = Utf8.FromUtf16(value.Span, _buffer.Span.Slice(_index), out int charsRead, out int bytesWritten);
+
+                switch (operationStatus)
+                {
+                    case OperationStatus.Done:
+                        _index += bytesWritten;
+                        return;
+                    case OperationStatus.DestinationTooSmall:
+                        //we are at the end so request a new buffer
+                        _index += bytesWritten;
+                        _writer.Advance(_index);
+                        _buffer = _writer.GetMemory(ChunkSize);
+                        _writtenSinceFlush += _index;
+                        _index = 0;
+
+                        value = value.Slice(charsRead);
+
+                        if (_writtenSinceFlush >= SyncSize)
+                        {
+                            await _writer.FlushAsync();
+                            _writtenSinceFlush = 0;
+                        }
+                        break;
+                    case OperationStatus.NeedMoreData:
+                        //this shouldn't happen as we have isFinalBlock set to true
+                        throw new InvalidOperationException("This shouldn't happen as we have isFinalBlock set to true (default)");
+                    case OperationStatus.InvalidData:
+                        throw new ArgumentException("string contains invalid characters");
+                }
             }
 
-            _index += System.Text.Encoding.UTF8.GetBytes(value, _buffer.AsSpan(_index));
-
-            return this;
         }
 
         public IJsonBuilder AppendAscii(char value)
@@ -53,7 +117,7 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(1);
             }
-            _buffer[_index] = (byte)value;
+            _buffer.Span[_index] = (byte)value;
             _index += 1;
             return this;
         }
@@ -64,6 +128,8 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(3);
             }
+            var buffer = _buffer.Span;
+
             int intValue = value;
 
             if (intValue > 99) goto hundreds;
@@ -71,15 +137,15 @@ namespace JsonSrcGen
             else goto ones;
 
             hundreds:
-            _buffer[_index++] = (byte)((intValue / 100) + '0');
+            buffer[_index++] = (byte)((intValue / 100) + '0');
             intValue = (intValue % 100);
 
         tens:
-            _buffer[_index++] = (byte)((intValue / 10) + '0');
+            buffer[_index++] = (byte)((intValue / 10) + '0');
             intValue = intValue % 10;
 
         ones:
-            _buffer[_index++] = (byte)(intValue + '0');
+            buffer[_index++] = (byte)(intValue + '0');
             return this;
         }
 
@@ -100,11 +166,11 @@ namespace JsonSrcGen
         public IJsonBuilder Append(short value)
         {
             int index = _index;
-            var buffer = _buffer;
+            var buffer = _buffer.Span;
             if (index + 6 > buffer.Length)
             {
                 ResizeBuffer(6);
-                buffer = _buffer;
+                buffer = _buffer.Span;
             }
 
             int intValue = value;
@@ -158,11 +224,11 @@ namespace JsonSrcGen
         public IJsonBuilder Append(ushort value)
         {
             int index = _index;
-            var buffer = _buffer;
+            var buffer = _buffer.Span;
             if (index + 5 > buffer.Length)
             {
                 ResizeBuffer(5);
-                buffer = _buffer;
+                buffer = _buffer.Span;
             }
 
             int intValue = value;
@@ -208,11 +274,11 @@ namespace JsonSrcGen
         public IJsonBuilder Append(int value)
         {
             int index = _index;
-            var buffer = _buffer;
+            var buffer = _buffer.Span;
             if (index + 11 > buffer.Length)
             {
                 ResizeBuffer(11);
-                buffer = _buffer;
+                buffer = _buffer.Span;
             }
 
             uint intValue = 0;
@@ -301,11 +367,11 @@ namespace JsonSrcGen
         public IJsonBuilder Append(uint value)
         {
             int index = _index;
-            var buffer = _buffer;
+            var buffer = _buffer.Span;
             if (index + 10 > buffer.Length)
             {
                 ResizeBuffer(10);
-                buffer = _buffer;
+                buffer = _buffer.Span;
             }
 
             uint intValue = value;
@@ -384,11 +450,11 @@ namespace JsonSrcGen
         public IJsonBuilder Append(long value)
         {
             int index = _index;
-            var buffer = _buffer;
+            var buffer = _buffer.Span;
             if (index + 26 > buffer.Length)
             {
                 ResizeBuffer(26);
-                buffer = _buffer;
+                buffer = _buffer.Span;
             }
 
             ulong longValue = 0;
@@ -535,11 +601,11 @@ namespace JsonSrcGen
         public IJsonBuilder Append(ulong longValue)
         {
             int index = _index;
-            var buffer = _buffer;
+            var buffer = _buffer.Span;
             if (index + 26 > buffer.Length)
             {
                 ResizeBuffer(26);
-                buffer = _buffer;
+                buffer = _buffer.Span;
             }
             // 9_223_372_036_854_775_807
             //18_446_744_073_709_551_615
@@ -687,7 +753,7 @@ namespace JsonSrcGen
                 ResizeBuffer(19);
             }
 
-            Utf8Formatter.TryFormat(value, _buffer.AsSpan(_index), out int bytesWritten);
+            Utf8Formatter.TryFormat(value, _buffer.Span.Slice(_index), out int bytesWritten);
             _index += bytesWritten;
             return this;
         }
@@ -698,7 +764,7 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(19);
             }
-            Utf8Formatter.TryFormat(value, _buffer.AsSpan(_index), out int bytesWritten);
+            Utf8Formatter.TryFormat(value, _buffer.Span.Slice(_index), out int bytesWritten);
             _index += bytesWritten;
             return this;
         }
@@ -709,7 +775,7 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(30);
             }
-            Utf8Formatter.TryFormat(value, _buffer.AsSpan(_index), out int bytesWritten);
+            Utf8Formatter.TryFormat(value, _buffer.Span.Slice(_index), out int bytesWritten);
             _index += bytesWritten;
             return this;
         }
@@ -782,7 +848,7 @@ namespace JsonSrcGen
             DecomposedGuid guidAsBytes = default;
             guidAsBytes.Guid = value;
 
-            var destination = _buffer.AsSpan(_index);
+            var destination = _buffer.Span.Slice(_index);
 
             ///nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn
 
@@ -909,11 +975,6 @@ namespace JsonSrcGen
             throw new NotImplementedException();
         }
 
-        public ReadOnlySpan<byte> AsSpan()
-        {
-            return _buffer.AsSpan(0, _index);
-        }
-
         bool[] _needsEscaping = new bool[128];
         string[] _escapeLookup = new string[128];
 
@@ -1006,10 +1067,11 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(6);
             }
-            if (offset.TotalMinutes >= 0) _buffer[_index++] = (byte)'+';
-            else _buffer[_index++] = (byte)'-';
+            var buffer = _buffer.Span;
+            if (offset.TotalMinutes >= 0) buffer[_index++] = (byte)'+';
+            else buffer[_index++] = (byte)'-';
             AppendIntTwo(Math.Abs(offset.Hours));
-            _buffer[_index++] = (byte)':';
+            buffer[_index++] = (byte)':';
             AppendIntTwo(Math.Abs(offset.Minutes));
             return this;
         }
@@ -1020,7 +1082,7 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(38);
             }
-            var buffer = _buffer;
+            var buffer = _buffer.Span;
             buffer[_index++] = (byte)'\"';
             AppendIntFour(date.Year);
             buffer[_index++] = (byte)'-';
@@ -1066,7 +1128,7 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(38);
             }
-            var buffer = _buffer;
+            var buffer = _buffer.Span;
             buffer[_index++] = (byte)'\"';
             AppendIntFour(date.Year);
             buffer[_index++] = (byte)'-';
@@ -1093,123 +1155,127 @@ namespace JsonSrcGen
             return this;
         }
 
-        public JsonUtf8Builder AppendIntTwo(int number)
+        JsonBufferWriterBuilder AppendIntTwo(int number)
         {
             if (_index + 2 > _buffer.Length)
             {
                 ResizeBuffer(2);
             }
+            var buffer = _buffer.Span;
             int tens = number / 10;
             int soFar = tens * 10;
-            _buffer[_index] = (byte)('0' + tens);
+            buffer[_index] = (byte)('0' + tens);
             _index++;
 
             int ones = number - soFar;
-            _buffer[_index] = (byte)('0' + ones);
+            buffer[_index] = (byte)('0' + ones);
             _index++;
             return this;
         }
 
-        JsonUtf8Builder AppendIntFour(int number)
+        JsonBufferWriterBuilder AppendIntFour(int number)
         {
             if (_index + 4 > _buffer.Length)
             {
                 ResizeBuffer(4);
             }
+            var buffer = _buffer.Span;
             int thousands = (number) / 1000;
             int soFar = thousands * 1000;
-            _buffer[_index] = (byte)('0' + thousands);
+            buffer[_index] = (byte)('0' + thousands);
             _index++;
 
             int hundreds = (number - soFar) / 100;
             soFar += hundreds * 100;
-            _buffer[_index] = (byte)('0' + hundreds);
+            buffer[_index] = (byte)('0' + hundreds);
             _index++;
 
             int tens = (number - soFar) / 10;
             soFar += tens * 10;
-            _buffer[_index] = (byte)('0' + tens);
+            buffer[_index] = (byte)('0' + tens);
             _index++;
 
             int ones = number - soFar;
-            _buffer[_index] = (byte)('0' + ones);
+            buffer[_index] = (byte)('0' + ones);
             _index++;
             return this;
         }
 
-        JsonUtf8Builder AppendDateTimeFraction(long number)
+        JsonBufferWriterBuilder AppendDateTimeFraction(long number)
         {
             if (_index + 11 > _buffer.Length)
             {
                 ResizeBuffer(11);
             }
 
+            var buffer = _buffer.Span;
+
             //24 973 300 000
             long soFar = 0;
 
             long tenBillions = (number) / 10000000000;
             soFar += tenBillions * 10000000000;
-            _buffer[_index] = (byte)('0' + tenBillions);
+            buffer[_index] = (byte)('0' + tenBillions);
             _index++;
             long leftLong = number - soFar;
             if (leftLong == 0) return this;
 
             long billions = leftLong / 1000000000;
-            _buffer[_index] = (byte)('0' + billions);
+            buffer[_index] = (byte)('0' + billions);
             _index++;
             int left = (int)(leftLong - (billions * 1000000000));
             if (left == 0) return this;
 
             int hundredMillions = left / 100000000;
-            _buffer[_index] = (byte)('0' + hundredMillions);
+            buffer[_index] = (byte)('0' + hundredMillions);
             _index++;
             left = left - (hundredMillions * 100000000);
             if (left == 0) return this;
 
             int tenMillions = left / 10000000;
-            _buffer[_index] = (byte)('0' + tenMillions);
+            buffer[_index] = (byte)('0' + tenMillions);
             _index++;
             left = left - (tenMillions * 10000000);
             if (left == 0) return this;
 
             int millions = left / 1000000;
-            _buffer[_index] = (byte)('0' + millions);
+            buffer[_index] = (byte)('0' + millions);
             _index++;
             left = left - (millions * 1000000);
             if (left == 0) return this;
 
             int hundredThousands = left / 100000;
-            _buffer[_index] = (byte)('0' + hundredThousands);
+            buffer[_index] = (byte)('0' + hundredThousands);
             _index++;
             left = left - (hundredThousands * 100000);
             if (left == 0) return this;
 
             int tenThousands = left / 10000;
-            _buffer[_index] = (byte)('0' + tenThousands);
+            buffer[_index] = (byte)('0' + tenThousands);
             _index++;
             left = left - (tenThousands * 10000);
             if (left == 0) return this;
 
             int thousands = left / 1000;
-            _buffer[_index] = (byte)('0' + thousands);
+            buffer[_index] = (byte)('0' + thousands);
             _index++;
             left = left - (thousands * 1000);
             if (left == 0) return this;
 
             int hundreds = left / 100;
-            _buffer[_index] = (byte)('0' + hundreds);
+            buffer[_index] = (byte)('0' + hundreds);
             _index++;
             left = left - (hundreds * 100);
             if (left == 0) return this;
 
             int tens = left / 10;
-            _buffer[_index] = (byte)('0' + tens);
+            buffer[_index] = (byte)('0' + tens);
             _index++;
             left = left - (tens * 10);
             if (left == 0) return this;
 
             int ones = left;
-            _buffer[_index] = (byte)('0' + ones);
+            buffer[_index] = (byte)('0' + ones);
             _index++;
             return this;
         }
@@ -1220,10 +1286,11 @@ namespace JsonSrcGen
             {
                 ResizeBuffer(input.Length);
             }
+            var buffer = _buffer.Span;
 
             for (int index = 0; index < input.Length; index++)
             {
-                _buffer[index + _index] = input[index];
+                buffer[index + _index] = input[index];
             }
 
             _index += input.Length;
@@ -1237,7 +1304,7 @@ namespace JsonSrcGen
                 ResizeBuffer(10);
             }
 
-            var span = _buffer.AsSpan();
+            var span = _buffer.Span;
 
             { _ = span[9]; }
 

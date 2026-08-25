@@ -12,9 +12,9 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <ProjectReference Include="../JsonSrcGen.Inputs/JsonSrcGen.Inputs.csproj" />
 
-	  <ProjectReference Include="../JsonSrcGen/JsonSrcGen.csproj"
+	  <!-- <ProjectReference Include="../JsonSrcGen/JsonSrcGen.csproj"
 					OutputItemType="Analyzer"
-					ReferenceOutputAssembly="false" />
+					ReferenceOutputAssembly="false" /> -->
   </ItemGroup>
 
 </Project>

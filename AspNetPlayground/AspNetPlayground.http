@@ -1,0 +1,11 @@
+@AspNetPlayground_HostAddress = http://localhost:5148
+
+GET {{AspNetPlayground_HostAddress}}/todos/
+Accept: application/json
+
+###
+
+GET {{AspNetPlayground_HostAddress}}/todos/1
+Accept: application/json
+
+###
